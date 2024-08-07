@@ -17,6 +17,12 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The type Role repository implements methods of the CompanyDao interface.
+ * The class is annotated with as a repository, which qualifies it to be automatically created by component-scanning.
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Repository
 @Transactional
 public class CompanyDaoImpl implements CompanyDao {
@@ -82,22 +88,48 @@ public class CompanyDaoImpl implements CompanyDao {
         return session.createQuery(criteriaQuery).stream().findFirst();
     }
 
+    /**
+     * The method creates the session instance from the currentSession.
+     *
+     * @return the session instance.
+     */
     private Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
     }
 
+    /**
+     * The method creates the CriteriaQuery of the Company instance from the criteriaBuilder instance.
+     * @param criteriaBuilder is the criteriaBuilder instance.
+     * @return the criteriaQuery instance.
+     */
     private CriteriaQuery<Company> createQuery(CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.createQuery(Company.class);
     }
 
+    /**
+     * The method creates the CriteriaBuilder instance from the session.
+     * @param session is the session instance.
+     *
+     * @return the CriteriaBuilder instance.
+     */
     private CriteriaBuilder createCriteriaBuilder(Session session) {
         return session.getCriteriaBuilder();
     }
 
+    /**
+     * The method creates the Root of the Company instance from the criteriaQuery instance.
+     * @param criteriaQuery is the criteriaQuery instance.
+     * @return the Root of the Company instance.
+     */
     private Root<Company> getRootCompany(CriteriaQuery<Company> criteriaQuery) {
         return criteriaQuery.from(Company.class);
     }
 
+    /**
+     * The method creates the criteria for searching in the company table.
+     * @param name is the name any company.
+     * @return String criteria type.
+     */
     private String createSearchCriteria(String name) {
         return PERCENT_CHAR + name + PERCENT_CHAR;
     }

@@ -7,11 +7,19 @@ import org.springframework.context.annotation.*;
 
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
+/**
+ * The type Development configuration class is a development class which connects to the unreal database in the application.
+ * The parameters of a connection is taken from the property file named "application-production.properties".
+ *
+ * @author Aliaksandr Pishchala
+ */
 @SpringBootApplication(scanBasePackages = "org.study.hydro", exclude = HibernateJpaAutoConfiguration.class)
 @PropertySource("classpath:application-development.properties")
 @Profile("development")
@@ -48,5 +56,14 @@ public class DevelopmentConfig {
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(getSessionFactory().getObject());
         return transactionManager;
+    }
+
+    /**
+     * Method for encrypting user password.
+     * @return the PasswordEncoder instance.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

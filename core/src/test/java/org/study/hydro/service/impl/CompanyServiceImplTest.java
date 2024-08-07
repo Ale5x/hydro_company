@@ -1,6 +1,6 @@
 package org.study.hydro.service.impl;
 
-import com.sun.xml.bind.v2.runtime.output.SAXOutput;
+//import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +54,6 @@ class CompanyServiceImplTest {
         when(companyDao.save(any(Company.class))).thenReturn(returnExpected);
         boolean expected = true;
         boolean actual = companyService.create(companyDto);
-        System.out.println("Test result -> " + actual);
         assertEquals(expected, actual);
     }
 
@@ -63,7 +62,6 @@ class CompanyServiceImplTest {
         when(companyDao.save(any(Company.class))).thenReturn(returnExpectedWrong);
         boolean expected = false;
         boolean actual = companyService.create(companyDto);
-        System.out.println("Test result -> " + actual);
         assertEquals(expected, actual);
     }
 
@@ -72,7 +70,6 @@ class CompanyServiceImplTest {
         String name = "Test name";
         when(companyDao.companiesByName(name)).thenReturn(companyList);
         List<CompanyDto> companyDtoList = companyService.findByName(name);
-        System.out.println(companyDtoList);
         assertFalse(companyDtoList.isEmpty());
         assertTrue(companyDtoList.size() > 0);
     }
@@ -81,7 +78,6 @@ class CompanyServiceImplTest {
     void findAll() {
         when(companyDao.companies(0, 0)).thenReturn(companyList);
         List<CompanyDto> companyDtoList = companyService.findAll(0, 0);
-        System.out.println(companyDtoList);
         assertFalse(companyDtoList.isEmpty());
         assertTrue(companyDtoList.size() > 0);
     }
@@ -90,7 +86,6 @@ class CompanyServiceImplTest {
     void findById() {
         int companyId = 1;
         when(companyDao.companyById(companyId)).thenReturn(Optional.of(companyList.get(companyId)));
-        System.out.println("Resalt --- > ");
         companyList.stream().filter(x -> x.getCompanyId() == companyId).forEach(System.out::println);
 
         Optional<CompanyDto> company = companyService.findById(companyId);
@@ -105,7 +100,6 @@ class CompanyServiceImplTest {
         companyList.stream().filter(x -> x.getCompanyId() == companyId).forEach(System.out::println);
 
         Optional<CompanyDto> company = companyService.findById(companyId);
-        System.out.println("Resalt --- > " + company.isPresent());
         assertFalse(company.isPresent());
     }
 }

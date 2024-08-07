@@ -25,6 +25,9 @@ public class User implements Serializable {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "password")
     private String password;
 
@@ -47,7 +50,8 @@ public class User implements Serializable {
     }
 
     public User(int userId, String firstName, String lastName, String password,
-                String pathPhoto, LocalDateTime registration, Role role, Company company) {
+                String pathPhoto, LocalDateTime registration, Role role,
+                String email, Company company) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -56,20 +60,22 @@ public class User implements Serializable {
         this.registration = registration;
         this.role = role;
         this.company = company;
+        this.email = email;
     }
 
-    public User(String firstName, String lastName, String password, String pathPhoto,
-                LocalDateTime registration, Role role) {
+    public User(String firstName, String lastName, String email, String password,
+                String pathPhoto, LocalDateTime registration, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.pathPhoto = pathPhoto;
         this.registration = registration;
         this.role = role;
+        this.email = email;
     }
 
-    public User(String firstName, String lastName, String password, String pathPhoto,
-                LocalDateTime registration, Role role, Company company) {
+    public User(String firstName, String lastName, String email, String password,
+                String pathPhoto, LocalDateTime registration, Role role, Company company) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
@@ -77,6 +83,7 @@ public class User implements Serializable {
         this.registration = registration;
         this.role = role;
         this.company = company;
+        this.email = email;
     }
 
     public int getUserId() {
@@ -101,6 +108,14 @@ public class User implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -153,6 +168,7 @@ public class User implements Serializable {
         if (userId != user.userId) return false;
         if (!Objects.equals(firstName, user.firstName)) return false;
         if (!Objects.equals(lastName, user.lastName)) return false;
+        if (!Objects.equals(email, user.email)) return false;
         if (!Objects.equals(password, user.password)) return false;
         if (!Objects.equals(pathPhoto, user.pathPhoto)) return false;
         if (!Objects.equals(registration, user.registration)) return false;
@@ -165,6 +181,7 @@ public class User implements Serializable {
         int result = userId;
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (pathPhoto != null ? pathPhoto.hashCode() : 0);
         result = 31 * result + (registration != null ? registration.hashCode() : 0);
@@ -179,6 +196,7 @@ public class User implements Serializable {
                 "userId=" + userId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", path='" + pathPhoto + '\'' +
                 ", registration=" + registration +

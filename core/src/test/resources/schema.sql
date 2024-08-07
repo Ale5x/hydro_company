@@ -15,6 +15,7 @@ create table users (
   id_users bigint primary key auto_increment,
   first_name varchar(45),
   last_name varchar(45),
+  email varchar(200),
   password varchar(320),
   path varchar(255),
   id_companies bigint,

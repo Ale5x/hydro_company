@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.study.hydro.dao.RoleDao;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.study.hydro.dao.UserDao;
 import org.study.hydro.entity.Company;
 import org.study.hydro.entity.Dto.CompanyDto;
@@ -15,6 +15,7 @@ import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
 import org.study.hydro.entity.User;
 import org.study.hydro.service.CompanyService;
+import org.study.hydro.service.RoleService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,10 +36,15 @@ class UserServiceImplTest {
     private CompanyService companyService;
 
     @Mock
-    private RoleDao roleService;
+    private RoleService roleService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    private UserDto userDto = new UserDto("Joy", "Smith", "joy@Email.com", "1234567", "path");
 
     private List<User> userList = new ArrayList<>();
 
@@ -72,13 +78,10 @@ class UserServiceImplTest {
     @Test
     void createTrueTest() {
         when(userDao.save(any(User.class))).thenReturn(expectedTrueTest);
-        when(roleService.findRole(ERole.MANAGER)).thenReturn(Optional.ofNullable(role));
+//        when(roleService.findRole(ERole.MANAGER)).thenReturn(Optional.ofNullable(role));
         when(companyService.findById(company.getCompanyId())).thenReturn(Optional.ofNullable(companyDto));
-        UserDto user = new UserDto();
-        user.setCompanyDto(companyDto);
-        boolean condition = userService.create(user);
-
-        System.out.println("Condition -> " + condition);
+        userDto.setCompanyDto(companyDto);
+        boolean condition = userService.create(userDto);
 
         assertTrue(condition);
     }
@@ -92,8 +95,6 @@ class UserServiceImplTest {
         user.setCompanyDto(companyDto);
         boolean condition = userService.create(user);
 
-        System.out.println("Condition -> " + condition);
-
         assertFalse(condition);
     }
 
@@ -104,7 +105,6 @@ class UserServiceImplTest {
         List<UserDto> userDtoList = userService.findAll(limit, offset);
         assertFalse(userDtoList.isEmpty());
         assertTrue(userDtoList.size() > 0);
-
     }
 
     @Test
@@ -115,7 +115,6 @@ class UserServiceImplTest {
                 .filter(item -> item.getUserId() == userId)
                 .findFirst());
         Optional<UserDto> userDto = userService.findUserById(userId);
-        System.out.println(userDto);
         assertTrue(userDto.isPresent());
     }
 
@@ -124,7 +123,6 @@ class UserServiceImplTest {
         int userId = 1;
         when(userDao.getUserById(userId)).thenReturn(Optional.empty());
         Optional<UserDto> userDto = userService.findUserById(userId);
-        System.out.println(userDto);
         assertFalse(userDto.isPresent());
     }
 }

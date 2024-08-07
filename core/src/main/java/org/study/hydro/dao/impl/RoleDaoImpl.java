@@ -14,6 +14,12 @@ import org.study.hydro.entity.Role;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The type Role repository implements methods of the RoleDao interface.
+ * The class is annotated with as a repository, which qualifies it to be automatically created by component-scanning.
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Repository
 @Transactional
 public class RoleDaoImpl implements RoleDao {
@@ -46,10 +52,20 @@ public class RoleDaoImpl implements RoleDao {
         return Optional.ofNullable(role);
     }
 
+    /**
+     * The method creates the session instance from the currentSession.
+     *
+     * @return the session instance.
+     */
     private Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
     }
 
+    /**
+     * The method creates the query to get the Role type from the database.
+     * @param eRole is the type of the Role.
+     * @return The query for the database.
+     */
     private String createQuery(ERole eRole) {
         return  new StringBuilder(GET_ROLE_QUERY)
                 .append(ROLE_ACUTE)

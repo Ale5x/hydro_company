@@ -10,6 +10,12 @@ import org.study.hydro.service.CompanyService;
 
 import java.util.*;
 
+/**
+ * The class {@link CompanyServiceImpl} implements methods of the CompanyService interface.
+ * The class is annotated as a service, which qualifies it to be automatically created by component-scanning.
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
@@ -43,6 +49,11 @@ public class CompanyServiceImpl implements CompanyService {
         return buildCompanyDto(companyDao.companies(size, offset));
     }
 
+    /**
+     * The method creates a list of the Company type DTO from the company's list for transport between layers.
+     * @param companiesList contains companies.
+     * @return The list of the companies Dto.
+     */
     private List<CompanyDto> buildCompanyDto(List<Company> companiesList) {
         List<CompanyDto> companyDtoList = new ArrayList<>();
         for (Company company : companiesList) {

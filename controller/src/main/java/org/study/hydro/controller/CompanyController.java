@@ -19,7 +19,7 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-    @PostMapping(value = "/company/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = PathPages.COMPANY_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> create (@RequestBody CompanyDto company) {
 
         if (companyService.create(company)) {
@@ -29,26 +29,25 @@ public class CompanyController {
         }
     }
 
-    @GetMapping(value = "/company/get_all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CollectionModel<CompanyDto> getCompanies(@RequestParam("page") String page,
-                                                    @RequestParam("size") String size) {
+    @GetMapping(value = PathPages.COMPANY_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<CompanyDto> getCompanies(@RequestParam(ControllerConstants.PAGE) String page,
+                                                    @RequestParam(ControllerConstants.SIZE) String size) {
         ValidatorParam.isNumber(size);
         ValidatorParam.validPage(page);
         List<CompanyDto> companyDtoList = companyService.findAll(Integer.parseInt(page), Integer.parseInt(size));
         return CollectionModel.of(companyDtoList);
     }
 
-    @GetMapping(value = "/company/id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = PathPages.COMPANY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public CompanyDto findCompanyById(@RequestParam("id") String id) {
+    public CompanyDto findCompanyById(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return companyService.findById(Integer.parseInt(id)).orElseThrow(() ->
                 new AppRequestException("Company doesn't exist", HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping(value = "company/find_company", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<CompanyDto> findCompanyByName(@RequestParam("name") String name) {
+    @GetMapping(value = PathPages.COMPANY_BY_NAME, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CompanyDto> findCompanyByName(@RequestParam(ControllerConstants.NAME) String name) {
         return companyService.findByName(name);
     }
-
 }

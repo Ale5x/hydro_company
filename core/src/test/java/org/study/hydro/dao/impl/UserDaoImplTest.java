@@ -41,7 +41,7 @@ class UserDaoImplTest {
 
     @Test
     void save() {
-        User user = new User("First name", "Last name", "password",
+        User user = new User("First name", "Last name", "email@email.com","password",
                 "path", LocalDateTime.now(), new Role(2, ERole.ADMIN), company);
         int countBeforeOperation = userDao.users(limit, offset).size();
         int userId = userDao.save(user);
@@ -61,5 +61,15 @@ class UserDaoImplTest {
         int userId = 1;
         Optional<User> user = userDao.getUserById(userId);
         assertTrue(user.isPresent());
+    }
+
+    @Test
+    void getUserByEmail() {
+        int userId = 1;
+        String email = userDao.getUserById(userId).orElseThrow().getEmail();
+        assertNotNull(email);
+        Optional<User> user = userDao.getUserByEmail(email);
+        assertTrue(user.isPresent());
+        assertEquals(email, user.orElseThrow().getEmail());
     }
 }

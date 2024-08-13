@@ -1,5 +1,11 @@
 package org.study.hydro.exception;
 
+/**
+ * This class {@link CoreException} is responsible for exceptions that occur in the core.
+ * Errors are wrapped for further work.
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class CoreException extends RuntimeException {
     public CoreException() {
     }

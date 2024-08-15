@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * This class {@link AppExceptionHandler} catches exceptions that occur in the application and sends a response depending on the type of exception.
+ * This class {@link AppExceptionHandler} catches exceptions that occur in the application and sends a
+ * response depending on the type of exception.
  *
  * @author Aliaksandr Pishchala
  */

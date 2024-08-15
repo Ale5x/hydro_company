@@ -23,7 +23,7 @@ public class AuthenticationController {
     }
 
     /**
-     * The method creates a user.
+     * The method creates a new user.
      *
      * @param userDto contains information about the new user.
      * @return HttpStatus with the authentication response.

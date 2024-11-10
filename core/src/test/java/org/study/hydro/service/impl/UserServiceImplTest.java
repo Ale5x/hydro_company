@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.study.hydro.dao.UserDao;
-import org.study.hydro.entity.Company;
-import org.study.hydro.entity.Dto.CompanyDto;
+import org.study.hydro.entity.UserCompany;
+import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.entity.Dto.UserDto;
 import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
 import org.study.hydro.entity.User;
-import org.study.hydro.service.CompanyService;
+import org.study.hydro.service.UserCompanyService;
 import org.study.hydro.service.RoleService;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ class UserServiceImplTest {
     private UserDao userDao;
 
     @Mock
-    private CompanyService companyService;
+    private UserCompanyService userCompanyService;
 
     @Mock
     private RoleService roleService;
@@ -49,8 +49,8 @@ class UserServiceImplTest {
     private List<User> userList = new ArrayList<>();
 
     private Role role = new Role(1, ERole.MANAGER);
-    private Company company = new Company(1, "Google", "CA, street 1");
-    private CompanyDto companyDto = new CompanyDto(1, "Google", "CA, street 1");
+    private UserCompany userCompany = new UserCompany(1, "Google", "CA, street 1");
+    private UserCompanyDto userCompanyDto = new UserCompanyDto(1, "Google", "CA, street 1");
 
     private int expectedTrueTest = 1;
     private int expectedWrongTest = 0;
@@ -69,7 +69,7 @@ class UserServiceImplTest {
             user.setPathPhoto("photo");
             user.setRole(role);
             user.setRegistration(LocalDateTime.now());
-            user.setCompany(company);
+            user.setUserCompany(userCompany);
 
             userList.add(user);
         }
@@ -79,8 +79,9 @@ class UserServiceImplTest {
     void createTrueTest() {
         when(userDao.save(any(User.class))).thenReturn(expectedTrueTest);
 //        when(roleService.findRole(ERole.MANAGER)).thenReturn(Optional.ofNullable(role));
-        when(companyService.findById(company.getCompanyId())).thenReturn(Optional.ofNullable(companyDto));
-        userDto.setCompanyDto(companyDto);
+        when(userCompanyService.findById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompanyDto));
+        when(roleService.findRole(ERole.USER)).thenReturn(Optional.ofNullable(role));
+        userDto.setUserCompanyDto(userCompanyDto);
         boolean condition = userService.create(userDto);
 
         assertTrue(condition);
@@ -89,10 +90,10 @@ class UserServiceImplTest {
     @Test
     void createWrongTest() {
         when(userDao.save(any(User.class))).thenReturn(expectedWrongTest);
-        when(roleService.findRole(ERole.MANAGER)).thenReturn(Optional.ofNullable(role));
-        when(companyService.findById(company.getCompanyId())).thenReturn(Optional.ofNullable(companyDto));
+        when(roleService.findRole(ERole.USER)).thenReturn(Optional.ofNullable(role));
+        when(userCompanyService.findById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompanyDto));
         UserDto user = new UserDto();
-        user.setCompanyDto(companyDto);
+        user.setUserCompanyDto(userCompanyDto);
         boolean condition = userService.create(user);
 
         assertFalse(condition);
@@ -114,6 +115,7 @@ class UserServiceImplTest {
                 .stream()
                 .filter(item -> item.getUserId() == userId)
                 .findFirst());
+
         Optional<UserDto> userDto = userService.findUserById(userId);
         assertTrue(userDto.isPresent());
     }

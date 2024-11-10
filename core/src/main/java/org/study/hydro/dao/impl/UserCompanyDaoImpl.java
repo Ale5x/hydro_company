@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.CompanyDao;
-import org.study.hydro.entity.Company;
+import org.study.hydro.entity.UserCompany;
 
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -36,21 +36,21 @@ public class CompanyDaoImpl implements CompanyDao {
 
 
     @Override
-    public int save(Company company) {
+    public int save(UserCompany userCompany) {
         Session session = getCurrentSession();
-        session.save(company);
+        session.save(userCompany);
         session.flush();
 
-        return company.getCompanyId();
+        return userCompany.getCompanyId();
     }
 
     @Override
-    public List<Company> companies(int limit, int offset) {
+    public List<UserCompany> companies(int limit, int offset) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<Company> criteriaQuery = createQuery(criteriaBuilder);
-        Root<Company> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
+        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
         criteriaQuery.select(companyRoot);
         return session.createQuery(criteriaQuery)
                 .setMaxResults(limit)
@@ -59,12 +59,12 @@ public class CompanyDaoImpl implements CompanyDao {
     }
 
     @Override
-    public List<Company> companiesByName(String name) {
+    public List<UserCompany> companiesByName(String name) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<Company> criteriaQuery = createQuery(criteriaBuilder);
-        Root<Company> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
+        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
 
         Predicate[] predicate  = new Predicate[1];
         predicate[0] = criteriaBuilder.like(companyRoot.get(COMPANY_NAME), createSearchCriteria(name));
@@ -72,17 +72,17 @@ public class CompanyDaoImpl implements CompanyDao {
         criteriaQuery.select(companyRoot).where(criteriaBuilder.or(predicate)).distinct(true)
                 .orderBy(criteriaBuilder.desc(companyRoot.get(COMPANY_NAME)));
 
-        Query<Company> query = session.createQuery(criteriaQuery);
+        Query<UserCompany> query = session.createQuery(criteriaQuery);
         return query.getResultList();
     }
 
     @Override
-    public Optional<Company> companyById(int id) {
+    public Optional<UserCompany> companyById(int id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<Company> criteriaQuery = createQuery(criteriaBuilder);
-        Root<Company> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
+        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
         criteriaQuery.select(companyRoot).where(criteriaBuilder.equal(companyRoot.get(COMPANY_ID), id));
 
         return session.createQuery(criteriaQuery).stream().findFirst();
@@ -102,8 +102,8 @@ public class CompanyDaoImpl implements CompanyDao {
      * @param criteriaBuilder is the criteriaBuilder instance.
      * @return the criteriaQuery instance.
      */
-    private CriteriaQuery<Company> createQuery(CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.createQuery(Company.class);
+    private CriteriaQuery<UserCompany> createQuery(CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.createQuery(UserCompany.class);
     }
 
     /**
@@ -121,8 +121,8 @@ public class CompanyDaoImpl implements CompanyDao {
      * @param criteriaQuery is the criteriaQuery instance.
      * @return the Root of the Company instance.
      */
-    private Root<Company> getRootCompany(CriteriaQuery<Company> criteriaQuery) {
-        return criteriaQuery.from(Company.class);
+    private Root<UserCompany> getRootCompany(CriteriaQuery<UserCompany> criteriaQuery) {
+        return criteriaQuery.from(UserCompany.class);
     }
 
     /**

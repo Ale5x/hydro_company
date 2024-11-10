@@ -9,6 +9,10 @@ public class CompanyDto extends RepresentationModel<CompanyDto> {
 
     private String address;
 
+    private CountryDto countryDto;
+
+//    private
+
     public CompanyDto() {
     }
 
@@ -42,11 +46,20 @@ public class CompanyDto extends RepresentationModel<CompanyDto> {
         this.address = address;
     }
 
+    public CountryDto getCountryDto() {
+        return countryDto;
+    }
+
+    public void setCountryDto(CountryDto countryDto) {
+        this.countryDto = countryDto;
+    }
+
     @Override
     public String toString() {
         return "CompanyDto{" +
                 "companyDtoId=" + companyDtoId +
                 ", name='" + name + '\'' +
+                ", country='" + countryDto + '\'' +
                 ", address='" + address + '\'' +
                 '}';
     }

@@ -1,6 +1,6 @@
 package org.study.hydro.dao;
 
-import org.study.hydro.entity.Company;
+import org.study.hydro.entity.UserCompany;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +15,11 @@ public interface CompanyDao {
     /**
      * The method creates new record in database table.
      *
-     * @param company entity that specifies creation of new records in database table.
+     * @param userCompany entity that specifies creation of new records in database table.
      *
      * @return returns the number of modified rows in the table.
      */
-    int save(Company company);
+    int save(UserCompany userCompany);
 
     /**
      * The method will return list of companies.
@@ -29,7 +29,7 @@ public interface CompanyDao {
      *
      * @return the specified list of companies.
      */
-    List<Company> companies(int limit, int offset);
+    List<UserCompany> companies(int limit, int offset);
 
     /**
      * The method returns specified companies by name.
@@ -38,7 +38,7 @@ public interface CompanyDao {
      *
      * @return the specified list of Companies by name.
      */
-    List<Company> companiesByName(String name);
+    List<UserCompany> companiesByName(String name);
 
     /**
      * The method returns specified company by id.
@@ -47,5 +47,5 @@ public interface CompanyDao {
      *
      * @return the specified Optional Company by id.
      */
-    Optional<Company> companyById(int id);
+    Optional<UserCompany> companyById(int id);
 }

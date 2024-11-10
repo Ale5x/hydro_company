@@ -2,8 +2,10 @@ package org.study.hydro.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "companies")
@@ -25,12 +27,27 @@ public class Company implements Serializable {
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
     private List<User> user;
 
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "companies_has_countries",
+            joinColumns = @JoinColumn(name = "id_companies"),
+            inverseJoinColumns = @JoinColumn(name = "id_countries")
+    )
+    private Set<Country> countries = new HashSet<>();
+
     public Company() {
     }
 
     public Company(String name, String address) {
         this.name = name;
         this.address = address;
+    }
+
+
+    public Company(String name, String address, Set<Country> countries) {
+        this.name = name;
+        this.address = address;
+        this.countries = countries;
     }
 
     public Company(int companyId, String name, String address) {

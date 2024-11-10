@@ -2,9 +2,8 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.CompanyDao;
-import org.study.hydro.entity.Company;
+import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.Dto.CompanyDto;
 import org.study.hydro.service.CompanyService;
 
@@ -24,12 +23,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public boolean create(CompanyDto companyDto) {
-        Company company = new Company();
+        UserCompany userCompany = new UserCompany();
 
-        company.setCompanyId(companyDto.getCompanyDtoId() == 0 ? 0 : companyDto.getCompanyDtoId());
-        company.setName(companyDto.getName());
-        company.setAddress(companyDto.getAddress());
-        return companyDao.save(company) > 0;
+        userCompany.setCompanyId(companyDto.getCompanyDtoId() == 0 ? 0 : companyDto.getCompanyDtoId());
+        userCompany.setName(companyDto.getName());
+        userCompany.setAddress(companyDto.getAddress());
+        return companyDao.save(userCompany) > 0;
     }
 
     @Override
@@ -54,13 +53,13 @@ public class CompanyServiceImpl implements CompanyService {
      * @param companiesList contains companies.
      * @return The list of the companies Dto.
      */
-    private List<CompanyDto> buildCompanyDto(List<Company> companiesList) {
+    private List<CompanyDto> buildCompanyDto(List<UserCompany> companiesList) {
         List<CompanyDto> companyDtoList = new ArrayList<>();
-        for (Company company : companiesList) {
+        for (UserCompany userCompany : companiesList) {
             CompanyDto companyDto = new CompanyDto();
-            companyDto.setCompanyDtoId(company.getCompanyId());
-            companyDto.setName(company.getName());
-            companyDto.setAddress(company.getAddress());
+            companyDto.setCompanyDtoId(userCompany.getCompanyId());
+            companyDto.setName(userCompany.getName());
+            companyDto.setAddress(userCompany.getAddress());
 
             companyDtoList.add(companyDto);
         }

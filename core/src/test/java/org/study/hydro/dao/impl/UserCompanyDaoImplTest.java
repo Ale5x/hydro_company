@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DevelopmentConfig.class)
 @ActiveProfiles("development")
-class UserUserCompanyDaoImplTest {
+class UserCompanyDaoImplTest {
 
     @Autowired
     private UserCompanyDao userCompanyDao;
@@ -31,19 +31,15 @@ class UserUserCompanyDaoImplTest {
 
     @BeforeEach
     void init () {
-        System.err.println("Test init");
         countries.add(new Country("Norway"));
     }
 
     @Test
     void save() {
-        System.err.println("Saving test starting...");
-        UserCompany userCompany = new UserCompany("Company 77", "Street 11", countries);
+        UserCompany userCompany = new UserCompany("Company 77", "Street 11");
         int countBeforeOperation = userCompanyDao.companies(limit, offset).size();
         int companyId = userCompanyDao.save(userCompany);
         int countAfterOperation = userCompanyDao.companies(limit, offset).size();
-
-        System.err.println("Size companies before -> " + countBeforeOperation + " | after -> " + countAfterOperation);
 
         assertTrue(companyId >= 1);
         assertTrue(countAfterOperation > countBeforeOperation);

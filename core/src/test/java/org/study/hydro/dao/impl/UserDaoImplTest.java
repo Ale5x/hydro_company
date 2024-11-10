@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.UserDao;
-import org.study.hydro.entity.Company;
+import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
 import org.study.hydro.entity.User;
@@ -27,7 +27,7 @@ class UserDaoImplTest {
 
     @Autowired
     private UserDao userDao;
-    private Company company = null;
+    private UserCompany userCompany = null;
 
     private int offset = 1;
     private int limit = 10;
@@ -35,14 +35,14 @@ class UserDaoImplTest {
 
     @BeforeEach
     void setUp() {
-        company = new Company(1, "Company 1", "USA");
+        userCompany = new UserCompany(1, "Company 1", "USA");
 
     }
 
     @Test
     void save() {
         User user = new User("First name", "Last name", "email@email.com","password",
-                "path", LocalDateTime.now(), new Role(2, ERole.ADMIN), company);
+                "path", LocalDateTime.now(), new Role(2, ERole.ADMIN), userCompany);
         int countBeforeOperation = userDao.users(limit, offset).size();
         int userId = userDao.save(user);
         int countAfterOperation = userDao.users(limit, offset).size();

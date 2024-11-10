@@ -1,0 +1,95 @@
+package org.study.hydro.dao.impl;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.study.hydro.dao.CriteriaQueryHelper;
+import org.study.hydro.dao.PictureDao;
+import org.study.hydro.entity.Picture;
+
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+@Transactional
+public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements PictureDao {
+
+
+    private final static String PICTURE_ID = "pictureId";
+    private final static String PRODUCT_ID = "productId";
+    private final static String DELETE_PICTURE_PATH_QUERY = String.format("DELETE Picture WHERE id =: %s", PICTURE_ID);
+    private final static String GET_PICTURES_BY_PRODUCT_ID = "SELECT pictures FROM Picture AS pictures JOIN pictures.product AS picture WHERE pictures.product.productId =: productId";
+
+    private SessionFactory sessionFactory;
+
+    @Autowired
+    public PictureDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public boolean create(Picture picture) {
+        Session session = getCurrentSession();
+        session.save(picture);
+        session.flush();
+        return picture.getPictureId() > 0;
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean remove(int id) {
+        Session session = getCurrentSession();
+
+        return session.createQuery(DELETE_PICTURE_PATH_QUERY)
+                .setParameter(PICTURE_ID, id)
+                .executeUpdate() > 0;
+    }
+
+    @Override
+    public List<Picture> getPicturesByProductId(int productId) {
+        Session session = getCurrentSession();
+//        session.createQuery(GET_PICTURES_BY_PRODUCT_ID, Picture.class).setParameter(PRODUCT_ID, productId).getResultList();
+        return session.createQuery(GET_PICTURES_BY_PRODUCT_ID, Picture.class)
+                    .setParameter(PRODUCT_ID, productId)
+                    .getResultList();
+    }
+
+    @Override
+    public List<Picture> getPictures(int limit, int offset) {
+        Session session = getCurrentSession();
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery<Picture> criteriaQuery = getCriteriaQuery(criteriaBuilder, Picture.class);
+        Root<Picture> pictureRoot = getRoot(criteriaQuery, Picture.class);
+
+        criteriaQuery.select(pictureRoot);
+        return session.createQuery(criteriaQuery)
+                    .setFirstResult(offset)
+                    .setMaxResults(limit)
+                    .getResultList();
+    }
+
+    @Override
+    public Optional<Picture> findById(int id) {
+        Session session = getCurrentSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<Picture> criteriaQuery = getCriteriaQuery(criteriaBuilder, Picture.class);
+        Root<Picture> pictureRoot = getRoot(criteriaQuery, Picture.class);
+
+        criteriaQuery.select(pictureRoot)
+                .where(criteriaBuilder.equal(pictureRoot.get(PICTURE_ID), id));
+        return session.createQuery(criteriaQuery)
+                        .getResultList()
+                        .stream()
+                        .findFirst();
+    }
+}

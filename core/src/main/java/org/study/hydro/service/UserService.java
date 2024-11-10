@@ -18,7 +18,7 @@ public interface UserService {
      *
      * @param user is a userDto type that contains some information about the new user.
      * @return The boolean result. If the new user is created that return true. Else the method will return false.
-     * @throws CoreException
+     * @throws CoreException if an error occurs during the retrieval process.
      */
     boolean create(UserDto user) throws CoreException;
 
@@ -29,8 +29,9 @@ public interface UserService {
      * @param offset the value of the element from which the countdown starts.
      *
      * @return the specified list of usersDto.
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<UserDto> findAll(int limit, int offset);
+    List<UserDto> findAll(int limit, int offset) throws CoreException;
 
     /**
      * The method returns specified UserDto by id.
@@ -38,8 +39,9 @@ public interface UserService {
      * @param id the User's id.
      *
      * @return the specified Optional UserDto by id.
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    Optional<UserDto> findUserById(int id);
+    Optional<UserDto> findUserById(int id) throws CoreException;
 
     /**
      * The method returns specified UserDto by email.
@@ -47,7 +49,7 @@ public interface UserService {
      * @param email the User email.
      *
      * @return the specified Optional UserDto by email.
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    Optional<UserDto> findUserByEmail(String email);
-
+    Optional<UserDto> findUserByEmail(String email) throws CoreException;
 }

@@ -13,9 +13,9 @@ import java.util.Optional;
 public interface RoleDao {
 
     /**
-     * The method returns specified role by name.
+     * The method returns the specified role by name.
      *
-     * @param name the Role's name.
+     * @param name is the Role's name.
      *
      * @return the specified Optional Role by name.
      */

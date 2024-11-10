@@ -12,8 +12,8 @@ import java.util.Objects;
 @Table(name = "users")
 public class User implements Serializable {
 
+    private static final long serialVersionUID = -4707275280725534844L;
 
-    private static final long serialVersionUID = -1593922590585255673L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_users")
@@ -38,20 +38,20 @@ public class User implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime registration;
 
-    @ManyToOne  //(optional=false, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_roles")
     private Role role;
 
-    @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_companies")
-    private Company company;
+    @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user_company")
+    private UserCompany userCompany;
 
     public User() {
     }
 
     public User(int userId, String firstName, String lastName, String password,
                 String pathPhoto, LocalDateTime registration, Role role,
-                String email, Company company) {
+                String email, UserCompany userCompany) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -59,7 +59,7 @@ public class User implements Serializable {
         this.pathPhoto = pathPhoto;
         this.registration = registration;
         this.role = role;
-        this.company = company;
+        this.userCompany = userCompany;
         this.email = email;
     }
 
@@ -75,14 +75,14 @@ public class User implements Serializable {
     }
 
     public User(String firstName, String lastName, String email, String password,
-                String pathPhoto, LocalDateTime registration, Role role, Company company) {
+                String pathPhoto, LocalDateTime registration, Role role, UserCompany userCompany) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.pathPhoto = pathPhoto;
         this.registration = registration;
         this.role = role;
-        this.company = company;
+        this.userCompany = userCompany;
         this.email = email;
     }
 
@@ -150,12 +150,12 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    public Company getCompany() {
-        return company;
+    public UserCompany getUserCompany() {
+        return userCompany;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setUserCompany(UserCompany userCompany) {
+        this.userCompany = userCompany;
     }
 
     @Override
@@ -172,8 +172,8 @@ public class User implements Serializable {
         if (!Objects.equals(password, user.password)) return false;
         if (!Objects.equals(pathPhoto, user.pathPhoto)) return false;
         if (!Objects.equals(registration, user.registration)) return false;
-        if (role != user.role) return false;
-        return Objects.equals(company, user.company);
+        if (!Objects.equals(role, user.role)) return false;
+        return Objects.equals(userCompany, user.userCompany);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class User implements Serializable {
         result = 31 * result + (pathPhoto != null ? pathPhoto.hashCode() : 0);
         result = 31 * result + (registration != null ? registration.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
-        result = 31 * result + (company != null ? company.hashCode() : 0);
+        result = 31 * result + (userCompany != null ? userCompany.hashCode() : 0);
         return result;
     }
 
@@ -198,10 +198,10 @@ public class User implements Serializable {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", path='" + pathPhoto + '\'' +
+                ", pathPhoto='" + pathPhoto + '\'' +
                 ", registration=" + registration +
                 ", role=" + role +
-                ", company=" + company +
+                ", userCompany=" + userCompany +
                 '}';
     }
 }

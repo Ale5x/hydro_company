@@ -1,11 +1,10 @@
 package org.study.hydro.entity.Dto;
 
 import org.springframework.hateoas.RepresentationModel;
-import org.study.hydro.entity.Company;
-import org.study.hydro.entity.Role;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Objects;
 
 public class UserDto extends RepresentationModel<UserDto> {
 
@@ -18,7 +17,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     private LocalDateTime registration;
 
     private Collection<String> role;
-    private CompanyDto companyDto;
+    private UserCompanyDto userCompanyDto;
 
 
     public UserDto() {
@@ -32,7 +31,6 @@ public class UserDto extends RepresentationModel<UserDto> {
         this.pathPhoto = pathPhoto;
         this.email = email;
     }
-
 
     public int getUserDtoId() {
         return userDtoId;
@@ -98,12 +96,47 @@ public class UserDto extends RepresentationModel<UserDto> {
         this.role = role;
     }
 
-    public CompanyDto getCompanyDto() {
-        return companyDto;
+    public UserCompanyDto getUserCompanyDto() {
+        return userCompanyDto;
     }
 
-    public void setCompanyDto(CompanyDto companyDto) {
-        this.companyDto = companyDto;
+    public void setUserCompanyDto(UserCompanyDto userCompanyDto) {
+        this.userCompanyDto = userCompanyDto;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        UserDto userDto = (UserDto) o;
+
+        if (userDtoId != userDto.userDtoId) return false;
+        if (!Objects.equals(firstName, userDto.firstName)) return false;
+        if (!Objects.equals(lastName, userDto.lastName)) return false;
+        if (!Objects.equals(email, userDto.email)) return false;
+        if (!Objects.equals(password, userDto.password)) return false;
+        if (!Objects.equals(pathPhoto, userDto.pathPhoto)) return false;
+        if (!Objects.equals(registration, userDto.registration))
+            return false;
+        if (!Objects.equals(role, userDto.role)) return false;
+        return Objects.equals(userCompanyDto, userDto.userCompanyDto);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + userDtoId;
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (pathPhoto != null ? pathPhoto.hashCode() : 0);
+        result = 31 * result + (registration != null ? registration.hashCode() : 0);
+        result = 31 * result + (role != null ? role.hashCode() : 0);
+        result = 31 * result + (userCompanyDto != null ? userCompanyDto.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -117,7 +150,7 @@ public class UserDto extends RepresentationModel<UserDto> {
                 ", pathPhoto='" + pathPhoto + '\'' +
                 ", registration=" + registration +
                 ", role=" + role +
-                ", companyDto=" + companyDto +
+                ", userCompanyDto=" + userCompanyDto +
                 '}';
     }
 }

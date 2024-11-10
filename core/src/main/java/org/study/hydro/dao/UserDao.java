@@ -13,37 +13,37 @@ import java.util.Optional;
 public interface UserDao {
 
     /**
-     * The method creates new record in database table.
+     * The method creates the new record in the database table.
      *
-     * @param user entity that specifies creation of new records in database table.
+     * @param user entity that specifies the creation of new record in the database table.
      *
-     * @return returns the number of modified rows in the table.
+     * @return returns the number of the modified rows in the table.
      */
     int save(User user);
 
     /**
-     * The method will return list of users.
+     * The method will return list of the users.
      *
      * @param limit the number of rows to get at one time.
      * @param offset the value of the element from which the countdown starts.
      *
-     * @return the specified list of users.
+     * @return the specified list of the users.
      */
     List<User> users(int limit, int offset);
 
     /**
-     * The method returns specified User by id.
+     * The method returns the specified User by id.
      *
-     * @param id the User's id.
+     * @param id is the User's id.
      *
      * @return the specified Optional User by id.
      */
     Optional<User> getUserById(int id);
 
     /**
-     * The method returns specified User by email.
+     * The method returns the specified User by email.
      *
-     * @param email the User email.
+     * @param email is the User's email.
      *
      * @return the specified Optional User by email.
      */

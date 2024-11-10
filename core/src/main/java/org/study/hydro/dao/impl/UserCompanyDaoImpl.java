@@ -6,7 +6,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.study.hydro.dao.CompanyDao;
+import org.study.hydro.dao.UserCompanyDao;
 import org.study.hydro.entity.UserCompany;
 
 
@@ -25,7 +25,7 @@ import java.util.Optional;
  */
 @Repository
 @Transactional
-public class CompanyDaoImpl implements CompanyDao {
+public class UserCompanyDaoImpl implements UserCompanyDao {
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -41,7 +41,7 @@ public class CompanyDaoImpl implements CompanyDao {
         session.save(userCompany);
         session.flush();
 
-        return userCompany.getCompanyId();
+        return userCompany.getUserCompanyId();
     }
 
     @Override

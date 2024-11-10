@@ -1,26 +1,26 @@
 package org.study.hydro.service;
 
-import org.study.hydro.entity.Dto.CompanyDto;
+import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.exception.CoreException;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * The interface {@link CompanyService} User service contains methods for business logic with company.
+ * The interface {@link UserCompanyService} User service contains methods for business logic with company.
  *
  * @author Aliaksandr Pishchala
  */
-public interface CompanyService {
+public interface UserCompanyService {
 
     /**
      * The method creates a new company in the database.
      *
-     * @param companyDto is a companyDto type that contains some information about the new company.
+     * @param userCompanyDto is a companyDto type that contains some information about the new company.
      * @return The boolean result. If the new company is created that return true. Else the method will return false.
-     * @throws CoreException
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    boolean create(CompanyDto companyDto);
+    boolean create(UserCompanyDto userCompanyDto) throws CoreException;
 
     /**
      * The method returns specified list of companies by name.
@@ -29,7 +29,7 @@ public interface CompanyService {
      *
      * @return the specified list of CompaniesDto by name.
      */
-    List<CompanyDto> findByName(String name);
+    List<UserCompanyDto> findByName(String name) throws CoreException;
 
     /**
      * The method will return list of companies.
@@ -38,8 +38,9 @@ public interface CompanyService {
      * @param offset the value of the element from which the countdown starts.
      *
      * @return the specified list of companiesDto.
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<CompanyDto> findAll(int offset, int size);
+    List<UserCompanyDto> findAll(int offset, int size) throws CoreException;
 
     /**
      * The method returns specified CompanyDto by id.
@@ -47,6 +48,7 @@ public interface CompanyService {
      * @param id the Company's id.
      *
      * @return the specified Optional CompanyDto by id.
+     * @throws CoreException if an error occurs during the retrieval process.
      */
-    Optional<CompanyDto> findById(int id);
+    Optional<UserCompanyDto> findById(int id) throws CoreException;
 }

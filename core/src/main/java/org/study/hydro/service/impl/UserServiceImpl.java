@@ -3,16 +3,13 @@ package org.study.hydro.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserDao;
-import org.study.hydro.entity.Company;
-import org.study.hydro.entity.Dto.CompanyDto;
+import org.study.hydro.entity.*;
+import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.entity.Dto.UserDto;
-import org.study.hydro.entity.ERole;
-import org.study.hydro.entity.Role;
-import org.study.hydro.entity.User;
 import org.study.hydro.exception.CoreException;
-import org.study.hydro.service.CompanyService;
+import org.study.hydro.service.EntityMapper;
+import org.study.hydro.service.UserCompanyService;
 import org.study.hydro.service.RoleService;
 import org.study.hydro.service.UserService;
 
@@ -28,91 +25,62 @@ import java.util.*;
  * @author Aliaksandr Pishchala
  */
 @Service
-@Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
-    @Autowired
-    private CompanyService companyService;
+    private final UserCompanyService userCompanyService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String USER_NOT_FOUND_BY_ID_ERROR = "User by id not found.";
+
+    @Autowired
+    public UserServiceImpl(UserDao userDao, RoleService roleService, UserCompanyService userCompanyService,
+                           PasswordEncoder passwordEncoder) {
+        this.userDao = userDao;
+        this.roleService = roleService;
+        this.userCompanyService = userCompanyService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public boolean create(UserDto userDto) throws CoreException {
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setPathPhoto(userDto.getPathPhoto());
-        user.setRegistration(getLocalDate());
-        user.setRole(addRoleToNewUser());
-        user.setCompany(addCompanyToUser(userDto.getCompanyDto()));
-
-        return userDao.save(user) > 0;
+        return userDao.save(mapToEntityFromDto(userDto, false)) > 0;
     }
 
     @Override
-    public List<UserDto> findAll(int limit, int offset) {
-        return buildUserDto(userDao.users(limit, offset));
+    public List<UserDto> findAll(int limit, int offset) throws CoreException {
+        return mapToListObjectsDto(userDao.users(limit, offset));
     }
 
     @Override
-    public Optional<UserDto> findUserById(int id) {
-        Optional<User> user = userDao.getUserById(id);
-        return user.map(value -> buildUserDto(Collections.singletonList(value)).get(0));
+    public Optional<UserDto> findUserById(int id) throws CoreException {
+        return Optional.of(mapToObjectDto(userDao.getUserById(id)
+                .orElseThrow(() -> new CoreException(USER_NOT_FOUND_BY_ID_ERROR))));
     }
 
     @Override
     public Optional<UserDto> findUserByEmail(String email) {
-        Optional<User> user = userDao.getUserByEmail(email);
-        return user.map(value -> buildUserDto(Collections.singletonList(value)).get(0));
-    }
-
-    /**
-     * The method creates a list of the user type DTO from the user's list for transport between layers.
-     * @param userList contains users.
-     * @return The list of the users Dto.
-     */
-    private List<UserDto> buildUserDto(List<User> userList) {
-        List<UserDto> userDtoList = new ArrayList<>();
-        for (User user : userList) {
-            UserDto userDto = new UserDto();
-            userDto.setUserDtoId(user.getUserId());
-            userDto.setFirstName(user.getFirstName());
-            userDto.setLastName(user.getLastName());
-            userDto.setEmail(user.getEmail());
-            userDto.setPathPhoto(user.getPathPhoto());
-            userDto.setRegistration(user.getRegistration());
-
-            userDto.setCompanyDto(addCompanyDtoToUserDto(user.getCompany()));
-
-            userDto.setRole(mapRoles(user.getRole()));
-
-            userDtoList.add(userDto);
-        }
-        return userDtoList;
+        return Optional.of(mapToObjectDto(userDao.getUserByEmail(email)
+                .orElseThrow(() -> new CoreException(USER_NOT_FOUND_BY_ID_ERROR))));
     }
 
     /**
      * The method creates a company type DTO from a company for transport between layers.
-     * @param company is the company type.
+     * @param userCompany is the company type.
      * @return the CompanyDto.
      */
-    private CompanyDto addCompanyDtoToUserDto(Company company) {
-        CompanyDto companyDto = new CompanyDto();
-        companyDto.setCompanyDtoId(company.getCompanyId());
-        companyDto.setName(company.getName());
-        companyDto.setAddress(company.getAddress());
-        return companyDto;
+    private UserCompanyDto addCompanyDtoToUserDto(UserCompany userCompany) {
+        UserCompanyDto userCompanyDto = new UserCompanyDto();
+        userCompanyDto.setCompanyDtoId(userCompany.getUserCompanyId());
+        userCompanyDto.setName(userCompany.getName());
+        userCompanyDto.setAddress(userCompany.getAddress());
+
+        return userCompanyDto;
     }
 
     /**
@@ -144,18 +112,67 @@ public class UserServiceImpl implements UserService {
 
     /**
      * The method adds the company to the current user.
-     * @param companyDto contains some information for the company.
+     * @param userCompanyDto contains some information for the company.
      * @return The Company instance.
      */
-    private Company addCompanyToUser(CompanyDto companyDto) {
-        Optional<CompanyDto> company = companyService.findById(companyDto.getCompanyDtoId());
+    private UserCompany addCompanyToUser(UserCompanyDto userCompanyDto) {
+        Optional<UserCompanyDto> company = userCompanyService.findById(userCompanyDto.getCompanyDtoId());
         if(company.isPresent()) {
-            return new Company(companyDto.getCompanyDtoId(),
-                    companyDto.getName(),
-                    companyDto.getAddress());
+            return new UserCompany(userCompanyDto.getCompanyDtoId(),
+                    userCompanyDto.getName(),
+                    userCompanyDto.getAddress());
+                    //add country;
         } else {
-            return new Company(companyDto.getName(),
-                    companyDto.getAddress());
+            return new UserCompany(userCompanyDto.getName(),
+                    userCompanyDto.getAddress());
         }
+    }
+
+    @Override
+    public List<UserDto> mapToListObjectsDto(List<User> objectsList) {
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (User user : objectsList) {
+            userDtoList.add(mapToObjectDto(user));
+        }
+        return userDtoList;
+    }
+
+    @Override
+    public UserDto mapToObjectDto(User object) {
+        UserDto userDto = new UserDto();
+
+        userDto.setUserDtoId(object.getUserId());
+        userDto.setFirstName(object.getFirstName());
+        userDto.setLastName(object.getLastName());
+        userDto.setEmail(object.getEmail());
+        userDto.setPathPhoto(object.getPathPhoto());
+        userDto.setRegistration(object.getRegistration());
+
+        userDto.setUserCompanyDto(addCompanyDtoToUserDto(object.getUserCompany()));
+
+        userDto.setRole(mapRoles(object.getRole()));
+        return userDto;
+    }
+
+    @Override
+    public User mapToEntityFromDto(UserDto objectDto, boolean isUpdate) {
+        User user = new User();
+
+        if (isUpdate) {
+            user.setUserId(objectDto.getUserDtoId());
+        }
+        if (objectDto.getPassword() != "") {
+            user.setPassword(passwordEncoder.encode(objectDto.getPassword()));
+        }
+
+        user.setFirstName(objectDto.getFirstName());
+        user.setLastName(objectDto.getLastName());
+        user.setEmail(objectDto.getEmail());
+
+        user.setPathPhoto(objectDto.getPathPhoto());
+        user.setRegistration(getLocalDate());
+        user.setRole(addRoleToNewUser());
+        user.setUserCompany(addCompanyToUser(objectDto.getUserCompanyDto()));
+        return user;
     }
 }

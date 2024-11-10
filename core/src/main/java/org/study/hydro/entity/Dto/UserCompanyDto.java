@@ -2,7 +2,9 @@ package org.study.hydro.entity.Dto;
 
 import org.springframework.hateoas.RepresentationModel;
 
-public class CompanyDto extends RepresentationModel<CompanyDto> {
+import java.util.Objects;
+
+public class UserCompanyDto extends RepresentationModel<UserCompanyDto> {
 
     private int companyDtoId;
     private String name;
@@ -11,12 +13,11 @@ public class CompanyDto extends RepresentationModel<CompanyDto> {
 
     private CountryDto countryDto;
 
-//    private
 
-    public CompanyDto() {
+    public UserCompanyDto() {
     }
 
-    public CompanyDto(int companyDtoId, String name, String address) {
+    public UserCompanyDto(int companyDtoId, String name, String address) {
         this.companyDtoId = companyDtoId;
         this.name = name;
         this.address = address;
@@ -55,12 +56,36 @@ public class CompanyDto extends RepresentationModel<CompanyDto> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        UserCompanyDto that = (UserCompanyDto) o;
+
+        if (companyDtoId != that.companyDtoId) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(address, that.address)) return false;
+        return Objects.equals(countryDto, that.countryDto);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + companyDtoId;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        result = 31 * result + (countryDto != null ? countryDto.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
-        return "CompanyDto{" +
+        return "UserCompanyDto{" +
                 "companyDtoId=" + companyDtoId +
                 ", name='" + name + '\'' +
-                ", country='" + countryDto + '\'' +
                 ", address='" + address + '\'' +
+                ", countryDto=" + countryDto +
                 '}';
     }
 }

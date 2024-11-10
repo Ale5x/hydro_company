@@ -2,21 +2,19 @@ package org.study.hydro.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
-@Table(name = "companies")
-public class Company implements Serializable {
+@Table(name = "user_company")
+public class UserCompany implements Serializable {
 
+    private static final long serialVersionUID = 2682677838623962740L;
 
-    private static final long serialVersionUID = -2899199795875787129L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_companies")
-    private int companyId;
+    @Column(name = "id_user_company")
+    private int userCompanyId;
 
     @Column(name = "name")
     private String name;
@@ -24,51 +22,47 @@ public class Company implements Serializable {
     @Column(name = "address")
     private String address;
 
-    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-    private List<User> user;
+    @OneToMany(mappedBy = "userCompany", fetch = FetchType.LAZY)
+    private List<User> users;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "companies_has_countries",
-            joinColumns = @JoinColumn(name = "id_companies"),
-            inverseJoinColumns = @JoinColumn(name = "id_countries")
-    )
-    private Set<Country> countries = new HashSet<>();
+    @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "countries_id")
+    private Country country;
 
-    public Company() {
+    public UserCompany() {
     }
 
-    public Company(String name, String address) {
+    public UserCompany(String name, String address) {
         this.name = name;
         this.address = address;
     }
 
-
-    public Company(String name, String address, Set<Country> countries) {
+    public UserCompany(int userCompanyId, String name, String address, Country country) {
+        this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
-        this.countries = countries;
+        this.country = country;
     }
 
-    public Company(int companyId, String name, String address) {
-        this.companyId = companyId;
+    public UserCompany(int userCompanyId, String name, String address) {
+        this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
     }
 
-    public Company(int companyId, String name, String address, List<User> user) {
-        this.companyId = companyId;
+    public UserCompany(int userCompanyId, String name, String address, List<User> users) {
+        this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
-        this.user = user;
+        this.users = users;
     }
 
-    public int getCompanyId() {
-        return companyId;
+    public int getUserCompanyId() {
+        return userCompanyId;
     }
 
-    public void setCompanyId(int companyId) {
-        this.companyId = companyId;
+    public void setUserCompanyId(int userCompanyId) {
+        this.userCompanyId = userCompanyId;
     }
 
     public String getName() {
@@ -87,12 +81,20 @@ public class Company implements Serializable {
         this.address = address;
     }
 
-    public List<User> getUser() {
-        return user;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUser(List<User> user) {
-        this.user = user;
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
     @Override
@@ -100,30 +102,33 @@ public class Company implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Company company = (Company) o;
+        UserCompany that = (UserCompany) o;
 
-        if (companyId != company.companyId) return false;
-        if (!Objects.equals(name, company.name)) return false;
-        if (!Objects.equals(address, company.address)) return false;
-        return Objects.equals(user, company.user);
+        if (userCompanyId != that.userCompanyId) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(address, that.address)) return false;
+        if (!Objects.equals(users, that.users)) return false;
+        return Objects.equals(country, that.country);
     }
 
     @Override
     public int hashCode() {
-        int result = companyId;
+        int result = userCompanyId;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (users != null ? users.hashCode() : 0);
+        result = 31 * result + (country != null ? country.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Company{" +
-                "companyId=" + companyId +
+        return "UserCompany{" +
+                "userCompanyId=" + userCompanyId +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
-                ", user=" + user +
+                ", users=" + users +
+                ", country=" + country +
                 '}';
     }
 }

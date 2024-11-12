@@ -1,11 +1,10 @@
 package org.study.hydro.dao.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.study.hydro.dao.CriteriaQueryHelper;
 import org.study.hydro.dao.UserCompanyDao;
 import org.study.hydro.entity.UserCompany;
 
@@ -24,14 +23,10 @@ import java.util.Optional;
  * @author Aliaksandr Pishchala
  */
 @Repository
-@Transactional
-public class UserCompanyDaoImpl implements UserCompanyDao {
+@Transactional(rollbackFor = Exception.class)
+public class UserCompanyDaoImpl extends CriteriaQueryHelper<UserCompany> implements UserCompanyDao {
 
-    @Autowired
-    private SessionFactory sessionFactory;
-
-    private final static char PERCENT_CHAR = '%';
-    private final static String COMPANY_ID = "companyId";
+    private final static String COMPANY_ID = "userCompanyId";
     private final static String COMPANY_NAME = "name";
 
 
@@ -48,9 +43,9 @@ public class UserCompanyDaoImpl implements UserCompanyDao {
     public List<UserCompany> companies(int limit, int offset) {
         Session session = getCurrentSession();
 
-        CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
-        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery<UserCompany> criteriaQuery = getCriteriaQuery(criteriaBuilder, UserCompany.class);
+        Root<UserCompany> companyRoot = getRoot(criteriaQuery, UserCompany.class);
         criteriaQuery.select(companyRoot);
         return session.createQuery(criteriaQuery)
                 .setMaxResults(limit)
@@ -62,9 +57,9 @@ public class UserCompanyDaoImpl implements UserCompanyDao {
     public List<UserCompany> companiesByName(String name) {
         Session session = getCurrentSession();
 
-        CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
-        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery<UserCompany> criteriaQuery = getCriteriaQuery(criteriaBuilder, UserCompany.class);
+        Root<UserCompany> companyRoot = getRoot(criteriaQuery, UserCompany.class);
 
         Predicate[] predicate  = new Predicate[1];
         predicate[0] = criteriaBuilder.like(companyRoot.get(COMPANY_NAME), createSearchCriteria(name));
@@ -80,57 +75,11 @@ public class UserCompanyDaoImpl implements UserCompanyDao {
     public Optional<UserCompany> companyById(int id) {
         Session session = getCurrentSession();
 
-        CriteriaBuilder criteriaBuilder = createCriteriaBuilder(session);
-        CriteriaQuery<UserCompany> criteriaQuery = createQuery(criteriaBuilder);
-        Root<UserCompany> companyRoot = getRootCompany(criteriaQuery);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery<UserCompany> criteriaQuery = getCriteriaQuery(criteriaBuilder, UserCompany.class);
+        Root<UserCompany> companyRoot = getRoot(criteriaQuery, UserCompany.class);
         criteriaQuery.select(companyRoot).where(criteriaBuilder.equal(companyRoot.get(COMPANY_ID), id));
 
         return session.createQuery(criteriaQuery).stream().findFirst();
-    }
-
-    /**
-     * The method creates the session instance from the currentSession.
-     *
-     * @return the session instance.
-     */
-    private Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
-    }
-
-    /**
-     * The method creates the CriteriaQuery of the Company instance from the criteriaBuilder instance.
-     * @param criteriaBuilder is the criteriaBuilder instance.
-     * @return the criteriaQuery instance.
-     */
-    private CriteriaQuery<UserCompany> createQuery(CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.createQuery(UserCompany.class);
-    }
-
-    /**
-     * The method creates the CriteriaBuilder instance from the session.
-     * @param session is the session instance.
-     *
-     * @return the CriteriaBuilder instance.
-     */
-    private CriteriaBuilder createCriteriaBuilder(Session session) {
-        return session.getCriteriaBuilder();
-    }
-
-    /**
-     * The method creates the Root of the Company instance from the criteriaQuery instance.
-     * @param criteriaQuery is the criteriaQuery instance.
-     * @return the Root of the Company instance.
-     */
-    private Root<UserCompany> getRootCompany(CriteriaQuery<UserCompany> criteriaQuery) {
-        return criteriaQuery.from(UserCompany.class);
-    }
-
-    /**
-     * The method creates the criteria for searching in the company table.
-     * @param name is the name any company.
-     * @return String criteria type.
-     */
-    private String createSearchCriteria(String name) {
-        return PERCENT_CHAR + name + PERCENT_CHAR;
     }
 }

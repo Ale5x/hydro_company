@@ -14,14 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> implements StorageRackDao {
 
     private final static String STORAGE_RACK_ID = "storageRackId";
     private final static String STORAGE_RACK_NAME = "name";
     private final static String DELETE_STORAGE_RUCK_BY_ID = String.format("DELETE StorageRack WHERE id =: %s",
             STORAGE_RACK_ID);
-
 
     @Override
     public boolean create(StorageRack storageRack) {
@@ -31,8 +30,6 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
         session.flush();
         return storageRack.getStorageRackId() > 0;
     }
-
-
 
     @Override
     public boolean remove(int id) {
@@ -51,8 +48,6 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
         return true;
     }
 
-
-
     @Override
     public Optional<StorageRack> getStorageRackById(int id) {
         Session session = getCurrentSession();
@@ -68,7 +63,6 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
 
         return session.createQuery(criteriaQuery).getResultList().stream().findFirst();
     }
-
 
     @Override
     public List<StorageRack> getStorageRacksList(int limit, int offset) {

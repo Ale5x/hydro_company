@@ -1,15 +1,12 @@
 package org.study.hydro.dao.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.CriteriaQueryHelper;
 import org.study.hydro.dao.PictureDao;
 import org.study.hydro.entity.Picture;
 
-import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -17,21 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements PictureDao {
-
 
     private final static String PICTURE_ID = "pictureId";
     private final static String PRODUCT_ID = "productId";
     private final static String DELETE_PICTURE_PATH_QUERY = String.format("DELETE Picture WHERE id =: %s", PICTURE_ID);
-    private final static String GET_PICTURES_BY_PRODUCT_ID = "SELECT pictures FROM Picture AS pictures JOIN pictures.product AS picture WHERE pictures.product.productId =: productId";
-
-    private SessionFactory sessionFactory;
-
-    @Autowired
-    public PictureDaoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+    private final static String GET_PICTURES_BY_PRODUCT_ID = "SELECT pictures FROM Picture AS pictures " +
+            "JOIN pictures.product AS picture WHERE pictures.product.productId =: productId";
 
     @Override
     public boolean create(Picture picture) {
@@ -41,10 +31,6 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
         return picture.getPictureId() > 0;
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public boolean remove(int id) {
         Session session = getCurrentSession();
@@ -57,7 +43,6 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
     @Override
     public List<Picture> getPicturesByProductId(int productId) {
         Session session = getCurrentSession();
-//        session.createQuery(GET_PICTURES_BY_PRODUCT_ID, Picture.class).setParameter(PRODUCT_ID, productId).getResultList();
         return session.createQuery(GET_PICTURES_BY_PRODUCT_ID, Picture.class)
                     .setParameter(PRODUCT_ID, productId)
                     .getResultList();

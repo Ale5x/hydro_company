@@ -14,7 +14,7 @@ import javax.persistence.criteria.Root;
 import java.util.*;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements CountryDao {
 
     private final static String COUNTRY_NAME = "name";

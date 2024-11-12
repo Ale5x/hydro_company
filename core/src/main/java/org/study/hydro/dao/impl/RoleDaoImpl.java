@@ -1,12 +1,11 @@
 package org.study.hydro.dao.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.study.hydro.dao.CriteriaQueryHelper;
 import org.study.hydro.dao.RoleDao;
 import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
@@ -21,11 +20,8 @@ import java.util.Optional;
  * @author Aliaksandr Pishchala
  */
 @Repository
-@Transactional
-public class RoleDaoImpl implements RoleDao {
-
-    @Autowired
-    private SessionFactory sessionFactory;
+@Transactional(rollbackFor = Exception.class)
+public class RoleDaoImpl extends CriteriaQueryHelper<Role> implements RoleDao {
 
     private static final String GET_ROLE_QUERY = "SELECT * FROM roles WHERE name=";
     private static final String ROLE_ID = "id_roles";
@@ -52,20 +48,6 @@ public class RoleDaoImpl implements RoleDao {
         return Optional.ofNullable(role);
     }
 
-    /**
-     * The method creates the session instance from the currentSession.
-     *
-     * @return the session instance.
-     */
-    private Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
-    }
-
-    /**
-     * The method creates the query to get the Role type from the database.
-     * @param eRole is the type of the Role.
-     * @return The query for the database.
-     */
     private String createQuery(ERole eRole) {
         return  new StringBuilder(GET_ROLE_QUERY)
                 .append(ROLE_ACUTE)

@@ -15,18 +15,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> implements ProductCompanyDao {
 
     private final static String PRODUCT_COMPANY_ID = "productCompanyId";
     private final static String PRODUCT_COMPANY_NAME = "name";
 
-    private final static String DELETE_PRODUCT_COMPANY_QUERY = String.format("DELETE ProductCompany WHERE id =: %s", PRODUCT_COMPANY_ID);
+    private final static String DELETE_PRODUCT_COMPANY_QUERY = String.format("DELETE ProductCompany WHERE id =: %s",
+            PRODUCT_COMPANY_ID);
 
-    /**
-     * @param productCompany
-     * @return
-     */
     @Override
     public boolean create(ProductCompany productCompany) {
         Session session = getCurrentSession();
@@ -35,10 +32,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         return productCompany.getProductCompanyId() > 0;
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public Optional<ProductCompany> getById(int id) {
         Session session = getCurrentSession();
@@ -52,9 +45,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         return session.createQuery(criteriaQuery).getResultList().stream().findFirst();
     }
 
-    /**
-     * @return
-     */
     @Override
     public List<ProductCompany> getProductCompanies() {
         Session session = getCurrentSession();
@@ -67,10 +57,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         return session.createQuery(criteriaQuery).getResultList();
     }
 
-    /**
-     * @param productCompany
-     * @return
-     */
     @Override
     public boolean update(ProductCompany productCompany) {
         Session session = getCurrentSession();
@@ -79,23 +65,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         return true;
     }
 
-    /**
-     * @param id
-     * @return
-     */
-//    @Override
-//    public boolean remove(int id) {
-//        Session session = getCurrentSession();
-//
-//        return session.createQuery(DELETE_PRODUCT_COMPANY_QUERY)
-//                .setParameter(PRODUCT_COMPANY_ID, id)
-//                .executeUpdate() > 0;
-//    }
-
-    /**
-     * @param name
-     * @return
-     */
     @Override
     public List<ProductCompany> getProductCompaniesByName(String name) {
         Session session = getCurrentSession();
@@ -103,9 +72,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<ProductCompany> criteriaQuery = getCriteriaQuery(criteriaBuilder, ProductCompany.class);
         Root<ProductCompany> productCompanyRoot = getRoot(criteriaQuery, ProductCompany.class);
-
-//        Predicate [] predicates = new Predicate[1];
-//        predicates[0] = criteriaBuilder.like(productCompanyRoot.get(PRODUCT_COMPANY_NAME), createSearchCriteria(name));
 
         Predicate [] predicates = createPredicates(List.of(PRODUCT_COMPANY_NAME), criteriaBuilder, productCompanyRoot, name);
 

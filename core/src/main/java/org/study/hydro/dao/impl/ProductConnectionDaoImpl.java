@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ProductConnectionDaoImpl extends CriteriaQueryHelper<ProductConnection> implements ProductConnectionDao {
 
     private final static String PRODUCT_CONNECTION_ID = "productConnectionId";

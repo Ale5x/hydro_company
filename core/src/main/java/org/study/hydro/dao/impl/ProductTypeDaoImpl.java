@@ -14,13 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> implements ProductTypeDao {
 
     private final static String PRODUCT_TYPE_ID = "productTypeId";
     private final static String PRODUCT_TYPE_NAME = "name";
 
-    private final static String DELETE_PRODUCT_TYPE_QUERY = String.format("DELETE ProductType WHERE id =: %s", PRODUCT_TYPE_ID);
+    private final static String DELETE_PRODUCT_TYPE_QUERY = String.format("DELETE ProductType WHERE id =: %s",
+            PRODUCT_TYPE_ID);
 
     @Override
     public boolean create(ProductType productType) {

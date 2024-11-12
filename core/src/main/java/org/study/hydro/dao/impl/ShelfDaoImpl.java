@@ -1,8 +1,6 @@
 package org.study.hydro.dao.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.CriteriaQueryHelper;
@@ -15,7 +13,7 @@ import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao {
 
     private final static String SHELF_ID = "shelfId";

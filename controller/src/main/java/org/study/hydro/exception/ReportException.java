@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 /**
  * This class {@link ReportException} is for generating exception report to send to client.
  */
-public class ReportException {
+public class ReportException extends RuntimeException {
 
     private HttpStatus status;
     private String message;

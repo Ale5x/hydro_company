@@ -1,0 +1,81 @@
+package org.study.hydro.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.study.hydro.entity.Dto.ShelfDto;
+import org.study.hydro.exception.ReportException;
+import org.study.hydro.service.ShelfService;
+import org.study.hydro.utill.ValidatorParam;
+
+/**
+ * This class {@link ShelfController} provides endpoints for accessing shelf data.
+ *
+ * @author Aliaksandr Pishchala
+ */
+@RestController
+public class ShelfController {
+
+    private final ShelfService shelfService;
+
+    private static final String SHELF_NOT_FOUND = "Shelf not found";
+
+    @Autowired
+    public ShelfController(ShelfService shelfService) {
+        this.shelfService = shelfService;
+    }
+
+    /**
+     * The method creates an access point for updating a shelf in the database.
+     * @param shelfDto is the date of the updating shelf.
+     * @return The instance of ResponseEntity with the HttpStatus.
+     */
+    @PostMapping(value = PathPages.SHELF_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> update (@RequestBody ShelfDto shelfDto) {
+        if (shelfService.update(shelfDto)) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * The method creates an and point for getting the shelf by the shelf's id.
+     * @param id is the id of the shelf.
+     * @return The object of the shelfDTO.
+     */
+    @GetMapping(value = PathPages.SHELF_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ShelfDto findById (@RequestParam(ControllerConstants.ID) String id) {
+        ValidatorParam.isNumber(id);
+        return shelfService.findById(Integer.parseInt(id))
+                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, SHELF_NOT_FOUND));
+    }
+
+    /**
+     * The method creates an and point for getting the shelf by the shelf's name.
+     * @param name is the name of the shelf.
+     * @return The object of the shelfDTO.
+     */
+    @GetMapping(value = PathPages.SHELF_BY_NAME, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ShelfDto findByName (@RequestParam(ControllerConstants.NAME) String name) {
+        return shelfService.findByName(name)
+                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, SHELF_NOT_FOUND));
+    }
+
+    /**
+     * The method creates an access point for removing a shelf in the database by the shelf's id.
+     * @param id is the id of the shelf.
+     * @return The instance of ResponseEntity with the HttpStatus.
+     */
+    @GetMapping(value = PathPages.SHELF_REMOVE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> remove (@RequestParam(ControllerConstants.ID) String id) {
+        ValidatorParam.isNumber(id);
+        if (shelfService.remove(Integer.parseInt(id))) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+}

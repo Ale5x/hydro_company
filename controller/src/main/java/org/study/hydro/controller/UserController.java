@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.UserDto;
-import org.study.hydro.exception.AppExceptionHandler;
-import org.study.hydro.exception.AppRequestException;
-import org.study.hydro.exception.CoreException;
+import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.UserService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
@@ -21,15 +19,21 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
- * This class {@link UserController} provides access endpoints for user data.
+ * This class {@link UserController} provides endpoints for accessing user data.
  *
  * @author Aliaksandr Pishchala
  */
 @RestController
 public class UserController {
 
-    @Autowired
     private UserService userService;
+
+    private final static String USER_NOT_FOUND = "User not found";
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * The method gives user data by user's id.
@@ -37,10 +41,11 @@ public class UserController {
      * @return The object of the userDTO.
      */
     @GetMapping(value = PathPages.USER_ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public UserDto getUser(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return userService.findUserById(Integer.parseInt(id))
-                .orElseThrow(() -> new AppRequestException("User is not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, USER_NOT_FOUND));
     }
 
     /**

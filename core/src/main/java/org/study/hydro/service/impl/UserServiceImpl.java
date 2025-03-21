@@ -3,6 +3,7 @@ package org.study.hydro.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserDao;
 import org.study.hydro.entity.*;
 import org.study.hydro.entity.Dto.UserCompanyDto;
@@ -25,6 +26,7 @@ import java.util.*;
  * @author Aliaksandr Pishchala
  */
 @Service
+@Transactional
 public class UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
 
     private final UserDao userDao;
@@ -116,16 +118,12 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
      * @return The Company instance.
      */
     private UserCompany addCompanyToUser(UserCompanyDto userCompanyDto) {
-        Optional<UserCompanyDto> company = userCompanyService.findById(userCompanyDto.getCompanyDtoId());
-        if(company.isPresent()) {
-            return new UserCompany(userCompanyDto.getCompanyDtoId(),
-                    userCompanyDto.getName(),
-                    userCompanyDto.getAddress());
-                    //add country;
-        } else {
-            return new UserCompany(userCompanyDto.getName(),
-                    userCompanyDto.getAddress());
+        UserCompany userCompany = new UserCompany();
+        if (userCompanyDto.getCompanyDtoId() == 0) {
+            userCompany.setName(userCompanyDto.getName());
+            userCompany.setAddress(userCompanyDto.getAddress());
         }
+        return userCompany;
     }
 
     @Override
@@ -157,7 +155,6 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     @Override
     public User mapToEntityFromDto(UserDto objectDto, boolean isUpdate) {
         User user = new User();
-
         if (isUpdate) {
             user.setUserId(objectDto.getUserDtoId());
         }
@@ -172,6 +169,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         user.setPathPhoto(objectDto.getPathPhoto());
         user.setRegistration(getLocalDate());
         user.setRole(addRoleToNewUser());
+
         user.setUserCompany(addCompanyToUser(objectDto.getUserCompanyDto()));
         return user;
     }

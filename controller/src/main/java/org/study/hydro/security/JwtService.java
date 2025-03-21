@@ -13,6 +13,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 /**
@@ -45,7 +46,7 @@ public class JwtService {
 
     /**
      * The method creates a token. It gets Map and UserDetails and packages the necessary information such as
-     * extraClaims, user name, Current date in milliseconds, token expiration date in milliseconds, secret key
+     * extraClaims, user's name, Current date in milliseconds, token expiration date in milliseconds, secret key
      * and encryption algorithm into a string type.
      *
      * @param userDetails contains information about the user in security.
@@ -128,7 +129,7 @@ public class JwtService {
      */
     private Claims extractAllClaims(String token) {
         return Jwts
-                .parserBuilder()
+                .parserBuilder().setAllowedClockSkewSeconds(600000000)
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)

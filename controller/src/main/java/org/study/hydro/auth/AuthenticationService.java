@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserDao;
 import org.study.hydro.entity.Dto.UserDto;
 import org.study.hydro.security.JwtService;
@@ -22,6 +23,7 @@ import java.util.Collection;
  * @author Aliaksandr Pishchala
  */
 @Service
+@Transactional
 public class AuthenticationService {
 
     private final UserDao userDao;

@@ -208,7 +208,7 @@ public class ProductController {
      * @param productCompanyDto is the object of the productCompany.
      * @return The object of the CollectionModel includes list of the products by some product company.
      */
-    @GetMapping(value = PathPages.PRODUCT_COMPANY, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = PathPages.PRODUCT_COMPANY_BRANCH, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByCompany (@RequestParam(ControllerConstants.PAGE) String page,
                                                       @RequestParam(ControllerConstants.SIZE) String size,
                                                       @RequestBody ProductCompanyDto productCompanyDto) {

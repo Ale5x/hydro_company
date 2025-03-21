@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserDao;
 import org.study.hydro.entity.User;
 
@@ -37,10 +38,11 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
      * @throws UsernameNotFoundException
      */
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userDao.getUserByEmail(username);
         if(user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("User not found: " + username);
         }
         return new org.springframework.security.core.userdetails.User(
                 user.orElseThrow().getEmail(),

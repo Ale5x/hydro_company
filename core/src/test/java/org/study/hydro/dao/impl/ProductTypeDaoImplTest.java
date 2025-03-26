@@ -66,8 +66,8 @@ class ProductTypeDaoImplTest {
         Optional<ProductType> productTypeOptional = productTypeDao.getProductTypeById(productTypeId);
         assertTrue(productTypeOptional.isPresent());
 
-        Optional<ProductType> prTypeByName = productTypeDao.getProductTypeByName(productTypeOptional.get().getName());
-        assertTrue(prTypeByName.isPresent());
+        List<ProductType> prTypeByName = productTypeDao.getProductTypeByName(productTypeOptional.get().getName());
+        assertFalse(prTypeByName.isEmpty());
     }
 
     @Test

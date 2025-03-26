@@ -38,13 +38,13 @@ public interface ProductTypeDao {
     Optional<ProductType> getProductTypeById(int id);
 
     /**
-     * The method returns the specified productType by name.
+     * The method returns the list of specified productType by name.
      *
      * @param name is the productType's name.
      *
-     * @return the specified Optional productType by name.
+     * @return the specified list of productType by name.
      */
-    Optional<ProductType> getProductTypeByName(String name);
+    List<ProductType> getProductTypeByName(String name);
 
     /**
      * The method updates an existing table record in the database.

@@ -39,6 +39,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
 
     private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String USER_NOT_FOUND_BY_ID_ERROR = "User by id not found.";
+    private static final String USER_ROLE_NOT_EXIST = "The User's role doesn't exist";
 
     @Autowired
     public UserServiceImpl(UserDao userDao, RoleService roleService, UserCompanyService userCompanyService,
@@ -109,7 +110,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
      */
     private Role addRoleToNewUser() {
         return roleService.findRole(ERole.USER).orElseThrow(
-                () -> new CoreException("'User' role doesn't exist"));
+                () -> new CoreException(USER_ROLE_NOT_EXIST));
     }
 
     /**
@@ -119,9 +120,11 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
      */
     private UserCompany addCompanyToUser(UserCompanyDto userCompanyDto) {
         UserCompany userCompany = new UserCompany();
-        if (userCompanyDto.getCompanyDtoId() == 0) {
-            userCompany.setName(userCompanyDto.getName());
-            userCompany.setAddress(userCompanyDto.getAddress());
+        userCompany.setName(userCompanyDto.getName());
+        userCompany.setAddress(userCompanyDto.getAddress());
+        if (userCompanyDto.getCompanyDtoId() > 0) {
+            Optional<UserCompanyDto> company = userCompanyService.findById(userCompanyDto.getCompanyDtoId());
+            userCompany.setUserCompanyId(company.get().getCompanyDtoId());
         }
         return userCompany;
     }

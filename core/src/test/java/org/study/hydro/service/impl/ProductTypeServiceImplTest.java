@@ -93,11 +93,11 @@ class ProductTypeServiceImplTest {
 
     @Test
     void findByName() {
-        when(productTypeDao.getProductTypeByName(name)).thenReturn(Optional.of(productType));
+        when(productTypeDao.getProductTypeByName(name)).thenReturn(List.of(productType));
 
-        Optional<ProductTypeDto> productType = productTypeService.findByName(name);
+        List<ProductTypeDto> productType = productTypeService.findByName(name);
 
-        assertTrue(productType.isPresent());
+        assertFalse(productType.isEmpty());
         verify(productTypeDao, times(1)).getProductTypeByName(name);
     }
 }

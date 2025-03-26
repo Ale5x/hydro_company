@@ -93,12 +93,11 @@ public class ProductTypeController {
     /**
      * The method creates an and point for getting the product type by the product type's name.
      * @param name is the name of the product type.
-     * @return The object of the productTypeDTO.
+     * @return The object's list of the productTypeDTO.
      */
     @GetMapping(value = PathPages.PRODUCT_TYPE_BY_NAME, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProductTypeDto findByName (@RequestParam(ControllerConstants.NAME) String name) {
-        return productTypeService.findByName(name)
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, PRODUCT_TYPE_NOT_FOUND));
+    public CollectionModel<ProductTypeDto> findByName (@RequestParam(ControllerConstants.NAME) String name) {
+        return CollectionModel.of(productTypeService.findByName(name));
     }
 }

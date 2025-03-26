@@ -51,8 +51,8 @@ public interface ProductTypeService {
     /**
      * Retrieves a productTypeDto by its name.
      * @param name the name of the product type.
-     * @return an Optional object of {@link ProductTypeDto} object representing the product type with its name.
+     * @return the list of {@link ProductTypeDto} objects representing the product type with its name.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    Optional<ProductTypeDto> findByName(String name) throws CoreException;
+    List<ProductTypeDto> findByName(String name) throws CoreException;
 }

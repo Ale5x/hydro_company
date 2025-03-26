@@ -58,9 +58,8 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
     }
 
     @Override
-    public Optional<ProductTypeDto> findByName(String name) throws CoreException {
-        return Optional.of(mapToObjectDto(productTypeDao.getProductTypeByName(name)
-                .orElseThrow(() -> new CoreException(PRODUCT_TYPE_BY_NAME_NOT_FOUND_ERROR))));
+    public List<ProductTypeDto> findByName(String name) throws CoreException {
+        return mapToListObjectsDto(productTypeDao.getProductTypeByName(name));
     }
 
     @Override

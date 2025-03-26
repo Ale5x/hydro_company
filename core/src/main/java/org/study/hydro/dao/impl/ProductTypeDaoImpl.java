@@ -56,14 +56,14 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
     }
 
     @Override
-    public Optional<ProductType> getProductTypeByName(String name) {
+    public List<ProductType> getProductTypeByName(String name) {
         Session session = getCurrentSession();
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<ProductType> criteriaQuery = getCriteriaQuery(criteriaBuilder, ProductType.class);
         Root<ProductType> productTypeRoot = getRoot(criteriaQuery, ProductType.class);
 
         criteriaQuery.select(productTypeRoot).where(criteriaBuilder.equal(productTypeRoot.get(PRODUCT_TYPE_NAME), name));
-        return session.createQuery(criteriaQuery).getResultList().stream().findFirst();
+        return session.createQuery(criteriaQuery).getResultList();
     }
 
     @Override

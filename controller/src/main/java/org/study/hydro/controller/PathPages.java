@@ -82,6 +82,7 @@ public class PathPages {
     public static final String SHELF_BY_ID = SHELF + "/id";
     public static final String SHELF_BY_NAME = SHELF + "/name";
     public static final String SHELF_REMOVE = SHELF + "/remove";
+    public static final String SHELF_ALL = SHELF + "/all";
 
 
     public static final String STORAGE_RACK = ADMIN_BRANCH + "/storage_rack";

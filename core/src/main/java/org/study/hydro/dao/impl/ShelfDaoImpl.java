@@ -10,6 +10,7 @@ import org.study.hydro.entity.Shelf;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -62,5 +63,17 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
                 .setParameter(SHELF_ID, id)
                 .executeUpdate();
         return rows > 0;
+    }
+
+    @Override
+    public List<Shelf> getAllShelf() {
+        Session session = getCurrentSession();
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery<Shelf> criteriaQuery = getCriteriaQuery(criteriaBuilder, Shelf.class);
+        Root<Shelf> shelfRoot = getRoot(criteriaQuery, Shelf.class);
+        criteriaQuery.select(shelfRoot);
+
+        return session.createQuery(criteriaQuery).getResultList();
     }
 }

@@ -50,6 +50,16 @@ class ShelfServiceImplTest {
     }
 
     @Test
+    void findAll() {
+        when(shelfDao.getAllShelf()).thenReturn(shelfList);
+
+        List<ShelfDto> shelfDtoList = shelfService.findAll();
+
+        assertTrue(shelfDtoList.size() > 0);
+        verify(shelfDao, times(1)).getAllShelf();
+    }
+
+    @Test
     void findById() {
         when(shelfDao.findById(id)).thenReturn(Optional.of(shelf));
 

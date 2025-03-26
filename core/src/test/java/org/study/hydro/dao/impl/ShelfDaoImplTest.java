@@ -33,6 +33,13 @@ class ShelfDaoImplTest {
     }
 
     @Test
+    void findAll() {
+        List<Shelf> shelfList = shelfDao.getAllShelf();
+        assertTrue(shelfList.size() > 0);
+        assertFalse(shelfList.isEmpty());
+    }
+
+    @Test
     void findByName() {
         int shelfId = 1;
         Optional<Shelf> shelfOptional = shelfDao.findById(shelfId);

@@ -1,6 +1,7 @@
 package org.study.hydro.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -77,5 +78,14 @@ public class ShelfController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * The method creates an and point for getting the list of the shelf.
+     * @return The object's list of the ShelfDTO.
+     */
+    @GetMapping(value = PathPages.SHELF_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<ShelfDto> findAll() {
+        return CollectionModel.of(shelfService.findAll());
     }
 }

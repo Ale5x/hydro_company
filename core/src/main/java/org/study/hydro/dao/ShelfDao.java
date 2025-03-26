@@ -2,6 +2,7 @@ package org.study.hydro.dao;
 
 import org.study.hydro.entity.Shelf;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,4 +47,11 @@ public interface ShelfDao {
      * @return returns boolean's result if the row removes.
      */
     boolean remove (int id);
+
+    /**
+     * The method will return list of the shelf.
+     *
+     * @return the specified list of the shelves.
+     */
+    List<Shelf> getAllShelf();
 }

@@ -4,6 +4,7 @@ import org.study.hydro.entity.Dto.ShelfDto;
 import org.study.hydro.entity.Shelf;
 import org.study.hydro.exception.CoreException;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,4 +54,11 @@ public interface ShelfService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     boolean remove(int id) throws CoreException;
+
+    /**
+     * Retrieves a list of the ShelfDto.
+     * @return the list of {@link ShelfDto} objects representing the shelf.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    List<ShelfDto> findAll() throws CoreException;
 }

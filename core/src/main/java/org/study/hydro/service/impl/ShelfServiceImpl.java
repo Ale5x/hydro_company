@@ -44,6 +44,11 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
     }
 
     @Override
+    public List<ShelfDto> findAll() throws CoreException {
+        return mapToListObjectsDto(shelfDao.getAllShelf());
+    }
+
+    @Override
     public boolean remove(int id) throws CoreException {
         Optional<Shelf> shelf = shelfDao.findById(id);
         if (shelf.isPresent()) {

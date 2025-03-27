@@ -29,6 +29,17 @@ public class ShelfController {
     }
 
     /**
+     * The method creates an access point for creating a shelf in the database.
+     * @param shelfDto is the date of the shelf company.
+     * @return The instance of ResponseEntity with the HttpStatus.
+     */
+    @PostMapping(value = PathPages.SHELF_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> create(@RequestBody ShelfDto shelfDto) {
+        shelfService.create(shelfDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
      * The method creates an access point for updating a shelf in the database.
      * @param shelfDto is the date of the updating shelf.
      * @return The instance of ResponseEntity with the HttpStatus.

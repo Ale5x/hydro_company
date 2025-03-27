@@ -54,4 +54,13 @@ public interface ShelfDao {
      * @return the specified list of the shelves.
      */
     List<Shelf> getAllShelf();
+
+    /**
+     * The method creates the new record in the database table.
+     *
+     * @param shelf entity that specifies the creation of new record in the database table.
+     *
+     * @return returns the number of the modified rows in the table.
+     */
+    int create(Shelf shelf);
 }

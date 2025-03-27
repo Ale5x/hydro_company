@@ -61,4 +61,13 @@ public interface ShelfService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     List<ShelfDto> findAll() throws CoreException;
+
+
+    /**
+     * Creates a new shelf based on the provided data.
+     * @param shelfDto a {@link ShelfDto} object containing the new shelf data.
+     * @return true if the shelf was successfully created; false otherwise.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    boolean create(ShelfDto shelfDto) throws CoreException;
 }

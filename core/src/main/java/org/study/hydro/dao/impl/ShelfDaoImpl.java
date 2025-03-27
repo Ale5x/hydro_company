@@ -76,4 +76,12 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
 
         return session.createQuery(criteriaQuery).getResultList();
     }
+
+    @Override
+    public int create(Shelf shelf) {
+        Session session = getCurrentSession();
+        session.save(shelf);
+        session.flush();
+        return shelf.getShelfId();
+    }
 }

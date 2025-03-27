@@ -32,6 +32,11 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
     }
 
     @Override
+    public boolean create(ShelfDto shelfDto) throws CoreException {
+        return shelfDao.create(mapToEntityFromDto(shelfDto, false)) > 0;
+    }
+
+    @Override
     public Optional<ShelfDto> findById(int id) throws CoreException {
         return Optional.of(mapToObjectDto(shelfDao.findById(id)
                 .orElseThrow(() -> new CoreException(SHELF_BY_ID_NOT_FOUND_ERROR))));

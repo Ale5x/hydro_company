@@ -41,8 +41,7 @@ insert into pictures (path, id_products) values('path_product-1', 1),
 insert into storage_racks_products (id_products, id_storage_racks) values(1, 1),
 (2, 2), (5, 1), (3, 1), (4, 2);
 
-insert into shelf (id_shelf, name) values(1, '#1'),
-(2, '#2'), (3, '#3'), (4, '#4'), (5, '#5'), (6, '#6');
+insert into shelf (name) values('#1'), ('#2'), ('#3'), ('#4'), ('#5'), ('#6');
 
 insert into storage_racks (name, shelf_id) values('storage_racks-name-1', 1),
 ('storage_racks-name-2', 2), ('storage_racks-name-3', 3), ('storage_racks-name-4', 4), ('storage_racks-name-5', 5);

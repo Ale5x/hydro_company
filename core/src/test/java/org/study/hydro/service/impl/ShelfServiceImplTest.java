@@ -50,6 +50,20 @@ class ShelfServiceImplTest {
     }
 
     @Test
+    void create() {
+        Shelf sendShelf = new Shelf(0, "create");
+        ShelfDto sendShelfDto = new ShelfDto();
+        sendShelfDto.setName(sendShelf.getName());
+
+        when(shelfDao.create(any(Shelf.class))).thenReturn(1);
+
+        boolean condition = shelfService.create(sendShelfDto);
+
+        assertTrue(condition);
+        verify(shelfDao, times(1)).create(sendShelf);
+    }
+
+    @Test
     void findAll() {
         when(shelfDao.getAllShelf()).thenReturn(shelfList);
 

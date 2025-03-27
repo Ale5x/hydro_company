@@ -9,9 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ShelfDao;
 import org.study.hydro.entity.Shelf;
-import org.study.hydro.entity.StorageRack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +22,8 @@ class ShelfDaoImplTest {
 
     @Autowired
     private ShelfDao shelfDao;
+
+    private Shelf newShelf = new Shelf("New shelf");
 
     @Test
     void findById() {
@@ -38,6 +38,24 @@ class ShelfDaoImplTest {
         assertTrue(shelfList.size() > 0);
         assertFalse(shelfList.isEmpty());
     }
+
+    @Test
+    void create() {
+        List<Shelf> shelfListBefore = shelfDao.getAllShelf();
+        assertTrue(shelfListBefore.size() > 0);
+        assertFalse(shelfListBefore.isEmpty());
+
+        int newShelfId = shelfDao.create(newShelf);
+
+        assertTrue(newShelfId > 0);
+
+        List<Shelf> shelfListAfter = shelfDao.getAllShelf();
+        assertTrue(shelfListAfter.size() > 0);
+
+        assertTrue(shelfListAfter.size() > shelfListBefore.size());
+    }
+
+
 
     @Test
     void findByName() {

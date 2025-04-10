@@ -53,9 +53,9 @@ class ProductDaoImplTest {
 
         assertFalse(productListBefore.isEmpty());
 
-        boolean condition = productDao.create(product);
+        int id = productDao.create(product);
 
-        assertTrue(condition);
+        assertTrue(id > 0);
 
         List<Product> productListAfter = productDao.getProductsList(maxLimit, offset);
 

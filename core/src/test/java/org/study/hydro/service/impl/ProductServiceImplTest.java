@@ -76,7 +76,7 @@ class ProductServiceImplTest {
 
     @Test
     void create() {
-        when(productDao.create(any(Product.class))).thenReturn(true);
+        when(productDao.create(any(Product.class))).thenReturn(productId);
 
         boolean condition = productService.create(productDto);
 

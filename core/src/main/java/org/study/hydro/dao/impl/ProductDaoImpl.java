@@ -46,11 +46,11 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
             " WHERE sr.name =: " + STORAGE_RACK_NAME + " order by p.productId";
 
     @Override
-    public boolean create(Product product) {
+    public int create(Product product) {
         Session session = getCurrentSession();
         session.save(product);
         session.flush();
-        return product.getProductId() > 0;
+        return product.getProductId();
     }
 
     @Override

@@ -22,6 +22,15 @@ public interface PictureDao {
     boolean create(Picture picture);
 
     /**
+     * The method creates new records in the database table from the list of the pictures.
+     *
+     * @param pictures the list of Picture entities to be saved.
+     *
+     * @return {@code true} if all pictures were saved successfully, {@code false} otherwise
+     */
+    boolean createList(List<Picture> pictures);
+
+    /**
      * The method removes the current record in the database table.
      *
      * @param id is the id of the picture that will be removed.

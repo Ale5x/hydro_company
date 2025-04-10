@@ -32,6 +32,18 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
     }
 
     @Override
+    public boolean createList(List<Picture> pictures) {
+        Session session = getCurrentSession();
+
+        for (Picture picture : pictures) {
+            session.persist(picture);
+        }
+        session.flush();
+
+        return pictures.get(0).getPictureId() > 0;
+    }
+
+    @Override
     public boolean remove(int id) {
         Session session = getCurrentSession();
 

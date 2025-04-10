@@ -17,9 +17,9 @@ public interface ProductDao {
      *
      * @param product entity that specifies creation of new records in database table.
      *
-     * @return returns boolean's result if the row creates.
+     * @return it will return an ID the new product.
      */
-    boolean create(Product product);
+    int create(Product product);
 
     /**
      * The method updates an existing table record in the database.

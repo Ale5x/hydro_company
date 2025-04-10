@@ -10,6 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ControllerConstants {
 
+    public final static String FILE = "file";
+    public final static String FILES = "files";
+    public final static String FILE_PRODUCT_SCHEME = "product_scheme";
+
+    public final static String DATE = "date";
+
     public final static String ID = "id";
     public final static String PAGE = "page";
     public final static String SIZE = "size";

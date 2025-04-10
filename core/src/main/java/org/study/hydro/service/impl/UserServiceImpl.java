@@ -145,12 +145,13 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         userDto.setUserDtoId(object.getUserId());
         userDto.setFirstName(object.getFirstName());
         userDto.setLastName(object.getLastName());
+
         userDto.setEmail(object.getEmail());
         userDto.setPathPhoto(object.getPathPhoto());
         userDto.setRegistration(object.getRegistration());
 
         userDto.setUserCompanyDto(addCompanyDtoToUserDto(object.getUserCompany()));
-
+        userDto.setPathPhoto(object.getPathPhoto());
         userDto.setRole(mapRoles(object.getRole()));
         return userDto;
     }
@@ -173,6 +174,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         user.setRegistration(getLocalDate());
         user.setRole(addRoleToNewUser());
 
+        user.setPathPhoto(objectDto.getPathPhoto());
         user.setUserCompany(addCompanyToUser(objectDto.getUserCompanyDto()));
         return user;
     }

@@ -1,20 +1,25 @@
 package org.study.hydro.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.study.hydro.entity.Dto.ProductCompanyDto;
 import org.study.hydro.entity.Dto.ProductDto;
 import org.study.hydro.entity.Dto.ProductTypeDto;
 import org.study.hydro.entity.Dto.StorageRackDto;
 import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.ProductService;
+import org.study.hydro.utill.ImageStorage;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
+
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -29,11 +34,20 @@ public class ProductController {
 
     private final ProductService productService;
 
+    private final ImageStorage localImageStorage;
+
     private static final String PRODUCT_NOT_FOUND = "Product not found";
 
+    @Value("${file.upload-product-scheme-dir}")
+    private String schemeDir;
+
+    @Value("${file.upload-product-images-dir}")
+    private String imagesDir;
+
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ImageStorage localImageStorage) {
         this.productService = productService;
+        this.localImageStorage = localImageStorage;
     }
 
     /**
@@ -42,7 +56,12 @@ public class ProductController {
      * @return The instance of ResponseEntity with the HttpStatus.
      */
     @PostMapping(value = PathPages.PRODUCT_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> create (@RequestBody ProductDto productDto) {
+    public ResponseEntity<HttpStatus> create (
+            @RequestPart(ControllerConstants.DATE) ProductDto productDto,
+            @RequestParam(ControllerConstants.FILE_PRODUCT_SCHEME) MultipartFile fileScheme,
+            @RequestParam(ControllerConstants.FILES) List<MultipartFile> files) {
+        productDto.setPathHydraulicScheme(localImageStorage.save(fileScheme, schemeDir));
+        productDto.setImagesPaths(localImageStorage.saveAll(files, imagesDir));
         if (productService.create(productDto)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
@@ -256,4 +275,10 @@ public class ProductController {
                 previousLink,
                 nextLink);
     }
+
+    private void addImagePathsToProduct(ProductDto productDto, List<MultipartFile> files) {
+        // Method logic
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package org.study.hydro.service;
 
 import org.study.hydro.entity.Dto.PictureDto;
+import org.study.hydro.entity.Picture;
 import org.study.hydro.exception.CoreException;
 
 import java.util.List;
@@ -35,6 +36,13 @@ public interface PictureService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     List<PictureDto> findPicturesByProductId(int productId) throws CoreException;
+
+    /**
+     * Retrieves a list of all pictures filtered by the unique identifier of the product.
+     * @return a list of all pictures as {@link Picture} objects.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    List<Picture> findAllPicturesByProductId(int productId) throws CoreException;
 
     /**
      * Retrieves a list of all picturesDto.

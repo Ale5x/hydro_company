@@ -50,6 +50,7 @@ public interface ProductService {
      */
     Optional<ProductDto> findById(int id) throws CoreException;
 
+
     /**
      * Retrieves a productDto by its unique identifier.
      * @param id the unique identifier of the product.

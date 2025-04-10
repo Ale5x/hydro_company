@@ -8,7 +8,7 @@ import org.study.hydro.entity.Picture;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.PictureService;
-import org.study.hydro.service.ProductService;
+import org.study.hydro.service.ServiceMediator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +21,12 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     private final static String PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR = "Product not found for the picture";
 
     private final PictureDao pictureDao;
-    private final ProductService productService;
+    private final ServiceMediator serviceMediator;
 
     @Autowired
-    public PictureServiceImpl(PictureDao pictureDao, ProductService productService) {
+    public PictureServiceImpl(PictureDao pictureDao, ServiceMediator serviceMediator) {
         this.pictureDao = pictureDao;
-        this.productService = productService;
+        this.serviceMediator = serviceMediator;
     }
 
     @Override
@@ -74,12 +74,17 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     }
 
     @Override
+    public List<Picture> findAllPicturesByProductId(int productId) throws CoreException {
+        return pictureDao.getPicturesByProductId(productId);
+    }
+
+    @Override
     public Picture mapToEntityFromDto(PictureDto objectDto, boolean isUpdate) {
         Picture picture = new Picture();
 
         picture.setPictureId(objectDto.getPictureDtoId());
 
-        picture.setProduct(productService.findProductById(objectDto.getProductId())
+        picture.setProduct(serviceMediator.findProductById(objectDto.getProductId())
                 .orElseThrow(() -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR)));
 
         picture.setPath(objectDto.getPath());

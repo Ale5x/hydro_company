@@ -67,7 +67,7 @@ create table products (
   pressure_max bigint,
   sku varchar(45),
   weight varchar(45),
-  path_hydraulic_scheme varchar(200),
+  path_hydraulic_scheme varchar(254),
   additional_inf varchar(320),
   foreign key (id_countries) references countries (id_countries),
   foreign key (id_products_type) references products_type (id_products_type),
@@ -79,7 +79,7 @@ create table products (
 create table pictures (
   id_pictures bigint primary key auto_increment,
   id_products bigint,
-  path varchar(15),
+  path varchar(254),
   foreign key (id_products) references products (id_products)
   on delete cascade on update cascade
 );

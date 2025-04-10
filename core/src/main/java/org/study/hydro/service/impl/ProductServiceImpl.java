@@ -7,7 +7,9 @@ import org.study.hydro.entity.*;
 import org.study.hydro.entity.Dto.*;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
+import org.study.hydro.service.PictureService;
 import org.study.hydro.service.ProductService;
+import org.study.hydro.service.ServiceMediator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +19,24 @@ import java.util.Optional;
 public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implements ProductService {
 
     private final ProductDao productDao;
-    private final static String PRODUCT_BY_ID_NOT_FOUND_ERROR = "Product by id not found.";
+
+    private final ServiceMediator serviceMediator;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao) {
+    public ProductServiceImpl(ProductDao productDao, ServiceMediator serviceMediator) {
         this.productDao = productDao;
+        this.serviceMediator = serviceMediator;
     }
+
+    private final static String PRODUCT_BY_ID_NOT_FOUND_ERROR = "Product by id not found.";
+
+
 
     @Override
     public boolean create(ProductDto productDto) throws CoreException {
-        return productDao.create(mapToEntityFromDto(productDto, false));
+        int productId = productDao.create(mapToEntityFromDto(productDto, false));
+
+        return 1 > 0;
     }
 
     @Override
@@ -103,9 +113,11 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         prDto.setProductDtoId(object.getProductId());
         prDto.setCount(object.getCount());
         prDto.setStockKeepingUnit(object.getStockKeepingUnit());
+
         prDto.setFlowRate(object.getFlowRate());
         prDto.setPressure(object.getPressure());
         prDto.setPressureMax(object.getPressureMax());
+
         prDto.setWeight(object.getWeight());
         prDto.setAdditionalInformation(object.getAdditionalInformation());
         prDto.setProductTypeDto(new ProductTypeDto(
@@ -115,9 +127,11 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         prDto.setProductCompanyDto(new ProductCompanyDto(
                 object.getProductCompany().getProductCompanyId(),
                 object.getProductCompany().getName()));
+
         prDto.setProductConnectionDto(new ProductConnectionDto(
                 object.getProductConnection().getProductConnectionId(),
                 object.getProductConnection().getSize()));
+
         prDto.setPathHydraulicScheme(object.getPathHydraulicScheme());
 
         prDto.setCountryDto(new CountryDto(
@@ -126,8 +140,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         prDto.setImagesPaths(convertToPicturesDtoList(object.getPicturePath()));
         prDto.setStorageRackDtoList(convertToStorageRackDtoList(object.getStorageRackList()));
-
-        System.out.println("Product DTO -> " + prDto);
 
         return prDto;
     }
@@ -143,26 +155,33 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         product.setCount(objectDto.getCount());
         product.setStockKeepingUnit(objectDto.getStockKeepingUnit());
         product.setFlowRate(objectDto.getFlowRate());
+
         product.setPressure(objectDto.getPressure());
         product.setPressureMax(objectDto.getPressureMax());
         product.setWeight(objectDto.getWeight());
+
         product.setPathHydraulicScheme(objectDto.getPathHydraulicScheme());
         product.setAdditionalInformation(objectDto.getAdditionalInformation());
+
         product.setProductType(new ProductType(
                 objectDto.getProductTypeDto().getProductTypeId(),
                 objectDto.getProductTypeDto().getName()));
+
         product.setProductCompany(new ProductCompany(
                 objectDto.getProductCompanyDto().getProductCompanyDtoId(),
                 objectDto.getProductCompanyDto().getName()));
+
         product.setProductConnection(new ProductConnection(
                 objectDto.getProductConnectionDto().getProductConnectionId(),
                 objectDto.getProductConnectionDto().getSize()));
+
         product.setStorageRackList(convertFromStorageRackDtoList(objectDto.getStorageRackDtoList()));
+
+        product.setPicturePath(generatePictureList(objectDto.getImagesPaths(), product.getProductId()));
         product.setCountryProduct(new Country(
                 objectDto.getCountryDto().getCountryId(),
                 objectDto.getCountryDto().getName()));
 
-        System.out.println("Product  -> " + product);
         return product;
     }
 
@@ -216,5 +235,31 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
             }
         }
         return picturePathsList;
+    }
+
+    /**
+     * Generates a list of {@link Picture} entities based on the given list of image paths.
+     * Optionally associates each picture with a {@link Product} if a valid product ID is provided.
+     *
+     * @param picturesPaths list of image file paths to be converted into Picture entities
+     * @param productId     the ID of the product to associate with each picture;
+     *                      if 0, no product will be linked
+     * @return a list of {@link Picture} objects with paths and optional product reference
+     */
+    private List<Picture> generatePictureList(List<String> picturesPaths, int productId) {
+        List<Picture> pictures = new ArrayList<>();
+
+        for(String path : picturesPaths) {
+
+            if (productId == 0) {
+                Picture picture = new Picture();
+                picture.setPath(path);
+                pictures.add(picture);
+
+            } else {
+                pictures = serviceMediator.findPicturesByProduct(productId);
+            }
+        }
+        return pictures;
     }
 }

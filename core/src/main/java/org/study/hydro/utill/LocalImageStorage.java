@@ -27,6 +27,10 @@ public class LocalImageStorage implements ImageStorage {
     private final FileNameConverter fileNameConvector;
 
     private final static String FILE_NOT_SAVE_ERROR = "The file wasn't save.";
+    private final static String MAX_FILE_SIZE_EXCEEDED_ERROR = "File size exceeded. The size - ";
+    private final static String MAX_NAME_LENGTH_EXCEEDED_ERROR = "The file's name length exceeded. The length - ";
+    private final static String FILE_PATH_EMPTY_OR_NULL_ERROR = "The path of the file is empty or null.";
+    private final static String FILE_PATH_NOT_EXIST_ERROR = "The file doesn't exist.";
     private final static String FILES_NOT_SAVE_ERROR = "Failed to save all files. Rollback completed.";
     private final static String FILES_LIMIT_EXCEEDED_ERROR = "File upload limit exceeded. Maximum allowed files per request: ";
 
@@ -48,6 +52,8 @@ public class LocalImageStorage implements ImageStorage {
     @Override
     public String save(MultipartFile file, String uploadDir) throws CoreException {
         try {
+            isBigSizeFile(file.getSize());
+            isBigLengthName(file.getOriginalFilename().length());
             isDir(uploadDir);
             Path filePath = Paths.get(uploadDir + generateUniqueName(file.getOriginalFilename()));
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -74,15 +80,26 @@ public class LocalImageStorage implements ImageStorage {
     }
 
     @Override
-    public boolean isBigSizeFile(long uploadedFileSize ) {
-        return maxSizeFile <= uploadedFileSize ;
+    public void isBigSizeFile(long uploadedFileSize ) {
+        if (uploadedFileSize >= maxSizeFile) {
+            throw new CoreException(MAX_FILE_SIZE_EXCEEDED_ERROR + uploadedFileSize);
+        }
     }
 
     @Override
-    public boolean isBigLengthName(byte length) {
-        return length >= maxLengthFile;
+    public void isBigLengthName(int length) {
+        if (length >= maxLengthFile) {
+            throw new CoreException(MAX_NAME_LENGTH_EXCEEDED_ERROR + length);
+        }
     }
 
+    /**
+     * Ensures that the given upload directory exists. If the directory does not exist, it will be created along
+     * with any necessary parent directories.
+     *
+     * @param uploadDir the path to the directory to check or create
+     * @throws IOException if an I/O error occurs while creating the directory
+     */
     private void isDir(String uploadDir) throws IOException {
         Path path = Paths.get(uploadDir);
         if (!Files.exists(path)) {
@@ -113,5 +130,19 @@ public class LocalImageStorage implements ImageStorage {
             }
         }
         return savedPaths;
+    }
+
+    @Override
+    public boolean removeFile(String path) throws CoreException {
+        if (path.isEmpty() || path == null) {
+            throw new CoreException(FILE_PATH_EMPTY_OR_NULL_ERROR);
+        }
+        Path pathFile = Paths.get(path);
+        try {
+            Files.deleteIfExists(pathFile);
+            return true;
+        }catch (IOException e) {
+            throw new CoreException(FILE_PATH_NOT_EXIST_ERROR);
+        }
     }
 }

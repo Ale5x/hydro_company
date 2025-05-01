@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface PictureService {
 
+    String PHOTO_LIMIT_EXCEEDED_ERROR = "Photo limit reached for product.";
+
     /**
      * Creates a new pictures based on the provided data.
      * @param pictureDto a {@link PictureDto} object containing the new picture data.
@@ -52,4 +54,25 @@ public interface PictureService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     List<PictureDto> findAll(int limit, int offset) throws CoreException;
+
+    /**
+     * Validates that the number of photos associated with a product does not exceed the allowed limit. This method
+     * retrieves all pictures for the given product ID and checks if the number of pictures exceeds the maximum
+     * allowed photo limit. If the limit is exceeded, a {@link CoreException} is thrown.
+     *
+     * @param productId the ID of the product whose photos are being validated
+     * @throws CoreException if the number of photos exceeds the configured limit
+     */
+    default void validatePhotoCountLimit(int productId) throws CoreException {
+        List<Picture> pictures = findAllPicturesByProductId(productId);
+        if (pictures.size() >= getMaxPhotoLimit()) {
+            throw new CoreException(PHOTO_LIMIT_EXCEEDED_ERROR);
+        }
+    }
+
+    /**
+     * The method returns the max number of photos allowed per product for saving.
+     * @return the maximum allowed number of photos for a product.
+     */
+    int getMaxPhotoLimit();
 }

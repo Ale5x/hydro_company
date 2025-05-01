@@ -33,17 +33,28 @@ public interface ImageStorage {
 
     /**
      * Checks whether the uploaded file size exceeds a predefined maximum limit.
-     * @param uploadedFileSize the size of the uploaded file in bytes
-     * @return true if the file is too large, false otherwise
+     * @param uploadedFileSize the size of the uploaded file in bytes.
+     * @throws CoreException if the size file is bigger than its allowed.
      */
-    boolean isBigSizeFile(long uploadedFileSize);
+    void isBigSizeFile(long uploadedFileSize) throws CoreException;
+
+    /**
+     * Removes a file from the system based on the provided file path. This method attempts to delete the file
+     * located at the specified path.
+     * @param path The absolute path to the file that should be removed.
+     *              The path should be in a valid format and point to an existing file.
+     * @return {@code true} if the file was successfully removed,
+     *         {@code false} otherwise.
+     * @throws CoreException If the provided path is null or empty.
+     */
+    boolean removeFile(String path) throws CoreException;
 
     /**
      * Checks whether the file name length (in characters) exceeds a predefined maximum limit.
      * @param length the length of the file name in bytes
-     * @return true if the name is too long, false otherwise
+     * @throws CoreException if the name's file is bigger than its allowed.
      */
-    boolean isBigLengthName(byte length);
+    void isBigLengthName(int length);
 
     /**
      * Adds additional information before the file extension to make unique name.

@@ -7,9 +7,9 @@ import org.study.hydro.entity.*;
 import org.study.hydro.entity.Dto.*;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
-import org.study.hydro.service.PictureService;
 import org.study.hydro.service.ProductService;
 import org.study.hydro.service.ServiceMediator;
+import org.study.hydro.utill.ImageStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,17 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     private final ServiceMediator serviceMediator;
 
+    private final ImageStorage imageStorage;
+
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ServiceMediator serviceMediator) {
+    public ProductServiceImpl(ProductDao productDao, ServiceMediator serviceMediator, ImageStorage imageStorage) {
         this.productDao = productDao;
         this.serviceMediator = serviceMediator;
+        this.imageStorage = imageStorage;
     }
 
     private final static String PRODUCT_BY_ID_NOT_FOUND_ERROR = "Product by id not found.";
+    private final static String FILED_REMOVING_FILES_ERROR = "Failed to remove some product's files: ";
 
 
 
@@ -36,7 +40,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     public boolean create(ProductDto productDto) throws CoreException {
         int productId = productDao.create(mapToEntityFromDto(productDto, false));
 
-        return 1 > 0;
+        return productId > 0;
     }
 
     @Override
@@ -46,11 +50,25 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     @Override
     public boolean remove(int id) throws CoreException {
-        Optional<Product> product = productDao.getProductById(id);
-        if (product.isPresent()) {
-            return productDao.remove(id);
-        } else {
-            throw new CoreException(PRODUCT_BY_ID_NOT_FOUND_ERROR);
+        Product product = productDao.getProductById(id).orElseThrow(
+                () -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_ERROR));
+
+        if (productDao.remove(product.getProductId())) {
+            removeAllProductFiles(product);
+            return true;
+        }
+        return false;
+    }
+
+    private void removeAllProductFiles(Product product) {
+        List<String> failedPaths = product.getPicturePath().stream()
+                .map(Picture::getPath)
+                .filter(path -> !imageStorage.removeFile(path))
+                .toList();
+
+        if (!failedPaths.isEmpty()) {
+            //logging
+            throw new CoreException(FILED_REMOVING_FILES_ERROR + failedPaths);
         }
     }
 
@@ -216,7 +234,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                     storageRackDto.getName(),
                     new Shelf(storageRackDto.getShelfName())
             );
-
             storageList.add(storageRack);
         }
         return storageList;
@@ -248,14 +265,11 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
      */
     private List<Picture> generatePictureList(List<String> picturesPaths, int productId) {
         List<Picture> pictures = new ArrayList<>();
-
         for(String path : picturesPaths) {
-
             if (productId == 0) {
                 Picture picture = new Picture();
                 picture.setPath(path);
                 pictures.add(picture);
-
             } else {
                 pictures = serviceMediator.findPicturesByProduct(productId);
             }

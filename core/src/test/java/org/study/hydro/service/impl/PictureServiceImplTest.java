@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.study.hydro.dao.PictureDao;
 import org.study.hydro.entity.Dto.PictureDto;
 import org.study.hydro.entity.Picture;
 import org.study.hydro.entity.Product;
+import org.study.hydro.service.ServiceMediator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ class PictureServiceImplTest {
     @Mock
     private PictureDao pictureDao;
     @Mock
-    private ProductServiceImpl productService;
+    private ServiceMediator serviceMediator;
 
     @InjectMocks
     private PictureServiceImpl pictureService;
@@ -51,11 +53,14 @@ class PictureServiceImplTest {
 
         pictureList.add(picture);
 
+        ReflectionTestUtils.setField(pictureService, "maxPhotoLimit", 10);
+
     }
 
     @Test
     void create() {
-        when(productService.findProductById(someId)).thenReturn(Optional.of(new Product(someId)));
+        when(serviceMediator.findProductById(someId)).thenReturn(Optional.of(new Product(someId)));
+        when(pictureService.findAllPicturesByProductId(someId)).thenReturn(pictureList);
         when(pictureDao.create(any(Picture.class))).thenReturn(true);
 
         boolean condition = pictureService.create(pictureDto);
@@ -92,5 +97,12 @@ class PictureServiceImplTest {
 
         assertNotNull(list);
         verify(pictureDao, times(1)).getPictures(limit, offset);
+    }
+
+    @Test
+    void getMaxPhotoLimit() {
+        int expected = 10;
+        int actual = pictureService.getMaxPhotoLimit();
+        assertEquals(expected, actual);
     }
 }

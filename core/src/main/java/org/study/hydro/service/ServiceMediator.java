@@ -2,6 +2,8 @@ package org.study.hydro.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.study.hydro.dao.PictureDao;
+import org.study.hydro.dao.ProductDao;
 import org.study.hydro.entity.Picture;
 import org.study.hydro.entity.Product;
 
@@ -16,13 +18,13 @@ import java.util.Optional;
 @Component
 public class ServiceMediator {
 
-    private final ProductService productService;
-    private final PictureService pictureService;
+    private final ProductDao productDao;
+    private final PictureDao pictureDao;
 
     @Autowired
-    public ServiceMediator(ProductService productService, PictureService pictureService) {
-        this.productService = productService;
-        this.pictureService = pictureService;
+    public ServiceMediator(ProductDao productDao, PictureDao pictureDao) {
+        this.productDao = productDao;
+        this.pictureDao = pictureDao;
     }
 
     /**
@@ -32,7 +34,7 @@ public class ServiceMediator {
      * @return An Optional containing the product if found, or empty if not
      */
     public Optional<Product> findProductById(int id) {
-        return productService.findProductById(id);
+        return productDao.getProductById(id);
     }
 
     /**
@@ -42,6 +44,6 @@ public class ServiceMediator {
      * @return A list of pictures associated with the given product ID
      */
     public List<Picture> findPicturesByProduct(int productId) {
-        return pictureService.findAllPicturesByProductId(productId);
+        return pictureDao.getPicturesByProductId(productId);
     }
 }

@@ -43,7 +43,7 @@ public class LocalImageStorage implements ImageStorage {
     private long maxSizeFile;
 
     @Value("${file.multipart.max-length-file}")
-    private byte maxLengthFile;
+    private int maxLengthFile;
 
     @Value("${file.multipart.max-allowed-files}")
     private int maxAllowedFiles;

@@ -23,7 +23,7 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     private final static String PICTURE_NOT_REMOVE_ERROR = "A picture don't remove";
     private final static String PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR = "Product not found for the picture";
 
-    @Value("${file.limit-pictures}")
+    @Value("${file.limit_pictures}")
     private int maxPhotoLimit;
 
     private final PictureDao pictureDao;

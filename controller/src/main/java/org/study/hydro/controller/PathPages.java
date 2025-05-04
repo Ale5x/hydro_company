@@ -104,9 +104,15 @@ public class PathPages {
     public static final String COUNTRY_ID = COUNTRY + "/id";
     public static final String COUNTRY_NAME = COUNTRY + "/name";
 
-    public static final String USER = API + "/user";
-    public static final String USER_ALL = ADMIN_BRANCH + "/get_all";
-    public static final String USER_ID = USER_BRANCH + "/id";
+    public static final String USER = "/user";
+    public static final String USER_ALL = ADMIN_BRANCH + USER + "/get_all";
+    public static final String USER_ID = ADMIN_BRANCH + USER + "/id";
+
+    public static final String PICTURE_BRANCH = ADMIN_BRANCH + "/picture";
+    public static final String PICTURE_CREATE = PICTURE_BRANCH + "/create";
+    public static final String PICTURE_REMOVE = PICTURE_BRANCH + "/remove";
+    public static final String PICTURE_BY_PRODUCT = PICTURE_BRANCH + "/product_id";
+    public static final String PICTURE_ALL = PICTURE_BRANCH + "/all";
 
 
     public static final String ALL_RESOURCES = "/**";

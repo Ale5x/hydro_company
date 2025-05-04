@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.StorageRackDao;
 import org.study.hydro.entity.Dto.StorageRackDto;
 import org.study.hydro.entity.StorageRack;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, StorageRack> implements StorageRackService {
 
     private final static String NOT_FOUND_STORAGE_RACK_ERROR = "Storage rack not found";

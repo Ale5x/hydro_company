@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.ProductConnectionDao;
 import org.study.hydro.entity.Dto.ProductConnectionDto;
 import org.study.hydro.entity.ProductConnection;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ProductConnectionServiceImpl extends EntityMapper<ProductConnectionDto, ProductConnection> implements ProductConnectionService {
 
     private final ProductConnectionDao productConnectionDao;

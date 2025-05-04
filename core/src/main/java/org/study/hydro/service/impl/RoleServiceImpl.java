@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.RoleDao;
 import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * @author Aliaksandr Pishchala
  */
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 
     @Autowired

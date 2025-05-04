@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.CountryDao;
 import org.study.hydro.entity.Country;
 import org.study.hydro.entity.Dto.CountryDto;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implements CountryService {
 
     private static final String COUNTRY_NOT_FOUND_ERROR = "Country not found.";

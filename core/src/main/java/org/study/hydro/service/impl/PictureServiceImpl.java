@@ -3,6 +3,7 @@ package org.study.hydro.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.PictureDao;
 import org.study.hydro.entity.Dto.PictureDto;
 import org.study.hydro.entity.Picture;
@@ -17,6 +18,7 @@ import java.util.List;
 
 
 @Service
+@Transactional
 public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implements PictureService {
 
     private final static String PICTURE_NOT_FOUND_BY_ID_ERROR = "A picture not found by id";

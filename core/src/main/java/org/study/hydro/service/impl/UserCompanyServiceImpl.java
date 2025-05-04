@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserCompanyDao;
 import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.Dto.UserCompanyDto;
@@ -18,6 +19,7 @@ import java.util.*;
  * @author Aliaksandr Pishchala
  */
 @Service
+@Transactional
 public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCompany> implements UserCompanyService {
 
     private final static String USER_COMPANY_BY_ID_NOT_FOUND = "User company by id not found.";

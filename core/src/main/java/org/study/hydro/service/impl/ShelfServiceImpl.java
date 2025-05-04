@@ -2,6 +2,7 @@ package org.study.hydro.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.ShelfDao;
 import org.study.hydro.entity.Dto.ShelfDto;
 import org.study.hydro.entity.Shelf;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements ShelfService {
 
     private final ShelfDao shelfDao;

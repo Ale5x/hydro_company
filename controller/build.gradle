@@ -36,13 +36,10 @@ dependencies {
 
     implementation 'commons-dbcp:commons-dbcp:1.4'
 
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api   delete
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl    delete
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson delete
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
     implementation group: 'com.auth0', name: 'java-jwt', version: '3.11.0'

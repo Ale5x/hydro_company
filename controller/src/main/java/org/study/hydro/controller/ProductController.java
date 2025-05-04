@@ -58,8 +58,8 @@ public class ProductController {
     @PostMapping(value = PathPages.PRODUCT_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> create (
             @RequestPart(ControllerConstants.DATE) ProductDto productDto,
-            @RequestParam(ControllerConstants.FILE_PRODUCT_SCHEME) MultipartFile fileScheme,
-            @RequestParam(ControllerConstants.FILES) List<MultipartFile> files) {
+            @RequestPart(ControllerConstants.FILE_PRODUCT_SCHEME) MultipartFile fileScheme,
+            @RequestPart(ControllerConstants.FILES) List<MultipartFile> files) {
         productDto.setPathHydraulicScheme(localImageStorage.save(fileScheme, schemeDir));
         productDto.setImagesPaths(localImageStorage.saveAll(files, imagesDir));
         if (productService.create(productDto)) {

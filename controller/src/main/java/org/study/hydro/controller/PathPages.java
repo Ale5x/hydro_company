@@ -112,6 +112,7 @@ public class PathPages {
     public static final String PICTURE_CREATE = PICTURE_BRANCH + "/create";
     public static final String PICTURE_REMOVE = PICTURE_BRANCH + "/remove";
     public static final String PICTURE_BY_PRODUCT = PICTURE_BRANCH + "/product_id";
+    public static final String PICTURE_BY_ID = PICTURE_BRANCH + "/id";
     public static final String PICTURE_ALL = PICTURE_BRANCH + "/all";
 
 

@@ -9,12 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.StorageRackDto;
 import org.study.hydro.exception.ReportException;
+import org.study.hydro.hateoas.HateoasLinkHelper;
+import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.StorageRackService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class {@link StorageRackController} provides endpoints for accessing storage rack data.
@@ -22,7 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @author Aliaksandr Pishchala
  */
 @RestController
-public class StorageRackController {
+public class StorageRackController implements HypermediaListAssembler<StorageRackDto> {
 
     private final StorageRackService storageRackService;
 
@@ -80,21 +82,27 @@ public class StorageRackController {
      */
     @GetMapping(value = PathPages.STORAGE_RACK_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<StorageRackDto> findAll (@RequestParam(ControllerConstants.PAGE) String page,
-                                                @RequestParam(ControllerConstants.SIZE) String size) {
-        ValidatorParam.isNumber(size);
-        ValidatorParam.isNumber(page);
+                                                    @RequestParam(ControllerConstants.SIZE) String size) {
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size);
+        List<StorageRackDto> storageRackList = storageRackService.storageRackList(
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<StorageRackDto> nextDataList = storageRackService.storageRackList(
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
 
-        Link previousLink = linkTo(methodOn(StorageRackController.class)
-                .findAll(Pagination.getPreviousPage(page), size))
-                .withRel(ControllerConstants.PREVIOUS).withType(ControllerConstants.METHOD_GET);
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                StorageRackController.class,
+                PathPages.STORAGE_RACK_ALL,
+                searchCriteria);
 
-        Link nextLink = linkTo(methodOn(StorageRackController.class)
-                .findAll(Pagination.getNumberNextPage(page), size))
-                .withRel(ControllerConstants.NEXT).withType(ControllerConstants.METHOD_GET);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                StorageRackController.class,
+                PathPages.STORAGE_RACK_ALL,
+                searchCriteria);
 
-        return CollectionModel.of(
-                storageRackService.storageRackList(Integer.parseInt(size), Integer.parseInt(page)),
-                previousLink,
-                nextLink);
+        return createPaginatedModel(storageRackList, nextDataList, previousLink, nextLink);
     }
 }

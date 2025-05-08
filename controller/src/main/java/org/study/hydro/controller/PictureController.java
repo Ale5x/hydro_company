@@ -10,14 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.study.hydro.entity.Dto.PictureDto;
+import org.study.hydro.exception.AppRequestException;
+import org.study.hydro.hateoas.HateoasLinkHelper;
+import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.PictureService;
 import org.study.hydro.utill.ImageStorage;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import java.util.Map;
 
 /**
  * This class {@link PictureController} provides endpoints for accessing pictures data.
@@ -25,7 +27,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
  * @author Aliaksandr Pishchala
  */
 @RestController
-public class PictureController {
+public class PictureController implements HypermediaListAssembler<PictureDto> {
+
+    private final static String PICTURE_NOT_FOUND_MESSAGE = "A picture not found.";
 
     @Value("${file.upload-product-images-dir}")
     private String productImages;
@@ -49,7 +53,7 @@ public class PictureController {
      */
     @PostMapping(value = PathPages.PICTURE_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<HttpStatus> create(@RequestPart(ControllerConstants.FILE) MultipartFile file,
-                                              @RequestPart("picture") PictureDto pictureDto) {
+                                              @RequestPart(ControllerConstants.PICTURE) PictureDto pictureDto) {
         pictureDto.setPath(imageStorage.save(file, productImages));
         if (pictureService.create(pictureDto)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -84,9 +88,21 @@ public class PictureController {
      */
     @GetMapping(value = PathPages.PICTURE_BY_PRODUCT, produces = MediaType.APPLICATION_JSON_VALUE)
     private CollectionModel<PictureDto> findByProduct(@RequestParam(ControllerConstants.ID) String id) {
-
         ValidatorParam.isNumber(id);
         return CollectionModel.of(pictureService.findPicturesByProductId(Integer.parseInt(id)));
+    }
+
+    /**
+     * Retrieves a picture associated with a specific own by its ID.
+     * Validates that the provided ID is a valid numeric string using {@link ValidatorParam#isNumber(String)}.
+     * @param id  the string representation of the pictures ID; must be a valid number
+     * @return a {@link CollectionModel} containing the list of {@link PictureDto} objects associated with the product
+     */
+    @GetMapping(value = PathPages.PICTURE_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    private PictureDto findById(@RequestParam(ControllerConstants.ID) String id) {
+        ValidatorParam.isNumber(id);
+        return pictureService.findPictureById(Integer.parseInt(id)).orElseThrow(
+                () -> new AppRequestException(PICTURE_NOT_FOUND_MESSAGE, HttpStatus.BAD_REQUEST));
     }
 
     /**
@@ -104,20 +120,29 @@ public class PictureController {
     @GetMapping(value = PathPages.PICTURE_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
     private CollectionModel<PictureDto> findAllPictures(@RequestParam(ControllerConstants.SIZE) String size,
                                                         @RequestParam(ControllerConstants.PAGE) String page) {
-        ValidatorParam.isNumber(size);
-        ValidatorParam.validPage(page);
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size);
 
-        List<PictureDto> pictures = pictureService.findAll(Integer.parseInt(size), Integer.parseInt(page));
+        List<PictureDto> pictureList = pictureService.findAll(
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<PictureDto> nextDataList = pictureService.findAll(
+                Pagination.getOffset(
+                        Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
 
-        Link previousLink = linkTo(PictureController.class)
-                .slash(PathPages.PICTURE_ALL + "?size=" + size + "&page=" + Pagination.getPreviousPage(page))
-                .withRel(ControllerConstants.PREVIOUS);
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                PictureController.class,
+                PathPages.PICTURE_ALL,
+                searchCriteria);
 
-        Link nextLink = linkTo(PictureController.class)
-                .slash(PathPages.PICTURE_ALL + "?size=" + size + "&page=" + Pagination.getNumberNextPage(page))
-                .withRel(ControllerConstants.NEXT);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                PictureController.class,
+                PathPages.PICTURE_ALL,
+                searchCriteria);
 
-        return CollectionModel.of(pictures, previousLink, nextLink);
+        return createPaginatedModel(pictureList, nextDataList, previousLink, nextLink);
     }
 }
 

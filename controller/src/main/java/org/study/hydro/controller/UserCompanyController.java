@@ -9,12 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.exception.ReportException;
+import org.study.hydro.hateoas.HateoasLinkHelper;
+import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.UserCompanyService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * This class {@link UserCompanyController} provides endpoints for accessing user company data.
@@ -22,7 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @author Aliaksandr Pishchala
  */
 @RestController
-public class UserCompanyController {
+public class UserCompanyController implements HypermediaListAssembler<UserCompanyDto> {
 
     private final UserCompanyService userCompanyService;
 
@@ -65,22 +69,29 @@ public class UserCompanyController {
      */
     @GetMapping(value = PathPages.USER_COMPANY_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<UserCompanyDto> findAll (@RequestParam(ControllerConstants.PAGE) String page,
-                                                @RequestParam(ControllerConstants.SIZE) String size) {
-        ValidatorParam.isNumber(size);
-        ValidatorParam.isNumber(page);
+                                                    @RequestParam(ControllerConstants.SIZE) String size) {
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size);
 
-        Link previousLink = linkTo(methodOn(UserCompanyController.class)
-                .findAll(Pagination.getPreviousPage(page), size))
-                .withRel(ControllerConstants.PREVIOUS).withType(ControllerConstants.METHOD_GET);
+        List<UserCompanyDto> companyList = userCompanyService.findAll(
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<UserCompanyDto> nextDataList = userCompanyService.findAll(
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
 
-        Link nextLink = linkTo(methodOn(UserCompanyController.class)
-                .findAll(Pagination.getNumberNextPage(page), size))
-                .withRel(ControllerConstants.NEXT).withType(ControllerConstants.METHOD_GET);
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                UserCompanyController.class,
+                PathPages.USER_COMPANY_ALL,
+                searchCriteria);
 
-        return CollectionModel.of(
-                userCompanyService.findAll(Integer.parseInt(size), Integer.parseInt(page)),
-                previousLink,
-                nextLink);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                UserCompanyController.class,
+                PathPages.USER_COMPANY_ALL,
+                searchCriteria);
+
+        return createPaginatedModel(companyList, nextDataList, previousLink, nextLink);
     }
 
     /**

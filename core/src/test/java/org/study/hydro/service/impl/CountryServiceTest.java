@@ -105,6 +105,23 @@ public class CountryServiceTest {
     }
 
     @Test
+    void getCountryByIdRightTest() {
+        int id = 1;
+        given(countryDao.countryById(id)).willReturn(Optional.of(optionalCountry));
+        Optional<CountryDto> countryDto = countryService.findById(id);
+        assertTrue(countryDto.isPresent());
+    }
+
+    @Test
+    void getCountryByIdWrongTest() {
+        int id = 1;
+        given(countryDao.countryById(id)).willReturn(Optional.empty());
+        Optional<CountryDto> countryDto = countryService.findById(id);
+        assertFalse(countryDto.isPresent());
+        assertTrue(countryDto.isEmpty());
+    }
+
+    @Test
     void getCountriesRightTest() {
         int testOne = 0;
         int testTwo = 1;

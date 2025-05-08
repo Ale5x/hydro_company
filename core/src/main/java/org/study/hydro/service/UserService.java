@@ -31,7 +31,7 @@ public interface UserService {
      * @return the specified list of usersDto.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<UserDto> findAll(int limit, int offset) throws CoreException;
+    List<UserDto> findAll(int offset, int limit) throws CoreException;
 
     /**
      * The method returns specified UserDto by id.

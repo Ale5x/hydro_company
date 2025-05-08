@@ -1,6 +1,5 @@
 package org.study.hydro.service.impl;
 
-//import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,8 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydro.dao.UserCompanyDao;
+import org.study.hydro.entity.Dto.CountryDto;
 import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.Dto.UserCompanyDto;
+import org.study.hydro.service.CountryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,11 @@ class UserCompanyServiceImplTest {
 
     @Mock
     private UserCompanyDao userCompanyDao;
+    @Mock
+    private CountryService countryService;
 
     private UserCompanyDto userCompanyDto = new UserCompanyDto();
+    private CountryDto countryDto = new CountryDto(1, "BOSH");
     private List<UserCompany> userCompanyList = new ArrayList<>();
     private int returnExpected = 1;
     private int returnExpectedWrong = 0;
@@ -50,6 +54,7 @@ class UserCompanyServiceImplTest {
     @Test
     void create() {
         when(userCompanyDao.save(any(UserCompany.class))).thenReturn(returnExpected);
+        when(countryService.findById(1)).thenReturn(Optional.of(countryDto));
         boolean expected = true;
         boolean actual = companyService.create(userCompanyDto);
         assertEquals(expected, actual);

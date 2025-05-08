@@ -11,6 +11,10 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
     public ProductCompanyDto() {}
 
+    public ProductCompanyDto(int productCompanyDtoId) {
+        this.productCompanyDtoId = productCompanyDtoId;
+    }
+
     public ProductCompanyDto(int productCompanyDtoId, String name) {
         this.productCompanyDtoId = productCompanyDtoId;
         this.name = name;

@@ -67,7 +67,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                 .map(Picture::getPath)
                 .filter(path -> !imageStorage.removeFile(path))
                 .toList();
-
         if (!failedPaths.isEmpty()) {
             //logging
             throw new CoreException(FILED_REMOVING_FILES_ERROR + failedPaths);
@@ -86,12 +85,12 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     }
 
     @Override
-    public List<ProductDto> findAll(int limit, int offset) throws CoreException {
+    public List<ProductDto> findAll(int offset, int limit) throws CoreException {
         return mapToListObjectsDto(productDao.getProductsList(limit, offset));
     }
 
     @Override
-    public List<ProductDto> findAllByPressure(int limit, int offset, int pressure) throws CoreException {
+    public List<ProductDto> findAllByPressure(int offset, int limit, int pressure) throws CoreException {
         return mapToListObjectsDto(productDao.getProductsByPressure(limit, offset, pressure));
     }
 
@@ -101,17 +100,17 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     }
 
     @Override
-    public List<ProductDto> findAllByType(int limit, int offset, ProductTypeDto type) throws CoreException {
+    public List<ProductDto> findAllByType(int offset, int limit, ProductTypeDto type) throws CoreException {
         return mapToListObjectsDto(productDao.getProductsByTypeId(limit, offset, type.getProductTypeId()));
     }
 
     @Override
-    public List<ProductDto> findAllByCompany(int limit, int offset, ProductCompanyDto company) throws CoreException {
+    public List<ProductDto> findAllByCompany(int offset, int limit, ProductCompanyDto company) throws CoreException {
         return mapToListObjectsDto(productDao.getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId()));
     }
 
     @Override
-    public List<ProductDto> findAllByStorageRack(int limit, int offset, StorageRackDto storageRack) throws CoreException {
+    public List<ProductDto> findAllByStorageRack(int offset, int limit, StorageRackDto storageRack) throws CoreException {
         return mapToListObjectsDto(productDao.getProductsByStorageRackName(limit, offset, storageRack.getName()));
     }
 
@@ -183,27 +182,44 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         product.setPathHydraulicScheme(objectDto.getPathHydraulicScheme());
         product.setAdditionalInformation(objectDto.getAdditionalInformation());
 
-        product.setProductType(new ProductType(
-                objectDto.getProductTypeDto().getProductTypeId(),
-                objectDto.getProductTypeDto().getName()));
+        if (objectDto.getProductTypeDto().getProductTypeId() == 0) {
+            product.setProductType(new ProductType(
+                    objectDto.getProductTypeDto().getName()));
+        } else {
+            product.setProductType(new ProductType(
+                    objectDto.getProductTypeDto().getProductTypeId(),
+                    objectDto.getProductTypeDto().getName()));
+        }
+         if (objectDto.getProductCompanyDto().getProductCompanyDtoId() == 0) {
+             product.setProductCompany(new ProductCompany(
+                     objectDto.getProductCompanyDto().getName()));
+         } else {
+             product.setProductCompany(new ProductCompany(
+                     objectDto.getProductCompanyDto().getProductCompanyDtoId(),
+                     objectDto.getProductCompanyDto().getName()));
+         }
 
-        product.setProductCompany(new ProductCompany(
-                objectDto.getProductCompanyDto().getProductCompanyDtoId(),
-                objectDto.getProductCompanyDto().getName()));
+         if (objectDto.getProductConnectionDto().getProductConnectionId() == 0) {
+             product.setProductConnection(new ProductConnection(
+                     objectDto.getProductConnectionDto().getSize()));
+         } else {
+             product.setProductConnection(new ProductConnection(
+                     objectDto.getProductConnectionDto().getProductConnectionId(),
+                     objectDto.getProductConnectionDto().getSize()));
+         }
 
-        product.setProductConnection(new ProductConnection(
-                objectDto.getProductConnectionDto().getProductConnectionId(),
-                objectDto.getProductConnectionDto().getSize()));
 
         product.setStorageRackList(convertFromStorageRackDtoList(objectDto.getStorageRackDtoList()));
 
-        product.setPicturePath(generatePictureList(objectDto.getImagesPaths(), product.getProductId()));
+        product.setPicturePath(generatePictureList(objectDto.getImagesPaths(), objectDto.getProductDtoId()));
         product.setCountryProduct(new Country(
                 objectDto.getCountryDto().getCountryId(),
                 objectDto.getCountryDto().getName()));
 
-        return product;
-    }
+
+
+            return product;
+        }
 
     /**
      * The method converts storage racks objects into storage racks DTO objects.

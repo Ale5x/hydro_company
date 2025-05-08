@@ -48,6 +48,11 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
     }
 
     @Override
+    public Optional<Country> findCountryById(int id) {
+        return countryDao.countryById(id);
+    }
+
+    @Override
     public List<CountryDto> mapToListObjectsDto(List<Country> objectsDtoList) {
         List<CountryDto> countryDtoList = new ArrayList<>();
         for(Country country : objectsDtoList) {

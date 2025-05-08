@@ -28,6 +28,8 @@ class ProductCompanyDaoImplTest {
     private int productCompanyId = 1;
     private String newName = "BOSH - 2";
     private String createNewProductCompanyName = "AlG link";
+    private int offset = 1;
+    private int limit = 10;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +37,7 @@ class ProductCompanyDaoImplTest {
 
     @Test
     void create() {
-        List<ProductCompany> productCompanyListBefore = productCompanyDao.getProductCompanies();
+        List<ProductCompany> productCompanyListBefore = productCompanyDao.getProductCompanies(offset, limit);
 
         assertFalse(productCompanyListBefore.isEmpty());
 
@@ -44,7 +46,7 @@ class ProductCompanyDaoImplTest {
 
         assertTrue(condition);
 
-        List<ProductCompany> productCompanyListAfter = productCompanyDao.getProductCompanies();
+        List<ProductCompany> productCompanyListAfter = productCompanyDao.getProductCompanies(offset, limit);
 
         assertFalse(productCompanyListAfter.isEmpty());
         assertTrue(productCompanyListAfter.size() > productCompanyListBefore.size());
@@ -60,7 +62,7 @@ class ProductCompanyDaoImplTest {
 
     @Test
     void getProductCompanies() {
-        List<ProductCompany> productCompanyList = productCompanyDao.getProductCompanies();
+        List<ProductCompany> productCompanyList = productCompanyDao.getProductCompanies(offset, limit);
         assertFalse(productCompanyList.isEmpty());
         assertTrue(productCompanyList.size() > 0);
     }

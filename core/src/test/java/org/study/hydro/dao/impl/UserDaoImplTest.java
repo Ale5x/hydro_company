@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.UserDao;
@@ -20,9 +22,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DevelopmentConfig.class)
+@SpringBootTest(classes = DevelopmentConfig.class)
 @ActiveProfiles("development")
+@TestPropertySource(locations = "classpath:application-development.properties")
 class UserDaoImplTest {
 
     @Autowired

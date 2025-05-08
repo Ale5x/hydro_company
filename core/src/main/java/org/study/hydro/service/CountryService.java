@@ -1,5 +1,6 @@
 package org.study.hydro.service;
 
+import org.study.hydro.entity.Country;
 import org.study.hydro.entity.Dto.CountryDto;
 import org.study.hydro.exception.CoreException;
 
@@ -30,10 +31,18 @@ public interface CountryService {
     List<CountryDto> findByName(String name);
 
     /**
-     * Retrieves a countriesDto by its unique identifier.
+     * Retrieves a countryDto by its unique identifier.
      * @param id the unique identifier of the country.
      * @return an Optional object of {@link CountryDto} object representing the country with the specified id.
      * @throws CoreException if an error occurs during the retrieval process.
      */
     Optional<CountryDto> findById(int id);
+
+    /**
+     * Retrieves a country by its unique identifier.
+     * @param id the unique identifier of the country.
+     * @return an Optional object of {@link Country} object representing the country with the specified id.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    Optional<Country> findCountryById(int id);
 }

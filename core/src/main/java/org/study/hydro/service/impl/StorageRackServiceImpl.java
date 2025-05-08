@@ -48,7 +48,7 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
     }
 
     @Override
-    public List<StorageRackDto> storageRackList(int limit, int offset) throws CoreException {
+    public List<StorageRackDto> storageRackList(int offset, int limit) throws CoreException {
         return mapToListObjectsDto(storageRackDao.getStorageRacksList(limit, offset));
     }
 
@@ -82,11 +82,9 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
             storageRack.setStorageRackId(objectDto.getStorageRackDtoId());
 
         }
-        System.out.println("objectDto.getName() -> " + objectDto.getName());
         storageRack.setName(objectDto.getName());
         storageRack.setShelf(shelfService.findShelfByName(objectDto.getShelfName())
                 .orElseThrow(() -> new CoreException(SHELF_FOR_STORAGE_NOT_FOUND_ERROR)));
-        System.out.println("storageRack -> " + storageRack);
         return storageRack;
     }
 }

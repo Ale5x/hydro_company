@@ -90,10 +90,20 @@ class PictureServiceImplTest {
     }
 
     @Test
+    void findPicturesById() {
+        when(pictureDao.findById(someId)).thenReturn(Optional.of(picture));
+
+        Optional<PictureDto> pictureDtoOptional = pictureService.findPictureById(someId);
+
+        assertTrue(pictureDtoOptional.isPresent());
+        verify(pictureDao, times(1)).findById(someId);
+    }
+
+    @Test
     void findAll() {
         when(pictureDao.getPictures(limit, offset)).thenReturn(pictureList);
 
-        List<PictureDto> list = pictureService.findAll(limit, offset);
+        List<PictureDto> list = pictureService.findAll(offset, limit);
 
         assertNotNull(list);
         verify(pictureDao, times(1)).getPictures(limit, offset);

@@ -66,7 +66,7 @@ public interface ProductService {
      * @return a list of all productsDto as {@link ProductDto} objects.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAll(int limit, int offset) throws CoreException;
+    List<ProductDto> findAll(int offset, int limit) throws CoreException;
 
     /**
      * Retrieves a paginated list of productsDto filtered by a specific pressure value.
@@ -76,7 +76,7 @@ public interface ProductService {
      * @return a list of {@link ProductDto} objects representing the productsDto that match the specified pressure value.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByPressure(int limit, int offset, int pressure) throws CoreException;
+    List<ProductDto> findAllByPressure(int offset, int limit, int pressure) throws CoreException;
 
     /**
      * Retrieves a paginated list of productsDto filtered by a specific flowRate value.
@@ -86,7 +86,7 @@ public interface ProductService {
      * @return a list of {@link ProductDto} objects representing the productsDto that match the specified flowRate value.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByFlowRate(int limit, int offset, int flowRate) throws CoreException;
+    List<ProductDto> findAllByFlowRate(int offset, int limit, int flowRate) throws CoreException;
 
     /**
      * Retrieves a paginated list of products filtered by a specific productDto type by its unique identifier.
@@ -97,7 +97,7 @@ public interface ProductService {
      * its unique identifier.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByType(int limit, int offset, ProductTypeDto type) throws CoreException;
+    List<ProductDto> findAllByType(int offset, int limit, ProductTypeDto type) throws CoreException;
 
     /**
      * Retrieves a paginated list of productsDto filtered by a specific product company by its unique identifier.
@@ -108,7 +108,7 @@ public interface ProductService {
      * company by its unique identifier.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByCompany(int limit, int offset, ProductCompanyDto company) throws CoreException;
+    List<ProductDto> findAllByCompany(int offset, int limit, ProductCompanyDto company) throws CoreException;
 
     /**
      * Retrieves a paginated list of productsDto filtered by a specific storage rack by its unique name.
@@ -119,5 +119,5 @@ public interface ProductService {
      * its unique name.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByStorageRack(int limit, int offset, StorageRackDto storageRack) throws CoreException;
+    List<ProductDto> findAllByStorageRack(int offset, int limit, StorageRackDto storageRack) throws CoreException;
 }

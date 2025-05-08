@@ -15,17 +15,18 @@ import org.study.hydro.utill.ImageStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 @Transactional
 public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implements PictureService {
 
-    private final static String PICTURE_NOT_FOUND_BY_ID_ERROR = "A picture not found by id";
-    private final static String PICTURE_NOT_REMOVE_ERROR = "A picture don't remove";
-    private final static String PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR = "Product not found for the picture";
+    private final static String PICTURE_NOT_FOUND_BY_ID_ERROR = "A picture not found by id= %s";
+    private final static String PICTURE_NOT_REMOVE_ERROR = "A picture don't remove. The picture id=%s ";
+    private final static String PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR = "A product not found for the picture. The product id=%s";
 
-    @Value("${file.limit_pictures}")
+    @Value("${file.limit-pictures}")
     private int maxPhotoLimit;
 
     private final PictureDao pictureDao;
@@ -50,13 +51,13 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     @Override
     public boolean remove(int id) throws CoreException {
         Picture picture = pictureDao.findById(id)
-                .orElseThrow(() -> new CoreException(PICTURE_NOT_FOUND_BY_ID_ERROR));
+                .orElseThrow(() -> new CoreException(String.format(PICTURE_NOT_FOUND_BY_ID_ERROR, id)));
 
         boolean isRemoved = pictureDao.remove(id);
         if (isRemoved) {
             return imageStorage.removeFile(picture.getPath());
         } else {
-            throw new CoreException(PICTURE_NOT_REMOVE_ERROR);
+            throw new CoreException(String.format(PICTURE_NOT_REMOVE_ERROR, id));
         }
     }
 
@@ -66,7 +67,14 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     }
 
     @Override
-    public List<PictureDto> findAll(int limit, int offset) throws CoreException {
+    public Optional<PictureDto> findPictureById(int id) throws CoreException {
+        return Optional.of(mapToObjectDto(pictureDao.findById(id).orElseThrow(
+                () -> new CoreException(String.format(PICTURE_NOT_FOUND_BY_ID_ERROR, id))
+        )));
+    }
+
+    @Override
+    public List<PictureDto> findAll(int offset, int limit) throws CoreException {
         return mapToListObjectsDto(pictureDao.getPictures(limit, offset));
     }
 
@@ -101,7 +109,8 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
         picture.setPictureId(objectDto.getPictureDtoId());
 
         picture.setProduct(serviceMediator.findProductById(objectDto.getProductId())
-                .orElseThrow(() -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR)));
+                .orElseThrow(() -> new CoreException(
+                        String.format(PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_ERROR, objectDto.getProductId()))));
 
         picture.setPath(objectDto.getPath());
 

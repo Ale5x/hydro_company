@@ -10,6 +10,16 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
     private String name;
     private String shelfName;
 
+    public StorageRackDto(){}
+
+    public StorageRackDto(int storageRackDtoId) {
+        this.storageRackDtoId = storageRackDtoId;
+    }
+
+    public StorageRackDto(String name) {
+        this.name = name;
+    }
+
     public int getStorageRackDtoId() {
         return storageRackDtoId;
     }

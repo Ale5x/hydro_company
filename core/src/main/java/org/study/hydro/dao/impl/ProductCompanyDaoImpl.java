@@ -46,7 +46,7 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
     }
 
     @Override
-    public List<ProductCompany> getProductCompanies() {
+    public List<ProductCompany> getProductCompanies(int offset, int limit) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
@@ -54,7 +54,10 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
         Root<ProductCompany> productCompanyRoot = getRoot(criteriaQuery, ProductCompany.class);
 
         criteriaQuery.select(productCompanyRoot);
-        return session.createQuery(criteriaQuery).getResultList();
+        return session.createQuery(criteriaQuery)
+                .setMaxResults(limit)
+                .setFirstResult(offset)
+                .getResultList();
     }
 
     @Override

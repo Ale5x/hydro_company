@@ -96,11 +96,11 @@ class StorageRackServiceImplTest {
 
     @Test
     void storageRackList() {
-        when(storageRackDao.getStorageRacksList(limit, offset)).thenReturn(storageList);
+        when(storageRackDao.getStorageRacksList(offset, limit)).thenReturn(storageList);
 
-        List<StorageRackDto> list = storageRackService.storageRackList(limit, offset);
+        List<StorageRackDto> list = storageRackService.storageRackList(offset, limit);
 
         assertNotNull(list);
-        verify(storageRackDao, times(1)).getStorageRacksList(limit, offset);
+        verify(storageRackDao, times(1)).getStorageRacksList(offset, limit);
     }
 }

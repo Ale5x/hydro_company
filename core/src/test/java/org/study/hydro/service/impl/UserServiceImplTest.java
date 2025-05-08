@@ -101,9 +101,9 @@ class UserServiceImplTest {
 
     @Test
     void findAll() {
-        when(userDao.users(limit, offset)).thenReturn(userList);
+        when(userDao.users(offset, limit)).thenReturn(userList);
 
-        List<UserDto> userDtoList = userService.findAll(limit, offset);
+        List<UserDto> userDtoList = userService.findAll(offset, limit);
         assertFalse(userDtoList.isEmpty());
         assertTrue(userDtoList.size() > 0);
     }

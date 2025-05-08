@@ -38,8 +38,8 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
     }
 
     @Override
-    public List<ProductCompanyDto> findAll() throws CoreException {
-        return mapToListObjectsDto(productCompanyDao.getProductCompanies());
+    public List<ProductCompanyDto> findAll(int offset, int limit) throws CoreException {
+        return mapToListObjectsDto(productCompanyDao.getProductCompanies(offset, limit));
     }
 
     @Override

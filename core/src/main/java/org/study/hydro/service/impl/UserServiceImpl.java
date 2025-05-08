@@ -56,7 +56,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     }
 
     @Override
-    public List<UserDto> findAll(int limit, int offset) throws CoreException {
+    public List<UserDto> findAll(int offset, int limit) throws CoreException {
         return mapToListObjectsDto(userDao.users(limit, offset));
     }
 

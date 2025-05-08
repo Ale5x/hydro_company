@@ -45,5 +45,5 @@ public interface StorageRackService {
      * @return a list of all storageRacksDto as {@link StorageRackDto} objects.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<StorageRackDto> storageRackList(int limit, int offset) throws CoreException;
+    List<StorageRackDto> storageRackList(int offset, int limit) throws CoreException;
 }

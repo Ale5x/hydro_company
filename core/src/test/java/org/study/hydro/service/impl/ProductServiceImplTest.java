@@ -5,9 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.study.hydro.dao.ProductDao;
 import org.study.hydro.entity.*;
 import org.study.hydro.entity.Dto.*;
+import org.study.hydro.service.ServiceMediator;
+import org.study.hydro.utill.ImageStorage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +25,12 @@ class ProductServiceImplTest {
 
     @Mock
     private ProductDao productDao;
+
+    @Mock
+    private ServiceMediator serviceMediator;
+
+    @Mock
+    private ImageStorage imageStorage;
 
     @InjectMocks
     private ProductServiceImpl productService;
@@ -70,6 +79,8 @@ class ProductServiceImplTest {
         product.setProductType(productType);
         product.setStorageRackList(Arrays.asList(storageRack));
         product.setCountryProduct(country);
+        product.setProductId(1);
+        product.setPicturePath(List.of(new Picture("some path")));
 
         productList.add(product);
     }
@@ -96,10 +107,16 @@ class ProductServiceImplTest {
 
     @Test
     void remove() {
-        when(productDao.remove(productId)).thenReturn(true);
         when(productDao.getProductById(productId)).thenReturn(Optional.of(product));
+        when(productDao.remove(productId)).thenReturn(true);
 
-        boolean condition = productService.remove(productId);
+        when(imageStorage.removeFile(anyString())).thenReturn(true);  // Мокируем все вызовы removeFile
+
+        ProductServiceImpl spyProductService = spy(productService);
+
+        ReflectionTestUtils.invokeMethod(spyProductService, "removeAllProductFiles", product);
+
+        boolean condition = spyProductService.remove(productId);
 
         assertTrue(condition);
         verify(productDao, times(1)).remove(productId);
@@ -127,7 +144,7 @@ class ProductServiceImplTest {
 
     @Test
     void findAll() {
-        when(productDao.getProductsList(limit, offset)).thenReturn(productList);
+        when(productDao.getProductsList(offset, limit)).thenReturn(productList);
 
         List<ProductDto> list = productService.findAll(limit, offset);
 
@@ -137,7 +154,7 @@ class ProductServiceImplTest {
 
     @Test
     void findAllByPressure() {
-        when(productDao.getProductsByPressure(limit, offset, 1)).thenReturn(productList);
+        when(productDao.getProductsByPressure(offset, limit, 1)).thenReturn(productList);
 
         List<ProductDto> list = productService.findAllByPressure(limit, offset, 1);
 
@@ -147,7 +164,7 @@ class ProductServiceImplTest {
 
     @Test
     void findAllByFlowRate() {
-        when(productDao.getProductsByFlowRate(limit, offset, 150)).thenReturn(productList);
+        when(productDao.getProductsByFlowRate(offset, limit, 150)).thenReturn(productList);
 
         List<ProductDto> list = productService.findAllByFlowRate(limit, offset, 150);
 
@@ -157,7 +174,7 @@ class ProductServiceImplTest {
 
     @Test
     void findAllByType() {
-        when(productDao.getProductsByTypeId(limit, offset, 1)).thenReturn(productList);
+        when(productDao.getProductsByTypeId(offset, limit, 1)).thenReturn(productList);
         ProductTypeDto type = new ProductTypeDto();
         type.setProductTypeId(1);
         List<ProductDto> list = productService.findAllByType(limit, offset, type);
@@ -169,7 +186,7 @@ class ProductServiceImplTest {
 
     @Test
     void findAllByCompany() {
-        when(productDao.getProductsByCompanyId(limit, offset, 1)).thenReturn(productList);
+        when(productDao.getProductsByCompanyId(offset, limit, 1)).thenReturn(productList);
         ProductCompanyDto company = new ProductCompanyDto();
         company.setProductCompanyDtoId(1);
         List<ProductDto> list = productService.findAllByCompany(limit, offset, company);
@@ -181,7 +198,7 @@ class ProductServiceImplTest {
     @Test
     void findAllByStorageRack() {
         String storageName = "name";
-        when(productDao.getProductsByStorageRackName(limit, offset, storageName)).thenReturn(productList);
+        when(productDao.getProductsByStorageRackName(offset, limit, storageName)).thenReturn(productList);
 
         List<ProductDto> list = productService.findAllByStorageRack(limit, offset, storageRackDto);
 

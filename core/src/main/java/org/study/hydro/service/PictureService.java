@@ -5,6 +5,7 @@ import org.study.hydro.entity.Picture;
 import org.study.hydro.exception.CoreException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The PictureService interface {@link PictureService} provides methods for managing pictures.
@@ -40,6 +41,13 @@ public interface PictureService {
     List<PictureDto> findPicturesByProductId(int productId) throws CoreException;
 
     /**
+     * Retrieves a pictureDto filtered by the own unique identifier.
+     * @return a pictureDto  {@link PictureDto} object.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    Optional<PictureDto> findPictureById(int productId) throws CoreException;
+
+    /**
      * Retrieves a list of all pictures filtered by the unique identifier of the product.
      * @return a list of all pictures as {@link Picture} objects.
      * @throws CoreException if an error occurs during the retrieval process.
@@ -53,7 +61,7 @@ public interface PictureService {
      * @return a list of all picturesDto as {@link PictureDto} objects.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<PictureDto> findAll(int limit, int offset) throws CoreException;
+    List<PictureDto> findAll(int offset, int limit) throws CoreException;
 
     /**
      * Validates that the number of photos associated with a product does not exceed the allowed limit. This method

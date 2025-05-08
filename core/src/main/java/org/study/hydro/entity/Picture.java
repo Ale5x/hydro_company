@@ -18,7 +18,7 @@ public class Picture implements Serializable {
     @Column(name = "path")
     private String path;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_products")
     private Product product;
 

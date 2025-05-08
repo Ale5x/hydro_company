@@ -25,6 +25,8 @@ class ProductCompanyServiceImplTest {
     private ProductCompanyServiceImpl productCompanyService;
 
     private int id = 1;
+    private int limit = 10;
+    private int offset = 1;
     private String name = "name";
 
     private List<ProductCompany> productCompanyList = new ArrayList<>();
@@ -67,12 +69,12 @@ class ProductCompanyServiceImplTest {
 
     @Test
     void findAll() {
-        when(productCompanyDao.getProductCompanies()).thenReturn(productCompanyList);
+        when(productCompanyDao.getProductCompanies(offset, limit)).thenReturn(productCompanyList);
 
-        List<ProductCompanyDto> list = productCompanyService.findAll();
+        List<ProductCompanyDto> list = productCompanyService.findAll(offset, limit);
 
         assertNotNull(list);
-        verify(productCompanyDao, times(1)).getProductCompanies();
+        verify(productCompanyDao, times(1)).getProductCompanies(offset, limit);
     }
 
     @Test

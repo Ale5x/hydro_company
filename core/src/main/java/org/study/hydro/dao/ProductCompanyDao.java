@@ -32,10 +32,11 @@ public interface ProductCompanyDao {
 
     /**
      * The method will return list of productCompanies.
-     *
+     * @param limit the maximum number of products to include in the list.
+     * @param offset the starting position of the product list.
      * @return the specified list of the productCompanies.
      */
-    List<ProductCompany> getProductCompanies();
+    List<ProductCompany> getProductCompanies(int offset, int limit);
 
     /**
      * The method updates an existing table record in the database.

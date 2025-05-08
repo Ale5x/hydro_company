@@ -18,7 +18,7 @@ import java.util.*;
 public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements CountryDao {
 
     private final static String COUNTRY_NAME = "name";
-    private final static String COUNTRY_ID = "idCountry";
+    private final static String COUNTRY_ID = "countryId";
 
     @Override
     public Set<Country> countries() {

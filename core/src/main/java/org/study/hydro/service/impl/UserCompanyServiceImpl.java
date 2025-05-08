@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.UserCompanyDao;
+import org.study.hydro.entity.Country;
+import org.study.hydro.entity.Dto.CountryDto;
 import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.exception.CoreException;
+import org.study.hydro.service.CountryService;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.UserCompanyService;
 
@@ -22,12 +25,16 @@ import java.util.*;
 @Transactional
 public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCompany> implements UserCompanyService {
 
-    private final static String USER_COMPANY_BY_ID_NOT_FOUND = "User company by id not found.";
-    private UserCompanyDao userCompanyDao;
+    private final static String USER_COMPANY_BY_ID_NOT_FOUND_ERROR = "User company by id not found.";
+    private final static String COUNTRY_NOT_FOUND_ERROR = "Country not found. Country: name=%s, id=%s";
+    private final UserCompanyDao userCompanyDao;
+
+    private final CountryService countryService;
 
     @Autowired
-    public UserCompanyServiceImpl(UserCompanyDao userCompanyDao) {
+    public UserCompanyServiceImpl(UserCompanyDao userCompanyDao, CountryService countryService) {
         this.userCompanyDao = userCompanyDao;
+        this.countryService = countryService;
     }
 
     @Override
@@ -43,7 +50,7 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
     @Override
     public Optional<UserCompanyDto> findById(int id) throws CoreException {
         return Optional.of(mapToObjectDto(userCompanyDao.companyById(id)
-                .orElseThrow(() -> new CoreException(USER_COMPANY_BY_ID_NOT_FOUND))));
+                .orElseThrow(() -> new CoreException(USER_COMPANY_BY_ID_NOT_FOUND_ERROR))));
     }
 
     @Override
@@ -81,6 +88,12 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
 
         userCompany.setName(objectDto.getName());
         userCompany.setAddress(objectDto.getAddress());
+        Country country = countryService.findCountryById(objectDto.getCountryDto().getCountryId())
+                .orElseThrow(
+                        () -> new CoreException(String.format(COUNTRY_NOT_FOUND_ERROR,
+                                                              objectDto.getCountryDto().getName(),
+                                                              objectDto.getCountryDto().getCountryId())));
+        userCompany.setCountry(country);
         return userCompany;
     }
 }

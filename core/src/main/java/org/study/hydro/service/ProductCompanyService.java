@@ -32,10 +32,12 @@ public interface ProductCompanyService {
 
     /**
      * Retrieves a list of all productCompaniesDto.
+     * @param limit the maximum number of productCompanyDto to include in the list.
+     * @param offset the starting position of the productCompanyDto list.
      * @return a list of all productCompaniesDto as {@link ProductCompanyDto} objects.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductCompanyDto> findAll() throws CoreException;
+    List<ProductCompanyDto> findAll(int offset, int limit) throws CoreException;
 
     /**
      * Retrieves list of productCompaniesDto filtered by a specific name value.

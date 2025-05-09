@@ -11,12 +11,12 @@ import java.util.Objects;
 @Table(name = "countries")
 public class Country implements Serializable {
 
-    private static final long serialVersionUID = -7401195441804755695L;
+    private static final long serialVersionUID = 780074541061735296L;
 
     @Id
     @Column(name = "id_countries")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int countryId;
+    private Integer countryId;
 
     @Column(name = "name")
     private String name;
@@ -33,7 +33,7 @@ public class Country implements Serializable {
     public Country() {
     }
 
-    public Country(int countryId) {
+    public Country(Integer countryId) {
         this.countryId = countryId;
     }
 
@@ -41,22 +41,22 @@ public class Country implements Serializable {
         this.name = name;
     }
 
-    public Country(int countryId, String name) {
+    public Country(Integer countryId, String name) {
         this.countryId = countryId;
         this.name = name;
     }
 
-    public Country(int countryId, String name, List<UserCompany> userCompanyList) {
+    public Country(Integer countryId, String name, List<UserCompany> userCompanyList) {
         this.countryId = countryId;
         this.name = name;
         this.userCompanyList = userCompanyList;
     }
 
-    public int getCountryId() {
+    public Integer getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(int countryId) {
+    public void setCountryId(Integer countryId) {
         this.countryId = countryId;
     }
 
@@ -99,7 +99,7 @@ public class Country implements Serializable {
 
         Country country = (Country) o;
 
-        if (countryId != country.countryId) return false;
+        if (!Objects.equals(countryId, country.countryId)) return false;
         if (!Objects.equals(name, country.name)) return false;
         if (!Objects.equals(userCompanyList, country.userCompanyList))
             return false;
@@ -110,7 +110,7 @@ public class Country implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = countryId;
+        int result = countryId != null ? countryId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (userCompanyList != null ? userCompanyList.hashCode() : 0);
         result = 31 * result + (productCompanies != null ? productCompanies.hashCode() : 0);

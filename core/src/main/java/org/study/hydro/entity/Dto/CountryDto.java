@@ -6,21 +6,21 @@ import java.util.Objects;
 
 public class CountryDto extends RepresentationModel<CountryDto> {
 
-    private int countryId;
+    private Integer countryId;
     private String name;
 
     public CountryDto() {}
 
-    public CountryDto (int countryId, String name) {
+    public CountryDto (Integer countryId, String name) {
         this.countryId = countryId;
         this.name = name;
     }
 
-    public int getCountryId() {
+    public Integer getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(int countryId) {
+    public void setCountryId(Integer countryId) {
         this.countryId = countryId;
     }
 
@@ -40,14 +40,14 @@ public class CountryDto extends RepresentationModel<CountryDto> {
 
         CountryDto that = (CountryDto) o;
 
-        if (countryId != that.countryId) return false;
+        if (!Objects.equals(countryId, that.countryId)) return false;
         return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + countryId;
+        result = 31 * result + (countryId != null ? countryId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }

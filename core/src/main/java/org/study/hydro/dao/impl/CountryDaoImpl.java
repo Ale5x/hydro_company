@@ -34,7 +34,7 @@ public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements Coun
     }
 
     @Override
-    public Optional countryById(int id) {
+    public Optional countryById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

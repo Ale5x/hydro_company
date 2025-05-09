@@ -27,7 +27,7 @@ public interface CountryDao {
      *
      * @return the specified Optional country by id.
      */
-    Optional<Country> countryById(int id);
+    Optional<Country> countryById(Integer id);
 
     /**
      * The method returns the specified list of the countries by the name or the same name.

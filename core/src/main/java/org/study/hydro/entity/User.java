@@ -12,12 +12,12 @@ import java.util.Objects;
 @Table(name = "users")
 public class User implements Serializable {
 
-    private static final long serialVersionUID = -4707275280725534844L;
+    private static final long serialVersionUID = -8105493629569357675L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_users")
-    private int userId;
+    private Integer userId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -38,18 +38,18 @@ public class User implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime registration;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_roles")
     private Role role;
 
-    @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne (cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user_company")
     private UserCompany userCompany;
 
     public User() {
     }
 
-    public User(int userId, String firstName, String lastName, String password,
+    public User(Integer userId, String firstName, String lastName, String password,
                 String pathPhoto, LocalDateTime registration, Role role,
                 String email, UserCompany userCompany) {
         this.userId = userId;
@@ -86,11 +86,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -165,7 +165,7 @@ public class User implements Serializable {
 
         User user = (User) o;
 
-        if (userId != user.userId) return false;
+        if (!Objects.equals(userId, user.userId)) return false;
         if (!Objects.equals(firstName, user.firstName)) return false;
         if (!Objects.equals(lastName, user.lastName)) return false;
         if (!Objects.equals(email, user.email)) return false;
@@ -178,7 +178,7 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = userId;
+        int result = userId != null ? userId.hashCode() : 0;
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);

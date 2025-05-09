@@ -9,12 +9,12 @@ import java.util.Objects;
 @Table(name = "user_company")
 public class UserCompany implements Serializable {
 
-    private static final long serialVersionUID = 2682677838623962740L;
+    private static final long serialVersionUID = -8612122621758523626L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user_company")
-    private int userCompanyId;
+    private Integer userCompanyId;
 
     @Column(name = "name")
     private String name;
@@ -22,7 +22,7 @@ public class UserCompany implements Serializable {
     @Column(name = "address")
     private String address;
 
-    @OneToMany(mappedBy = "userCompany", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "userCompany", fetch = FetchType.LAZY)
     private List<User> users;
 
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -37,31 +37,31 @@ public class UserCompany implements Serializable {
         this.address = address;
     }
 
-    public UserCompany(int userCompanyId, String name, String address, Country country) {
+    public UserCompany(Integer userCompanyId, String name, String address, Country country) {
         this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
         this.country = country;
     }
 
-    public UserCompany(int userCompanyId, String name, String address) {
+    public UserCompany(Integer userCompanyId, String name, String address) {
         this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
     }
 
-    public UserCompany(int userCompanyId, String name, String address, List<User> users) {
+    public UserCompany(Integer userCompanyId, String name, String address, List<User> users) {
         this.userCompanyId = userCompanyId;
         this.name = name;
         this.address = address;
         this.users = users;
     }
 
-    public int getUserCompanyId() {
+    public Integer getUserCompanyId() {
         return userCompanyId;
     }
 
-    public void setUserCompanyId(int userCompanyId) {
+    public void setUserCompanyId(Integer userCompanyId) {
         this.userCompanyId = userCompanyId;
     }
 
@@ -104,7 +104,8 @@ public class UserCompany implements Serializable {
 
         UserCompany that = (UserCompany) o;
 
-        if (userCompanyId != that.userCompanyId) return false;
+        if (!Objects.equals(userCompanyId, that.userCompanyId))
+            return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(address, that.address)) return false;
         if (!Objects.equals(users, that.users)) return false;
@@ -113,7 +114,7 @@ public class UserCompany implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = userCompanyId;
+        int result = userCompanyId != null ? userCompanyId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (users != null ? users.hashCode() : 0);

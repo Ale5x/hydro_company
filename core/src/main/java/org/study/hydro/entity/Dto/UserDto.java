@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class UserDto extends RepresentationModel<UserDto> {
 
-    private int userDtoId;
+    private Integer userDtoId;
     private String firstName;
     private String lastName;
     private String email;
@@ -19,9 +19,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     private Collection<String> role;
     private UserCompanyDto userCompanyDto;
 
-
-    public UserDto() {
-    }
+    public UserDto() {}
 
     public UserDto(String firstName, String lastName, String email, String password,
                 String pathPhoto) {
@@ -32,11 +30,11 @@ public class UserDto extends RepresentationModel<UserDto> {
         this.email = email;
     }
 
-    public int getUserDtoId() {
+    public Integer getUserDtoId() {
         return userDtoId;
     }
 
-    public void setUserDtoId(int userDtoId) {
+    public void setUserDtoId(Integer userDtoId) {
         this.userDtoId = userDtoId;
     }
 
@@ -112,7 +110,7 @@ public class UserDto extends RepresentationModel<UserDto> {
 
         UserDto userDto = (UserDto) o;
 
-        if (userDtoId != userDto.userDtoId) return false;
+        if (!Objects.equals(userDtoId, userDto.userDtoId)) return false;
         if (!Objects.equals(firstName, userDto.firstName)) return false;
         if (!Objects.equals(lastName, userDto.lastName)) return false;
         if (!Objects.equals(email, userDto.email)) return false;
@@ -127,7 +125,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + userDtoId;
+        result = 31 * result + (userDtoId != null ? userDtoId.hashCode() : 0);
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);

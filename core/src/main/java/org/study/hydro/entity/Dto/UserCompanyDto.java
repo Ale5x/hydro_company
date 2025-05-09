@@ -6,28 +6,27 @@ import java.util.Objects;
 
 public class UserCompanyDto extends RepresentationModel<UserCompanyDto> {
 
-    private int companyDtoId;
+    private Integer companyDtoId;
     private String name;
 
     private String address;
 
     private CountryDto countryDto;
 
-
     public UserCompanyDto() {
     }
 
-    public UserCompanyDto(int companyDtoId, String name, String address) {
+    public UserCompanyDto(Integer companyDtoId, String name, String address) {
         this.companyDtoId = companyDtoId;
         this.name = name;
         this.address = address;
     }
 
-    public int getCompanyDtoId() {
+    public Integer getCompanyDtoId() {
         return companyDtoId;
     }
 
-    public void setCompanyDtoId(int companyDtoId) {
+    public void setCompanyDtoId(Integer companyDtoId) {
         this.companyDtoId = companyDtoId;
     }
 
@@ -63,7 +62,7 @@ public class UserCompanyDto extends RepresentationModel<UserCompanyDto> {
 
         UserCompanyDto that = (UserCompanyDto) o;
 
-        if (companyDtoId != that.companyDtoId) return false;
+        if (!Objects.equals(companyDtoId, that.companyDtoId)) return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(address, that.address)) return false;
         return Objects.equals(countryDto, that.countryDto);
@@ -72,7 +71,7 @@ public class UserCompanyDto extends RepresentationModel<UserCompanyDto> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + companyDtoId;
+        result = 31 * result + (companyDtoId != null ? companyDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (countryDto != null ? countryDto.hashCode() : 0);

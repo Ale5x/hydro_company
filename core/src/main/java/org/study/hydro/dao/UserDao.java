@@ -38,7 +38,7 @@ public interface UserDao {
      *
      * @return the specified Optional User by id.
      */
-    Optional<User> getUserById(int id);
+    Optional<User> getUserById(Integer id);
 
     /**
      * The method returns the specified User by email.

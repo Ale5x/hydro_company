@@ -14,6 +14,7 @@ public class ControllerConstants {
     public final static String FILES = "files";
     public final static String PICTURE = "picture";
     public final static String FILE_PRODUCT_SCHEME = "product_scheme";
+    public final static String MESSAGE = "message";
 
     public final static String DATE = "date";
 

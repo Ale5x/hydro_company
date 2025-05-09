@@ -5,6 +5,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.UserDto;
 import org.study.hydro.exception.ReportException;
@@ -14,8 +15,10 @@ import org.study.hydro.service.UserService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -43,10 +46,16 @@ public class UserController implements HypermediaListAssembler<UserDto> {
      */
     @GetMapping(value = PathPages.USER_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UserDto getUser(@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> getUser(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return userService.findUserById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, USER_NOT_FOUND_MESSAGE));
+                .<ResponseEntity<?>>map(userDto -> ResponseEntity.ok(userDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, USER_NOT_FOUND_MESSAGE);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 
     /**

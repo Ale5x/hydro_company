@@ -49,8 +49,12 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
 
     @Override
     public Optional<UserCompanyDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(userCompanyDao.companyById(id)
-                .orElseThrow(() -> new CoreException(USER_COMPANY_BY_ID_NOT_FOUND_ERROR))));
+        Optional<UserCompany> company = userCompanyDao.companyById(id);
+        if (company.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return company.map(this::mapToObjectDto);
     }
 
     @Override
@@ -62,7 +66,6 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
     public List<UserCompanyDto> mapToListObjectsDto(List<UserCompany> objectsList) throws CoreException {
         List<UserCompanyDto> userCompanyDtoList = new ArrayList<>();
         for (UserCompany userCompany : objectsList) {
-
             userCompanyDtoList.add(mapToObjectDto(userCompany));
         }
         return userCompanyDtoList;
@@ -76,6 +79,11 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
         userCompanyDto.setName(object.getName());
         userCompanyDto.setAddress(object.getAddress());
         return userCompanyDto;
+    }
+
+    @Override
+    public Optional<UserCompany> findCompanyById(int id) throws CoreException {
+        return userCompanyDao.companyById(id);
     }
 
     @Override

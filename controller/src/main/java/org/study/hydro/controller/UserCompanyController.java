@@ -15,6 +15,7 @@ import org.study.hydro.service.UserCompanyService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -101,9 +102,15 @@ public class UserCompanyController implements HypermediaListAssembler<UserCompan
      */
     @GetMapping(value = PathPages.USER_COMPANY_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UserCompanyDto findById (@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findById (@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
-        return userCompanyService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, USER_COMPANY_NOT_FOUND));
+        return userCompanyService.findById(Integer.parseInt(id)).
+                <ResponseEntity<?>>map(userCompanyDto -> ResponseEntity.ok(userCompanyDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, USER_COMPANY_NOT_FOUND);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 }

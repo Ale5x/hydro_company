@@ -72,7 +72,7 @@ public class UserCompanyDaoImpl extends CriteriaQueryHelper<UserCompany> impleme
     }
 
     @Override
-    public Optional<UserCompany> companyById(int id) {
+    public Optional<UserCompany> companyById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

@@ -1,6 +1,7 @@
 package org.study.hydro.service;
 
 import org.study.hydro.entity.Dto.UserCompanyDto;
+import org.study.hydro.entity.UserCompany;
 import org.study.hydro.exception.CoreException;
 
 import java.util.List;
@@ -51,4 +52,14 @@ public interface UserCompanyService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     Optional<UserCompanyDto> findById(int id) throws CoreException;
+
+    /**
+     * The method returns specified Company by id.
+     *
+     * @param id the Company's id.
+     *
+     * @return the specified Optional Company by id.
+     * @throws CoreException if an error occurs during the retrieval process.
+     */
+    Optional<UserCompany> findCompanyById(int id) throws CoreException;
 }

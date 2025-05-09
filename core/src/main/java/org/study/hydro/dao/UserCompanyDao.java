@@ -47,5 +47,5 @@ public interface UserCompanyDao {
      *
      * @return the specified Optional Company by id.
      */
-    Optional<UserCompany> companyById(int id);
+    Optional<UserCompany> companyById(Integer id);
 }

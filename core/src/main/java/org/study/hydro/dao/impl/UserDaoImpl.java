@@ -32,7 +32,7 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
     public int save(User user) {
         Session session = getCurrentSession();
 
-        session.save(user);
+        session.persist(user);
         session.flush();
         return user.getUserId();
     }
@@ -52,7 +52,7 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
     }
 
     @Override
-    public Optional<User> getUserById(int id) {
+    public Optional<User> getUserById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

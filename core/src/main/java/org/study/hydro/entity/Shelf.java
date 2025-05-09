@@ -9,12 +9,12 @@ import java.util.Objects;
 @Table(name = "shelf")
 public class Shelf implements Serializable {
 
-    private static final long serialVersionUID = -4917683187669121701L;
+    private static final long serialVersionUID = -7734520313839121890L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_shelf")
-    private int shelfId;
+    private Integer shelfId;
 
     @Column(name = "name")
     private String name;
@@ -31,7 +31,7 @@ public class Shelf implements Serializable {
         this.storageRackList = storageRackList;
     }
 
-    public Shelf(int shelfId, String name) {
+    public Shelf(Integer shelfId, String name) {
         this.shelfId = shelfId;
         this.name = name;
     }
@@ -40,11 +40,11 @@ public class Shelf implements Serializable {
         this.name = name;
     }
 
-    public int getShelfId() {
+    public Integer getShelfId() {
         return shelfId;
     }
 
-    public void setShelfId(int shelfId) {
+    public void setShelfId(Integer shelfId) {
         this.shelfId = shelfId;
     }
 
@@ -71,14 +71,14 @@ public class Shelf implements Serializable {
 
         Shelf shelf = (Shelf) o;
 
-        if (shelfId != shelf.shelfId) return false;
+        if (!Objects.equals(shelfId, shelf.shelfId)) return false;
         if (!Objects.equals(name, shelf.name)) return false;
         return Objects.equals(storageRackList, shelf.storageRackList);
     }
 
     @Override
     public int hashCode() {
-        int result = shelfId;
+        int result = shelfId != null ? shelfId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (storageRackList != null ? storageRackList.hashCode() : 0);
         return result;

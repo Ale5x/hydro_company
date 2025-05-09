@@ -6,25 +6,25 @@ import java.util.Objects;
 
 public class ProductTypeDto extends RepresentationModel<ProductTypeDto> {
 
-    private int productTypeId;
+    private Integer productTypeId;
     private String name;
 
     public ProductTypeDto() {}
 
-    public ProductTypeDto(int productTypeId) {
+    public ProductTypeDto(Integer productTypeId) {
         this.productTypeId = productTypeId;
     }
 
-    public ProductTypeDto(int productTypeId, String name) {
+    public ProductTypeDto(Integer productTypeId, String name) {
         this.productTypeId = productTypeId;
         this.name = name;
     }
 
-    public int getProductTypeId() {
+    public Integer getProductTypeId() {
         return productTypeId;
     }
 
-    public void setProductTypeId(int productTypeId) {
+    public void setProductTypeId(Integer productTypeId) {
         this.productTypeId = productTypeId;
     }
 
@@ -44,14 +44,15 @@ public class ProductTypeDto extends RepresentationModel<ProductTypeDto> {
 
         ProductTypeDto that = (ProductTypeDto) o;
 
-        if (productTypeId != that.productTypeId) return false;
+        if (!Objects.equals(productTypeId, that.productTypeId))
+            return false;
         return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + productTypeId;
+        result = 31 * result + (productTypeId != null ? productTypeId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }

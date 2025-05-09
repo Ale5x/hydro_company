@@ -32,7 +32,7 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(Integer id) {
         Session session = getCurrentSession();
 
         return session.createQuery(DELETE_STORAGE_RUCK_BY_ID)
@@ -49,7 +49,7 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
     }
 
     @Override
-    public Optional<StorageRack> getStorageRackById(int id) {
+    public Optional<StorageRack> getStorageRackById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

@@ -61,7 +61,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(Integer id) {
         Session session = getCurrentSession();
         return session.createQuery(DELETE_PRODUCT_QUERY)
                 .setParameter(PRODUCT_ID, id)
@@ -69,7 +69,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public Optional<Product> getProductById(int id) {
+    public Optional<Product> getProductById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
@@ -96,7 +96,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public List<Product> getProductsByFlowRate(int limit, int offset, int flowRate) {
+    public List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate) {
         Session session = getCurrentSession();
         return session.createQuery(GET_PRODUCTS_BY_FLOW_RATE_QUERY)
                 .setParameter(PRODUCT_FLOW_RATE, flowRate)
@@ -106,7 +106,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public List<Product> getProductsByPressure(int limit, int offset, int pressure) {
+    public List<Product> getProductsByPressure(int limit, int offset, Integer pressure) {
         Session session = getCurrentSession();
 
         return session.createQuery(GET_PRODUCTS_BY_PRESSURE_QUERY)
@@ -117,7 +117,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public List<Product> getProductsByTypeId(int limit, int offset, int productTypeId) {
+    public List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId) {
         Session session = getCurrentSession();
 
         return session.createQuery(GET_PRODUCTS_BY_TYPE_ID_QUERY)
@@ -128,7 +128,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public List<Product> getProductsByCompanyId(int limit, int offset, int productCompanyId) {
+    public List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId) {
         Session session = getCurrentSession();
         return session.createQuery(GET_PRODUCTS_BY_COMPANY_ID_QUERY)
                 .setParameter(COMPANY_ID, productCompanyId)

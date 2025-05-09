@@ -44,7 +44,7 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(Integer id) {
         Session session = getCurrentSession();
 
         return session.createQuery(DELETE_PICTURE_PATH_QUERY)
@@ -53,7 +53,7 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
     }
 
     @Override
-    public List<Picture> getPicturesByProductId(int productId) {
+    public List<Picture> getPicturesByProductId(Integer productId) {
         Session session = getCurrentSession();
         return session.createQuery(GET_PICTURES_BY_PRODUCT_ID, Picture.class)
                     .setParameter(PRODUCT_ID, productId)
@@ -75,7 +75,7 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
     }
 
     @Override
-    public Optional<Picture> findById(int id) {
+    public Optional<Picture> findById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();

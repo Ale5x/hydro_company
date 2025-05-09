@@ -37,7 +37,7 @@ public interface ProductDao {
      *
      * @return returns boolean's result if the row removes.
      */
-    boolean remove(int id);
+    boolean remove(Integer id);
 
     /**
      * The method returns the specified Product by id.
@@ -46,7 +46,7 @@ public interface ProductDao {
      *
      * @return the specified Optional Product by id.
      */
-    Optional<Product> getProductById(int id);
+    Optional<Product> getProductById(Integer id);
 
     /**
      * The method will return list of the products.
@@ -68,7 +68,7 @@ public interface ProductDao {
      *
      * @return the specified list of the products with the same search pressure.
      */
-    List<Product> getProductsByPressure(int limit, int offset, int pressure);
+    List<Product> getProductsByPressure(int limit, int offset, Integer pressure);
 
     /**
      * The method will return list of the products by the flow rate.
@@ -80,7 +80,7 @@ public interface ProductDao {
      *
      * @return the specified list of the products with the same search flow rate.
      */
-    List<Product> getProductsByFlowRate(int limit, int offset, int flowRate);
+    List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate);
 
     /**
      * The method will return list of the products by the pressure.
@@ -91,7 +91,7 @@ public interface ProductDao {
      *
      * @return the specified list of the products with the same search type.
      */
-    List<Product> getProductsByTypeId(int limit, int offset, int productTypeId);
+    List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId);
 
     /**
      * The method will return list of the products by the product company.
@@ -102,7 +102,7 @@ public interface ProductDao {
      *
      * @return the specified list of the products with the same company.
      */
-    List<Product> getProductsByCompanyId(int limit, int offset, int productCompanyId);
+    List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId);
 
     /**
      * The method will return list of the products by the product company.

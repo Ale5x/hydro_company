@@ -28,7 +28,7 @@ public interface ProductCompanyDao {
      *
      * @return the specified Optional ProductCompany by id.
      */
-    Optional<ProductCompany> getById(int id);
+    Optional<ProductCompany> getById(Integer id);
 
     /**
      * The method will return list of productCompanies.

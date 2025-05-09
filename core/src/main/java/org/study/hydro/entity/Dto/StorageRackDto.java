@@ -6,13 +6,13 @@ import java.util.Objects;
 
 public class StorageRackDto extends RepresentationModel<StorageRackDto> {
 
-    private int storageRackDtoId;
+    private Integer storageRackDtoId;
     private String name;
     private String shelfName;
 
     public StorageRackDto(){}
 
-    public StorageRackDto(int storageRackDtoId) {
+    public StorageRackDto(Integer storageRackDtoId) {
         this.storageRackDtoId = storageRackDtoId;
     }
 
@@ -20,11 +20,11 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
         this.name = name;
     }
 
-    public int getStorageRackDtoId() {
+    public Integer getStorageRackDtoId() {
         return storageRackDtoId;
     }
 
-    public void setStorageRackDtoId(int storageRackDtoId) {
+    public void setStorageRackDtoId(Integer storageRackDtoId) {
         this.storageRackDtoId = storageRackDtoId;
     }
 
@@ -52,7 +52,8 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
 
         StorageRackDto that = (StorageRackDto) o;
 
-        if (storageRackDtoId != that.storageRackDtoId) return false;
+        if (!Objects.equals(storageRackDtoId, that.storageRackDtoId))
+            return false;
         if (!Objects.equals(name, that.name)) return false;
         return Objects.equals(shelfName, that.shelfName);
     }
@@ -60,7 +61,7 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + storageRackDtoId;
+        result = 31 * result + (storageRackDtoId != null ? storageRackDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (shelfName != null ? shelfName.hashCode() : 0);
         return result;

@@ -33,7 +33,7 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
     }
 
     @Override
-    public Optional<ProductCompany> getById(int id) {
+    public Optional<ProductCompany> getById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

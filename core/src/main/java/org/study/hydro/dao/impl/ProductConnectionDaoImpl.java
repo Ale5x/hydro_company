@@ -29,7 +29,7 @@ public class ProductConnectionDaoImpl extends CriteriaQueryHelper<ProductConnect
     }
 
     @Override
-    public Optional<ProductConnection> getProductConnectionById(int id) {
+    public Optional<ProductConnection> getProductConnectionById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);

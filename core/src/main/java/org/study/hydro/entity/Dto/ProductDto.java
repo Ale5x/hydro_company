@@ -8,13 +8,13 @@ import java.util.Objects;
 
 public class ProductDto extends RepresentationModel<ProductDto> {
 
-    private int productDtoId;
-    private int count;
+    private Integer productDtoId;
+    private Integer count;
     private String stockKeepingUnit;
-    private int flowRate;
-    private int pressure;
-    private int pressureMax;
-    private double weight;
+    private Integer flowRate;
+    private Integer pressure;
+    private Integer pressureMax;
+    private Double weight;
     private String additionalInformation;
 
     private ProductTypeDto productTypeDto;
@@ -25,19 +25,19 @@ public class ProductDto extends RepresentationModel<ProductDto> {
     private ProductConnectionDto productConnectionDto;
     private CountryDto countryDto;
 
-    public int getProductDtoId() {
+    public Integer getProductDtoId() {
         return productDtoId;
     }
 
-    public void setProductDtoId(int productDtoId) {
+    public void setProductDtoId(Integer productDtoId) {
         this.productDtoId = productDtoId;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 
@@ -49,35 +49,35 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         this.stockKeepingUnit = stockKeepingUnit;
     }
 
-    public int getFlowRate() {
+    public Integer getFlowRate() {
         return flowRate;
     }
 
-    public void setFlowRate(int flowRate) {
+    public void setFlowRate(Integer flowRate) {
         this.flowRate = flowRate;
     }
 
-    public int getPressure() {
+    public Integer getPressure() {
         return pressure;
     }
 
-    public void setPressure(int pressure) {
+    public void setPressure(Integer pressure) {
         this.pressure = pressure;
     }
 
-    public int getPressureMax() {
+    public Integer getPressureMax() {
         return pressureMax;
     }
 
-    public void setPressureMax(int pressureMax) {
+    public void setPressureMax(Integer pressureMax) {
         this.pressureMax = pressureMax;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
@@ -153,14 +153,14 @@ public class ProductDto extends RepresentationModel<ProductDto> {
 
         ProductDto that = (ProductDto) o;
 
-        if (productDtoId != that.productDtoId) return false;
-        if (count != that.count) return false;
-        if (flowRate != that.flowRate) return false;
-        if (pressure != that.pressure) return false;
-        if (pressureMax != that.pressureMax) return false;
-        if (Double.compare(that.weight, weight) != 0) return false;
+        if (!Objects.equals(productDtoId, that.productDtoId)) return false;
+        if (!Objects.equals(count, that.count)) return false;
         if (!Objects.equals(stockKeepingUnit, that.stockKeepingUnit))
             return false;
+        if (!Objects.equals(flowRate, that.flowRate)) return false;
+        if (!Objects.equals(pressure, that.pressure)) return false;
+        if (!Objects.equals(pressureMax, that.pressureMax)) return false;
+        if (!Objects.equals(weight, that.weight)) return false;
         if (!Objects.equals(additionalInformation, that.additionalInformation))
             return false;
         if (!Objects.equals(productTypeDto, that.productTypeDto))
@@ -180,15 +180,13 @@ public class ProductDto extends RepresentationModel<ProductDto> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        long temp;
-        result = 31 * result + productDtoId;
-        result = 31 * result + count;
+        result = 31 * result + (productDtoId != null ? productDtoId.hashCode() : 0);
+        result = 31 * result + (count != null ? count.hashCode() : 0);
         result = 31 * result + (stockKeepingUnit != null ? stockKeepingUnit.hashCode() : 0);
-        result = 31 * result + flowRate;
-        result = 31 * result + pressure;
-        result = 31 * result + pressureMax;
-        temp = Double.doubleToLongBits(weight);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (flowRate != null ? flowRate.hashCode() : 0);
+        result = 31 * result + (pressure != null ? pressure.hashCode() : 0);
+        result = 31 * result + (pressureMax != null ? pressureMax.hashCode() : 0);
+        result = 31 * result + (weight != null ? weight.hashCode() : 0);
         result = 31 * result + (additionalInformation != null ? additionalInformation.hashCode() : 0);
         result = 31 * result + (productTypeDto != null ? productTypeDto.hashCode() : 0);
         result = 31 * result + (pathHydraulicScheme != null ? pathHydraulicScheme.hashCode() : 0);

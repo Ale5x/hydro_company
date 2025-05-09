@@ -9,12 +9,12 @@ import java.util.Objects;
 @Table(name = "products_connection")
 public class ProductConnection implements Serializable {
 
-    private static final long serialVersionUID = -9132594259339316020L;
+    private static final long serialVersionUID = -4249187559410945137L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_products_connection")
-    private int productConnectionId;
+    private Integer productConnectionId;
 
     @Column(name = "size")
     private String size;
@@ -29,16 +29,16 @@ public class ProductConnection implements Serializable {
         this.size = size;
     }
 
-    public ProductConnection(int productConnectionId, String size) {
+    public ProductConnection(Integer productConnectionId, String size) {
         this.productConnectionId = productConnectionId;
         this.size = size;
     }
 
-    public int getProductConnectionId() {
+    public Integer getProductConnectionId() {
         return productConnectionId;
     }
 
-    public void setProductConnectionId(int productConnectionId) {
+    public void setProductConnectionId(Integer productConnectionId) {
         this.productConnectionId = productConnectionId;
     }
 
@@ -65,14 +65,15 @@ public class ProductConnection implements Serializable {
 
         ProductConnection that = (ProductConnection) o;
 
-        if (productConnectionId != that.productConnectionId) return false;
+        if (!Objects.equals(productConnectionId, that.productConnectionId))
+            return false;
         if (!Objects.equals(size, that.size)) return false;
         return Objects.equals(products, that.products);
     }
 
     @Override
     public int hashCode() {
-        int result = productConnectionId;
+        int result = productConnectionId != null ? productConnectionId.hashCode() : 0;
         result = 31 * result + (size != null ? size.hashCode() : 0);
         result = 31 * result + (products != null ? products.hashCode() : 0);
         return result;

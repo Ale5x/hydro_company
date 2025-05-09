@@ -6,21 +6,21 @@ import java.util.Objects;
 
 public class ProductConnectionDto extends RepresentationModel<ProductConnectionDto> {
 
-    private int productConnectionId;
+    private Integer productConnectionId;
     private String size;
 
     public ProductConnectionDto() {}
 
-    public ProductConnectionDto(int productConnectionId, String size) {
+    public ProductConnectionDto(Integer productConnectionId, String size) {
         this.productConnectionId = productConnectionId;
         this.size = size;
     }
 
-    public int getProductConnectionId() {
+    public Integer getProductConnectionId() {
         return productConnectionId;
     }
 
-    public void setProductConnectionId(int productConnectionId) {
+    public void setProductConnectionId(Integer productConnectionId) {
         this.productConnectionId = productConnectionId;
     }
 
@@ -36,16 +36,19 @@ public class ProductConnectionDto extends RepresentationModel<ProductConnectionD
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         ProductConnectionDto that = (ProductConnectionDto) o;
 
-        if (productConnectionId != that.productConnectionId) return false;
+        if (!Objects.equals(productConnectionId, that.productConnectionId))
+            return false;
         return Objects.equals(size, that.size);
     }
 
     @Override
     public int hashCode() {
-        int result = productConnectionId;
+        int result = super.hashCode();
+        result = 31 * result + (productConnectionId != null ? productConnectionId.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
         return result;
     }

@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class ShelfDto extends RepresentationModel<ShelfDto> {
 
-    private int shelfDtoId;
+    private Integer shelfDtoId;
     private String name;
 
-    public int getShelfDtoId() {
+    public Integer getShelfDtoId() {
         return shelfDtoId;
     }
 
@@ -33,14 +33,14 @@ public class ShelfDto extends RepresentationModel<ShelfDto> {
 
         ShelfDto shelfDto = (ShelfDto) o;
 
-        if (shelfDtoId != shelfDto.shelfDtoId) return false;
+        if (!Objects.equals(shelfDtoId, shelfDto.shelfDtoId)) return false;
         return Objects.equals(name, shelfDto.name);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + shelfDtoId;
+        result = 31 * result + (shelfDtoId != null ? shelfDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }

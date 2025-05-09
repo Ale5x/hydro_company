@@ -6,24 +6,24 @@ import java.util.Objects;
 
 public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
-    private int productCompanyDtoId;
+    private Integer productCompanyDtoId;
     private String name;
 
     public ProductCompanyDto() {}
 
-    public ProductCompanyDto(int productCompanyDtoId) {
+    public ProductCompanyDto(Integer productCompanyDtoId) {
         this.productCompanyDtoId = productCompanyDtoId;
     }
 
-    public ProductCompanyDto(int productCompanyDtoId, String name) {
+    public ProductCompanyDto(Integer productCompanyDtoId, String name) {
         this.productCompanyDtoId = productCompanyDtoId;
         this.name = name;
     }
-    public int getProductCompanyDtoId() {
+    public Integer getProductCompanyDtoId() {
         return productCompanyDtoId;
     }
 
-    public void setProductCompanyDtoId(int productCompanyDtoId) {
+    public void setProductCompanyDtoId(Integer productCompanyDtoId) {
         this.productCompanyDtoId = productCompanyDtoId;
     }
 
@@ -39,16 +39,19 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         ProductCompanyDto that = (ProductCompanyDto) o;
 
-        if (productCompanyDtoId != that.productCompanyDtoId) return false;
+        if (!Objects.equals(productCompanyDtoId, that.productCompanyDtoId))
+            return false;
         return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        int result = productCompanyDtoId;
+        int result = super.hashCode();
+        result = 31 * result + (productCompanyDtoId != null ? productCompanyDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }

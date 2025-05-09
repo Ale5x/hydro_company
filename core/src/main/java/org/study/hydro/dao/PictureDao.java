@@ -37,7 +37,7 @@ public interface PictureDao {
      *
      * @return returns boolean's result if the row removes.
      */
-    boolean remove(int id);
+    boolean remove(Integer id);
 
     /**
      * The method returns the specified picture by id.
@@ -46,7 +46,7 @@ public interface PictureDao {
      *
      * @return the specified Optional picture by id.
      */
-    Optional<Picture> findById(int id);
+    Optional<Picture> findById(Integer id);
 
     /**
      * The method returns specified list of the pictures by the id product.
@@ -55,7 +55,7 @@ public interface PictureDao {
      *
      * @return the specified list of pictures with the same search id product.
      */
-    List<Picture> getPicturesByProductId(int productId);
+    List<Picture> getPicturesByProductId(Integer productId);
 
     /**
      * The method will return list of the pictures.

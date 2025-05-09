@@ -8,12 +8,12 @@ import java.util.Objects;
 @Table(name = "pictures")
 public class Picture implements Serializable {
 
-    private static final long serialVersionUID = -4733464056485589548L;
+    private static final long serialVersionUID = 1618295118872891045L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pictures")
-    private int pictureId;
+    private Integer pictureId;
 
     @Column(name = "path")
     private String path;
@@ -34,11 +34,11 @@ public class Picture implements Serializable {
         this.product = product;
     }
 
-    public int getPictureId() {
+    public Integer getPictureId() {
         return pictureId;
     }
 
-    public void setPictureId(int pictureId) {
+    public void setPictureId(Integer pictureId) {
         this.pictureId = pictureId;
     }
 
@@ -65,14 +65,14 @@ public class Picture implements Serializable {
 
         Picture picture = (Picture) o;
 
-        if (pictureId != picture.pictureId) return false;
+        if (!Objects.equals(pictureId, picture.pictureId)) return false;
         if (!Objects.equals(path, picture.path)) return false;
         return Objects.equals(product, picture.product);
     }
 
     @Override
     public int hashCode() {
-        int result = pictureId;
+        int result = pictureId != null ? pictureId.hashCode() : 0;
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (product != null ? product.hashCode() : 0);
         return result;

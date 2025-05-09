@@ -35,7 +35,7 @@ public interface ProductTypeDao {
      *
      * @return the specified Optional productType by id.
      */
-    Optional<ProductType> getProductTypeById(int id);
+    Optional<ProductType> getProductTypeById(Integer id);
 
     /**
      * The method returns the list of specified productType by name.
@@ -62,5 +62,5 @@ public interface ProductTypeDao {
      *
      * @return returns boolean's result if the row removes.
      */
-    boolean remove (int id);
+    boolean remove (Integer id);
 }

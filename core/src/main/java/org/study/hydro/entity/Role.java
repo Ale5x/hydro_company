@@ -9,18 +9,15 @@ import java.util.Objects;
 @Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Role implements Serializable {
 
+    private static final long serialVersionUID = 6860836939002433814L;
 
-    private static final long serialVersionUID = -7986850286600965082L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_roles")
-    private int roleId;
+    private Integer roleId;
 
     @Enumerated(EnumType.STRING)
     private ERole name;
-
-//    @Column(name = "name")
-//    private String name;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<User> users;
@@ -28,20 +25,20 @@ public class Role implements Serializable {
     public Role() {
     }
 
-        public Role(ERole name) {
+    public Role(ERole name) {
         this.name = name;
     }
 
-    public Role(int roleId, ERole name) {
+    public Role(Integer roleId, ERole name) {
         this.roleId = roleId;
         this.name = name;
     }
 
-    public int getRoleId() {
+    public Integer getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(int roleId) {
+    public void setRoleId(Integer roleId) {
         this.roleId = roleId;
     }
 
@@ -66,16 +63,16 @@ public class Role implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Role role1 = (Role) o;
+        Role role = (Role) o;
 
-        if (roleId != role1.roleId) return false;
-        if (name != role1.name) return false;
-        return Objects.equals(users, role1.users);
+        if (!Objects.equals(roleId, role.roleId)) return false;
+        if (name != role.name) return false;
+        return Objects.equals(users, role.users);
     }
 
     @Override
     public int hashCode() {
-        int result = roleId;
+        int result = roleId != null ? roleId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (users != null ? users.hashCode() : 0);
         return result;

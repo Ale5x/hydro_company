@@ -10,12 +10,12 @@ import java.util.Set;
 @Entity
 public class ProductCompany implements Serializable {
 
-    private static final long serialVersionUID = -8377491531925855876L;
+    private static final long serialVersionUID = -3206315018093822278L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_product_companies")
-    private int productCompanyId;
+    private Integer productCompanyId;
 
     @Column(name = "name")
     private String name;
@@ -34,7 +34,7 @@ public class ProductCompany implements Serializable {
     public ProductCompany() {
     }
 
-    public ProductCompany(int productCompanyId, String name) {
+    public ProductCompany(Integer productCompanyId, String name) {
         this.productCompanyId = productCompanyId;
         this.name = name;
     }
@@ -43,11 +43,11 @@ public class ProductCompany implements Serializable {
         this.name = name;
     }
 
-    public int getProductCompanyId() {
+    public Integer getProductCompanyId() {
         return productCompanyId;
     }
 
-    public void setProductCompanyId(int productCompanyId) {
+    public void setProductCompanyId(Integer productCompanyId) {
         this.productCompanyId = productCompanyId;
     }
 
@@ -82,7 +82,8 @@ public class ProductCompany implements Serializable {
 
         ProductCompany that = (ProductCompany) o;
 
-        if (productCompanyId != that.productCompanyId) return false;
+        if (!Objects.equals(productCompanyId, that.productCompanyId))
+            return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(productList, that.productList)) return false;
         return Objects.equals(companyCountries, that.companyCountries);
@@ -90,7 +91,7 @@ public class ProductCompany implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = productCompanyId;
+        int result = productCompanyId != null ? productCompanyId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (productList != null ? productList.hashCode() : 0);
         result = 31 * result + (companyCountries != null ? companyCountries.hashCode() : 0);

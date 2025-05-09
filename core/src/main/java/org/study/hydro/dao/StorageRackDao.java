@@ -28,7 +28,7 @@ public interface StorageRackDao {
      *
      * @return returns boolean's result if the row removes.
      */
-    boolean remove(int id);
+    boolean remove(Integer id);
 
     /**
      * The method updates an existing table record in the database.
@@ -46,7 +46,7 @@ public interface StorageRackDao {
      *
      * @return the specified Optional StorageRack by id.
      */
-    Optional<StorageRack> getStorageRackById(int id);
+    Optional<StorageRack> getStorageRackById(Integer id);
 
     /**
      * The method will return list of the storageRacks.

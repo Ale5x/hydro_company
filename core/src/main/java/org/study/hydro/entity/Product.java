@@ -12,30 +12,30 @@ import java.util.Objects;
 @Table(name = "products")
 public class Product implements Serializable {
 
-    private static final long serialVersionUID = -7087563283086941576L;
+    private static final long serialVersionUID = -7789179148102341314L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_products")
-    private int productId;
+    private Integer productId;
 
     @Column(name = "count")
-    private int count;
+    private Integer count;
 
     @Column(name = "sku")
     private String stockKeepingUnit;
 
     @Column(name = "flow_rate")
-    private int flowRate;
+    private Integer flowRate;
 
     @Column(name = "pressure")
-    private int pressure;
+    private Integer pressure;
 
     @Column(name = "pressure_max")
-    private int pressureMax;
+    private Integer pressureMax;
 
     @Column(name = "weight")
-    private double weight;
+    private Double weight;
 
     @Column(name = "path_hydraulic_scheme")
     private String pathHydraulicScheme;
@@ -79,12 +79,12 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(int productId) {
+    public Product(Integer productId) {
         this.productId = productId;
     }
 
-    public Product(int productId, int count, int pressure, int pressureMax, double weight, int flowRate,
-                   String stockKeepingUnit, String pathHydraulicScheme, String additionalInformation,
+    public Product(Integer productId, Integer count, Integer pressure, Integer pressureMax, Double weight,
+                   Integer flowRate, String stockKeepingUnit, String pathHydraulicScheme, String additionalInformation,
                    List<Picture> picturePath) {
         this.productId = productId;
         this.flowRate = flowRate;
@@ -98,8 +98,8 @@ public class Product implements Serializable {
         this.additionalInformation = additionalInformation;
     }
 
-    public Product(int count, int pressure, int pressureMax, double weight, String pathHydraulicScheme, int flowRate,
-                   String stockKeepingUnit, String additionalInformation, List<Picture> picturePath) {
+    public Product(Integer count, Integer pressure, Integer pressureMax, Double weight, String pathHydraulicScheme,
+                   Integer flowRate, String stockKeepingUnit, String additionalInformation, List<Picture> picturePath) {
         this.flowRate = flowRate;
         this.count = count;
         this.pressure = pressure;
@@ -111,19 +111,19 @@ public class Product implements Serializable {
         this.picturePath = picturePath;
     }
 
-    public int getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 
@@ -135,35 +135,35 @@ public class Product implements Serializable {
         this.stockKeepingUnit = stockKeepingUnit;
     }
 
-    public int getFlowRate() {
+    public Integer getFlowRate() {
         return flowRate;
     }
 
-    public void setFlowRate(int flowRate) {
+    public void setFlowRate(Integer flowRate) {
         this.flowRate = flowRate;
     }
 
-    public int getPressure() {
+    public Integer getPressure() {
         return pressure;
     }
 
-    public void setPressure(int pressure) {
+    public void setPressure(Integer pressure) {
         this.pressure = pressure;
     }
 
-    public int getPressureMax() {
+    public Integer getPressureMax() {
         return pressureMax;
     }
 
-    public void setPressureMax(int pressureMax) {
+    public void setPressureMax(Integer pressureMax) {
         this.pressureMax = pressureMax;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
@@ -238,14 +238,14 @@ public class Product implements Serializable {
 
         Product product = (Product) o;
 
-        if (productId != product.productId) return false;
-        if (count != product.count) return false;
-        if (flowRate != product.flowRate) return false;
-        if (pressure != product.pressure) return false;
-        if (pressureMax != product.pressureMax) return false;
-        if (Double.compare(product.weight, weight) != 0) return false;
+        if (!Objects.equals(productId, product.productId)) return false;
+        if (!Objects.equals(count, product.count)) return false;
         if (!Objects.equals(stockKeepingUnit, product.stockKeepingUnit))
             return false;
+        if (!Objects.equals(flowRate, product.flowRate)) return false;
+        if (!Objects.equals(pressure, product.pressure)) return false;
+        if (!Objects.equals(pressureMax, product.pressureMax)) return false;
+        if (!Objects.equals(weight, product.weight)) return false;
         if (!Objects.equals(pathHydraulicScheme, product.pathHydraulicScheme))
             return false;
         if (!Objects.equals(additionalInformation, product.additionalInformation))
@@ -263,16 +263,13 @@ public class Product implements Serializable {
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = productId;
-        result = 31 * result + count;
+        int result = productId != null ? productId.hashCode() : 0;
+        result = 31 * result + (count != null ? count.hashCode() : 0);
         result = 31 * result + (stockKeepingUnit != null ? stockKeepingUnit.hashCode() : 0);
-        result = 31 * result + flowRate;
-        result = 31 * result + pressure;
-        result = 31 * result + pressureMax;
-        temp = Double.doubleToLongBits(weight);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (flowRate != null ? flowRate.hashCode() : 0);
+        result = 31 * result + (pressure != null ? pressure.hashCode() : 0);
+        result = 31 * result + (pressureMax != null ? pressureMax.hashCode() : 0);
+        result = 31 * result + (weight != null ? weight.hashCode() : 0);
         result = 31 * result + (pathHydraulicScheme != null ? pathHydraulicScheme.hashCode() : 0);
         result = 31 * result + (additionalInformation != null ? additionalInformation.hashCode() : 0);
         result = 31 * result + (productType != null ? productType.hashCode() : 0);

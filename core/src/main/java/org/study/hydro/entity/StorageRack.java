@@ -9,12 +9,12 @@ import java.util.Objects;
 @Table(name = "storage_racks")
 public class StorageRack implements Serializable {
 
-    private static final long serialVersionUID = -1850989911551433498L;
+    private static final long serialVersionUID = -5249233830527011318L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_racks")
-    private int storageRackId;
+    private Integer storageRackId;
 
     @Column(name = "name")
     private String name;
@@ -29,7 +29,7 @@ public class StorageRack implements Serializable {
     public StorageRack() {
     }
 
-    public StorageRack(int storageRackId, String name, Shelf shelf) {
+    public StorageRack(Integer storageRackId, String name, Shelf shelf) {
         this.storageRackId = storageRackId;
         this.name = name;
         this.shelf = shelf;
@@ -44,16 +44,16 @@ public class StorageRack implements Serializable {
         this.name = name;
     }
 
-    public StorageRack(int storageRackId, String name) {
+    public StorageRack(Integer storageRackId, String name) {
         this.storageRackId = storageRackId;
         this.name = name;
     }
 
-    public int getStorageRackId() {
+    public Integer getStorageRackId() {
         return storageRackId;
     }
 
-    public void setStorageRackId(int storageRackId) {
+    public void setStorageRackId(Integer storageRackId) {
         this.storageRackId = storageRackId;
     }
 
@@ -88,7 +88,8 @@ public class StorageRack implements Serializable {
 
         StorageRack that = (StorageRack) o;
 
-        if (storageRackId != that.storageRackId) return false;
+        if (!Objects.equals(storageRackId, that.storageRackId))
+            return false;
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(shelf, that.shelf)) return false;
         return Objects.equals(productList, that.productList);
@@ -96,7 +97,7 @@ public class StorageRack implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = storageRackId;
+        int result = storageRackId != null ? storageRackId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (shelf != null ? shelf.hashCode() : 0);
         result = 31 * result + (productList != null ? productList.hashCode() : 0);

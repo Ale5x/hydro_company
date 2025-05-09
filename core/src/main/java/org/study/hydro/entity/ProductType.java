@@ -9,12 +9,12 @@ import java.util.Objects;
 @Entity
 public class ProductType implements Serializable {
 
-    private static final long serialVersionUID = -162791289398456761L;
+    private static final long serialVersionUID = 3655198763736607930L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_products_type")
-    private int productTypeId;
+    private Integer productTypeId;
 
     @Column(name = "name")
     private String name;
@@ -29,16 +29,16 @@ public class ProductType implements Serializable {
         this.name = name;
     }
 
-    public ProductType(int productTypeId, String name) {
+    public ProductType(Integer productTypeId, String name) {
         this.productTypeId = productTypeId;
         this.name = name;
     }
 
-    public int getProductTypeId() {
+    public Integer getProductTypeId() {
         return productTypeId;
     }
 
-    public void setProductTypeId(int productTypeId) {
+    public void setProductTypeId(Integer productTypeId) {
         this.productTypeId = productTypeId;
     }
 
@@ -65,14 +65,15 @@ public class ProductType implements Serializable {
 
         ProductType that = (ProductType) o;
 
-        if (productTypeId != that.productTypeId) return false;
+        if (!Objects.equals(productTypeId, that.productTypeId))
+            return false;
         if (!Objects.equals(name, that.name)) return false;
         return Objects.equals(products, that.products);
     }
 
     @Override
     public int hashCode() {
-        int result = productTypeId;
+        int result = productTypeId != null ? productTypeId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (products != null ? products.hashCode() : 0);
         return result;

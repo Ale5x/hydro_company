@@ -45,7 +45,7 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
     }
 
     @Override
-    public Optional<ProductType> getProductTypeById(int id) {
+    public Optional<ProductType> getProductTypeById(Integer id) {
         Session session = getCurrentSession();
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<ProductType> criteriaQuery = getCriteriaQuery(criteriaBuilder, ProductType.class);
@@ -74,7 +74,7 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(Integer id) {
         Session session = getCurrentSession();
         return session.createQuery(DELETE_PRODUCT_TYPE_QUERY)
                 .setParameter(PRODUCT_TYPE_ID, id)

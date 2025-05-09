@@ -24,7 +24,7 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
 
 
     @Override
-    public Optional<Shelf> findById(int id) {
+    public Optional<Shelf> findById(Integer id) {
         Session session = getCurrentSession();
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
@@ -57,7 +57,7 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(Integer id) {
         Session session = getCurrentSession();
         int rows = session.createQuery(DELETE_SHELF_QUERY)
                 .setParameter(SHELF_ID, id)

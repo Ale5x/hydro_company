@@ -19,7 +19,7 @@ public interface ShelfDao {
      *
      * @return the specified Optional Shelf by id.
      */
-    Optional<Shelf> findById(int id);
+    Optional<Shelf> findById(Integer id);
 
     /**
      * The method returns the specified Shelf by name.
@@ -46,7 +46,7 @@ public interface ShelfDao {
      *
      * @return returns boolean's result if the row removes.
      */
-    boolean remove (int id);
+    boolean remove (Integer id);
 
     /**
      * The method will return list of the shelf.

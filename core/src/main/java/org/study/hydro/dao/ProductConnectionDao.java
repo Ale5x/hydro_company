@@ -28,7 +28,7 @@ public interface ProductConnectionDao {
      *
      * @return the specified Optional ProductConnection by id.
      */
-    Optional<ProductConnection> getProductConnectionById(int id);
+    Optional<ProductConnection> getProductConnectionById(Integer id);
 
     /**
      * The method will return list of the productConnections.

@@ -6,15 +6,15 @@ import java.util.Objects;
 
 public class PictureDto extends RepresentationModel<PictureDto> {
 
-    private int pictureDtoId;
+    private Integer pictureDtoId;
     private String path;
-    private int productId;
+    private Integer productId;
 
-    public int getPictureDtoId() {
+    public Integer getPictureDtoId() {
         return pictureDtoId;
     }
 
-    public void setPictureDtoId(int pictureDtoId) {
+    public void setPictureDtoId(Integer pictureDtoId) {
         this.pictureDtoId = pictureDtoId;
     }
 
@@ -26,11 +26,11 @@ public class PictureDto extends RepresentationModel<PictureDto> {
         this.path = path;
     }
 
-    public int getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
@@ -42,17 +42,17 @@ public class PictureDto extends RepresentationModel<PictureDto> {
 
         PictureDto that = (PictureDto) o;
 
-        if (pictureDtoId != that.pictureDtoId) return false;
-        if (productId != that.productId) return false;
-        return Objects.equals(path, that.path);
+        if (!Objects.equals(pictureDtoId, that.pictureDtoId)) return false;
+        if (!Objects.equals(path, that.path)) return false;
+        return Objects.equals(productId, that.productId);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + pictureDtoId;
+        result = 31 * result + (pictureDtoId != null ? pictureDtoId.hashCode() : 0);
         result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + productId;
+        result = 31 * result + (productId != null ? productId.hashCode() : 0);
         return result;
     }
 

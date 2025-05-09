@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.UserCompanyDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.UserCompanyService;
@@ -31,7 +30,7 @@ public class UserCompanyController implements HypermediaListAssembler<UserCompan
 
     private final UserCompanyService userCompanyService;
 
-    private static final String USER_COMPANY_NOT_FOUND = "User company not found";
+    private static final String USER_COMPANY_NOT_FOUND_MESSAGE = "The specified user company was not found.";
 
     @Autowired
     public UserCompanyController(UserCompanyService userCompanyService) {
@@ -107,7 +106,8 @@ public class UserCompanyController implements HypermediaListAssembler<UserCompan
         return userCompanyService.findById(Integer.parseInt(id)).
                 <ResponseEntity<?>>map(userCompanyDto -> ResponseEntity.ok(userCompanyDto))
                 .orElseGet(() -> {
-                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, USER_COMPANY_NOT_FOUND);
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, USER_COMPANY_NOT_FOUND_MESSAGE);
                     return ResponseEntity
                             .status(HttpStatus.NOT_FOUND)
                             .body(body);

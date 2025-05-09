@@ -7,9 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.ProductTypeDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.ProductTypeService;
 import org.study.hydro.utill.ValidatorParam;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * This class {@link ProductTypeController} provides endpoints for accessing product type data.
@@ -21,7 +23,7 @@ public class ProductTypeController {
 
     private final ProductTypeService productTypeService;
 
-    private static final String PRODUCT_TYPE_NOT_FOUND = "Product type not found";
+    private static final String PRODUCT_TYPE_NOT_FOUND_MESSAGE = "The specified product type was not found.";
 
     @Autowired
     public ProductTypeController(ProductTypeService productTypeService) {
@@ -84,10 +86,15 @@ public class ProductTypeController {
      */
     @GetMapping(value = PathPages.PRODUCT_TYPE_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProductTypeDto findById (@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findById (@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return productTypeService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, PRODUCT_TYPE_NOT_FOUND));
+                .<ResponseEntity<?>>map(productTypeDto -> ResponseEntity.ok(productTypeDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, PRODUCT_TYPE_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 
     /**

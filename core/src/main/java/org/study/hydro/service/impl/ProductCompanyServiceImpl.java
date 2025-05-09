@@ -49,8 +49,11 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
     @Override
     public Optional<ProductCompanyDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(productCompanyDao.getById(id)
-                .orElseThrow(() -> new CoreException(PRODUCT_COMPANY_BY_ID_NOT_FOUND_ERROR))));
+        Optional<ProductCompany> productCompany = productCompanyDao.getById(id);
+        if (productCompany.isEmpty()) {
+            return Optional.empty();
+        }
+        return productCompany.map(this::mapToObjectDto);
     }
 
     @Override

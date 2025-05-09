@@ -32,7 +32,7 @@ public class UserController implements HypermediaListAssembler<UserDto> {
 
     private UserService userService;
 
-    private final static String USER_NOT_FOUND_MESSAGE = "A user not found";
+    private static final String USER_NOT_FOUND_MESSAGE = "The specified user was not found.";
 
     @Autowired
     public UserController(UserService userService) {
@@ -51,7 +51,8 @@ public class UserController implements HypermediaListAssembler<UserDto> {
         return userService.findUserById(Integer.parseInt(id))
                 .<ResponseEntity<?>>map(userDto -> ResponseEntity.ok(userDto))
                 .orElseGet(() -> {
-                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, USER_NOT_FOUND_MESSAGE);
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, USER_NOT_FOUND_MESSAGE);
                     return ResponseEntity
                             .status(HttpStatus.NOT_FOUND)
                             .body(body);

@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.StorageRackDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.StorageRackService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public class StorageRackController implements HypermediaListAssembler<StorageRac
 
     private final StorageRackService storageRackService;
 
-    private static final String STORAGE_RACK_NOT_FOUND = "Storage rack not found";
+    private static final String STORAGE_RACK_NOT_FOUND_MESSAGE = "The specified storage rack was not found.";
 
     @Autowired
     public StorageRackController(StorageRackService storageRackService) {
@@ -68,10 +68,15 @@ public class StorageRackController implements HypermediaListAssembler<StorageRac
      */
     @GetMapping(value = PathPages.STORAGE_RACK_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public StorageRackDto findById (@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findById (@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return storageRackService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, STORAGE_RACK_NOT_FOUND));
+                .<ResponseEntity<?>>map(storageRackDto -> ResponseEntity.ok(storageRackDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, STORAGE_RACK_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 
     /**

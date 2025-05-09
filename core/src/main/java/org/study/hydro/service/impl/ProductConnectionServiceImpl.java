@@ -44,8 +44,12 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
 
     @Override
     public Optional<ProductConnectionDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(productConnectionDao.getProductConnectionById(id)
-                .orElseThrow(() -> new CoreException(PRODUCT_CONNECTION_BY_ID_NOT_FOUND_ERROR))));
+        Optional<ProductConnection> productConnection = productConnectionDao.getProductConnectionById(id);
+        if (productConnection.isEmpty()) {
+            // logger
+            return Optional.empty();
+        }
+        return productConnection.map(this::mapToObjectDto);
     }
 
     @Override

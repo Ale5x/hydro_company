@@ -36,8 +36,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     private final static String PRODUCT_BY_ID_NOT_FOUND_ERROR = "Product by id not found.";
     private final static String FILED_REMOVING_FILES_ERROR = "Failed to remove some product's files: ";
 
-
-
     @Override
     public boolean create(ProductDto productDto) throws CoreException {
         int productId = productDao.create(mapToEntityFromDto(productDto, false));
@@ -75,8 +73,12 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     @Override
     public Optional<ProductDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(productDao.getProductById(id)
-                .orElseThrow(() -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_ERROR))));
+        Optional<Product> product = productDao.getProductById(id);
+        if (product.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return product.map(this::mapToObjectDto);
     }
 
     @Override
@@ -118,9 +120,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     public List<ProductDto> mapToListObjectsDto(List<Product> objectsList) {
         List<ProductDto> productDtoList = new ArrayList<>();
         for (Product product : objectsList) {
-
             productDtoList.add(mapToObjectDto(product));
-
         }
         return productDtoList;
     }
@@ -215,8 +215,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         product.setCountryProduct(new Country(
                 objectDto.getCountryDto().getCountryId(),
                 objectDto.getCountryDto().getName()));
-
-
 
             return product;
         }

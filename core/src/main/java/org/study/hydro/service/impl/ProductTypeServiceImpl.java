@@ -44,6 +44,7 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
         if(productType.isPresent()) {
             return productTypeDao.remove(id);
         } else {
+            //logger
             throw new CoreException(PRODUCT_TYPE_BY_ID_NOT_FOUND_ERROR);
         }
     }
@@ -55,8 +56,12 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     @Override
     public Optional<ProductTypeDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(productTypeDao.getProductTypeById(id)
-                .orElseThrow(() -> new CoreException(PRODUCT_TYPE_BY_ID_NOT_FOUND_ERROR))));
+        Optional<ProductType> productType = productTypeDao.getProductTypeById(id);
+        if (productType.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return productType.map(this::mapToObjectDto);
     }
 
     @Override

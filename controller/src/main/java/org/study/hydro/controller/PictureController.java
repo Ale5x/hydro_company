@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.study.hydro.entity.Dto.PictureDto;
-import org.study.hydro.exception.AppRequestException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.PictureService;
@@ -18,6 +17,7 @@ import org.study.hydro.utill.ImageStorage;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import java.util.Map;
 @RestController
 public class PictureController implements HypermediaListAssembler<PictureDto> {
 
-    private final static String PICTURE_NOT_FOUND_MESSAGE = "A picture not found.";
+    private static final String PICTURE_NOT_FOUND_MESSAGE = "The requested picture was not found.";
 
     @Value("${file.upload-product-images-dir}")
     private String productImages;
@@ -99,10 +99,17 @@ public class PictureController implements HypermediaListAssembler<PictureDto> {
      * @return a {@link CollectionModel} containing the list of {@link PictureDto} objects associated with the product
      */
     @GetMapping(value = PathPages.PICTURE_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-    private PictureDto findById(@RequestParam(ControllerConstants.ID) String id) {
+    private ResponseEntity<?> findById(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
-        return pictureService.findPictureById(Integer.parseInt(id)).orElseThrow(
-                () -> new AppRequestException(PICTURE_NOT_FOUND_MESSAGE, HttpStatus.BAD_REQUEST));
+        return pictureService.findPictureById(Integer.parseInt(id)).
+                <ResponseEntity<?>>map(picture -> ResponseEntity.ok(picture)).
+                orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, PICTURE_NOT_FOUND_MESSAGE);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 
     /**

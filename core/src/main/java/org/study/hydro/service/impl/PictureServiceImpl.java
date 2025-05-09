@@ -68,9 +68,12 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     @Override
     public Optional<PictureDto> findPictureById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(pictureDao.findById(id).orElseThrow(
-                () -> new CoreException(String.format(PICTURE_NOT_FOUND_BY_ID_ERROR, id))
-        )));
+        Optional<Picture> picture = pictureDao.findById(id);
+        if(picture.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return picture.map(this::mapToObjectDto);
     }
 
     @Override

@@ -7,9 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.ShelfDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.ShelfService;
 import org.study.hydro.utill.ValidatorParam;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * This class {@link ShelfController} provides endpoints for accessing shelf data.
@@ -21,7 +23,7 @@ public class ShelfController {
 
     private final ShelfService shelfService;
 
-    private static final String SHELF_NOT_FOUND = "Shelf not found";
+    private static final String SHELF_NOT_FOUND_MESSAGE = "The specified shelf was not found.";
 
     @Autowired
     public ShelfController(ShelfService shelfService) {
@@ -59,10 +61,17 @@ public class ShelfController {
      */
     @GetMapping(value = PathPages.SHELF_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ShelfDto findById (@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findById (@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return shelfService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, SHELF_NOT_FOUND));
+                .<ResponseEntity<?>>map(shelfDto -> ResponseEntity.ok(shelfDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, SHELF_NOT_FOUND_MESSAGE);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 
     /**
@@ -72,9 +81,15 @@ public class ShelfController {
      */
     @GetMapping(value = PathPages.SHELF_BY_NAME, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ShelfDto findByName (@RequestParam(ControllerConstants.NAME) String name) {
+    public ResponseEntity<?> findByName (@RequestParam(ControllerConstants.NAME) String name) {
         return shelfService.findByName(name)
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, SHELF_NOT_FOUND));
+                .<ResponseEntity<?>>map(shelfDto -> ResponseEntity.ok(shelfDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, SHELF_NOT_FOUND_MESSAGE);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 
     /**

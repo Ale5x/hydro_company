@@ -40,14 +40,22 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
 
     @Override
     public Optional<ShelfDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(shelfDao.findById(id)
-                .orElseThrow(() -> new CoreException(SHELF_BY_ID_NOT_FOUND_ERROR))));
+        Optional<Shelf> shelf = shelfDao.findById(id);
+        if (shelf.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return shelf.map(this::mapToObjectDto);
     }
 
     @Override
     public Optional<ShelfDto> findByName(String name) throws CoreException {
-        return Optional.of(mapToObjectDto(shelfDao.findByName(name)
-                .orElseThrow(() -> new CoreException(SHELF_BY_NAME_NOT_FOUND_ERROR))));
+        Optional<Shelf> shelf = shelfDao.findByName(name);
+        if (shelf.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return shelf.map(this::mapToObjectDto);
     }
 
     @Override

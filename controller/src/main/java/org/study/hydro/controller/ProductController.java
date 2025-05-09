@@ -13,12 +13,12 @@ import org.study.hydro.entity.Dto.ProductCompanyDto;
 import org.study.hydro.entity.Dto.ProductDto;
 import org.study.hydro.entity.Dto.ProductTypeDto;
 import org.study.hydro.entity.Dto.StorageRackDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.ProductService;
 import org.study.hydro.utill.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
 
     private final ImageStorage localImageStorage;
 
-    private static final String PRODUCT_NOT_FOUND = "Product not found";
+    private static final String PRODUCT_NOT_FOUND_MESSAGE = "The specified product was not found.";
 
     @Value("${file.upload-product-scheme-dir}")
     private String schemeDir;
@@ -100,10 +100,15 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
      */
     @GetMapping(value = PathPages.PRODUCT_BY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProductDto findProductById (@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findProductById (@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return productService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, PRODUCT_NOT_FOUND));
+                .<ResponseEntity<?>>map(productDto -> ResponseEntity.ok(productDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, PRODUCT_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 
     /**
@@ -304,7 +309,6 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     public CollectionModel<ProductDto> findAllByStorageRack (@RequestParam(ControllerConstants.PAGE) String page,
                                                          @RequestParam(ControllerConstants.SIZE) String size,
                                                          @RequestParam(ControllerConstants.NAME) String name) {
-
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,

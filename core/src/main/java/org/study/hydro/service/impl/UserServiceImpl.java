@@ -27,7 +27,8 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
+public class
+  UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
 
     private final UserDao userDao;
 

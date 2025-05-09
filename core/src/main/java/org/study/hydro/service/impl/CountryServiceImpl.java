@@ -43,8 +43,12 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
 
     @Override
     public Optional<CountryDto> findById(int id) {
-        return Optional.of(mapToObjectDto(countryDao.countryById(id)
-                .orElseThrow(() -> new CoreException(COUNTRY_NOT_FOUND_ERROR))));
+        Optional<Country> country = countryDao.countryById(id);
+        if (country.isEmpty()) {
+            //logger
+            return Optional.empty();
+        }
+        return country.map(this::mapToObjectDto);
     }
 
     @Override

@@ -7,9 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.ProductConnectionDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.ProductConnectionService;
 import org.study.hydro.utill.ValidatorParam;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * This class {@link ProductConnectionController} provides endpoints for accessing product connection data.
@@ -21,7 +23,7 @@ public class ProductConnectionController {
 
     private final ProductConnectionService productConnectionService;
 
-    private static final String PRODUCT_CONNECTION_NOT_FOUND = "Product connection not found";
+    private static final String PRODUCT_CONNECTION_NOT_FOUND_MESSAGE = "The specified product connection was not found.";
 
     @Autowired
     public ProductConnectionController(ProductConnectionService productConnectionService) {
@@ -70,9 +72,14 @@ public class ProductConnectionController {
      */
     @GetMapping(value = PathPages.PRODUCT_CONNECTION_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProductConnectionDto findById(@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findById(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return productConnectionService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, PRODUCT_CONNECTION_NOT_FOUND));
+                .<ResponseEntity<?>>map(connectionDto -> ResponseEntity.ok(connectionDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, PRODUCT_CONNECTION_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 }

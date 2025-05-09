@@ -4,15 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.hydro.entity.Dto.CountryDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.service.CountryService;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class {@link CountryController} provides endpoints for accessing country data.
@@ -24,7 +26,7 @@ public class CountryController {
 
     private final CountryService countryService;
 
-    private static final String COUNTRY_NOT_FOUND = "Country not found";
+    private static final String COUNTRY_NOT_FOUND_MESSAGE = "The specified country was not found.";
 
     @Autowired
     public CountryController(CountryService countryService) {
@@ -47,10 +49,17 @@ public class CountryController {
      * @return The object of the countryDTO.
      */
     @GetMapping(value = PathPages.COUNTRY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CountryDto findCountryById(@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findCountryById(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
         return countryService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, COUNTRY_NOT_FOUND));
+                .<ResponseEntity<?>>map(country -> ResponseEntity.ok(country))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, COUNTRY_NOT_FOUND_MESSAGE);
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                    });
     }
 
     /**

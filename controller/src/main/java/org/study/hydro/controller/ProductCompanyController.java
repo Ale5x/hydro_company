@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydro.entity.Dto.ProductCompanyDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.ProductCompanyService;
 import org.study.hydro.utill.Pagination;
 import org.study.hydro.utill.ValidatorParam;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public class ProductCompanyController implements HypermediaListAssembler<Product
 
     private final ProductCompanyService productCompanyService;
 
-    private static final String PRODUCT_COMPANY_NOT_FOUND = "Product Company not found";
+    private static final String PRODUCT_COMPANY_NOT_FOUND_MESSAGE = "The specified product company was not found.";
 
     @Autowired
     public ProductCompanyController(ProductCompanyService productCompanyService) {
@@ -101,10 +101,15 @@ public class ProductCompanyController implements HypermediaListAssembler<Product
      */
     @GetMapping(value = PathPages.PRODUCT_COMPANY_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProductCompanyDto findProductCompanyById(@RequestParam(ControllerConstants.ID) String id) {
+    public ResponseEntity<?> findProductCompanyById(@RequestParam(ControllerConstants.ID) String id) {
         ValidatorParam.isNumber(id);
-        return productCompanyService.findById(Integer.parseInt(id))
-                .orElseThrow(() -> new ReportException(HttpStatus.BAD_REQUEST, PRODUCT_COMPANY_NOT_FOUND));
+        return productCompanyService.findById(Integer.parseInt(id)).
+                <ResponseEntity<?>>map(productCompanyDto -> ResponseEntity.ok(productCompanyDto))
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections
+                            .singletonMap(ControllerConstants.MESSAGE, PRODUCT_COMPANY_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 
     /**

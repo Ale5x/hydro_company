@@ -42,9 +42,11 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
 
     @Override
     public Optional<StorageRackDto> findById(int id) throws CoreException {
-        return Optional.of(mapToObjectDto(
-                storageRackDao.getStorageRackById(id)
-                        .orElseThrow(() -> new CoreException(NOT_FOUND_STORAGE_RACK_ERROR))));
+        Optional<StorageRack> storageRack = storageRackDao.getStorageRackById(id);
+        if (storageRack.isEmpty()) {
+            return Optional.empty();
+        }
+        return storageRack.map(this::mapToObjectDto);
     }
 
     @Override

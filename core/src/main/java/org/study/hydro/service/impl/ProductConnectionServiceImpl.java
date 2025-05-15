@@ -9,6 +9,7 @@ import org.study.hydro.entity.ProductConnection;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.ProductConnectionService;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ import java.util.Optional;
 @Transactional
 public class ProductConnectionServiceImpl extends EntityMapper<ProductConnectionDto, ProductConnection> implements ProductConnectionService {
 
-    private final ProductConnectionDao productConnectionDao;
+    private final static String PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE = "Product Connection not found. [id = %s.]";
 
-    private final static String PRODUCT_CONNECTION_BY_ID_NOT_FOUND_ERROR = "Product Connection by id not found.";
+    private final ProductConnectionDao productConnectionDao;
 
     @Autowired
     public ProductConnectionServiceImpl(ProductConnectionDao productConnectionDao) {
@@ -29,12 +30,24 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
 
     @Override
     public boolean create(ProductConnectionDto productConnectionDto) throws CoreException {
-        return productConnectionDao.save(mapToEntityFromDto(productConnectionDto, false)) > 0;
+        ProductConnection productConnection = new ProductConnection();
+        productConnection.setSize(productConnectionDto.getSize());
+        return productConnectionDao.save(productConnection) > 0;
     }
 
     @Override
     public boolean update(ProductConnectionDto productConnectionDto) throws CoreException {
-        return productConnectionDao.updateProductConnection(mapToEntityFromDto(productConnectionDto, true));
+        ProductConnection existingConnection = productConnectionDao
+                .getProductConnectionById(productConnectionDto.getProductConnectionId())
+                .orElseThrow(() -> {
+                    // logger
+                    throw new CoreException(String.format(PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
+                            productConnectionDto.getProductConnectionId()));
+                });
+        existingConnection.setSize(StringUtils.isBlankOrNullText(productConnectionDto.getSize())
+                ? existingConnection.getSize() : productConnectionDto.getSize());
+
+        return productConnectionDao.updateProductConnection(existingConnection);
     }
 
     @Override
@@ -70,16 +83,5 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
         productConnectionDto.setSize(object.getSize());
 
         return productConnectionDto;
-    }
-
-    @Override
-    public ProductConnection mapToEntityFromDto(ProductConnectionDto objectDto, boolean isUpdate) {
-        ProductConnection productConnection = new ProductConnection();
-        if (isUpdate) {
-            productConnection.setProductConnectionId(objectDto.getProductConnectionId());
-        }
-
-        productConnection.setSize(objectDto.getSize());
-        return productConnection;
     }
 }

@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ProductCompanyDao;
 import org.study.hydro.entity.ProductCompany;
@@ -25,6 +28,9 @@ class ProductCompanyDaoImplTest {
     @Autowired
     private ProductCompanyDao productCompanyDao;
 
+    @Autowired
+    private SessionFactory sessionFactory;
+
     private int productCompanyId = 1;
     private String newName = "BOSH - 2";
     private String createNewProductCompanyName = "AlG link";
@@ -42,15 +48,36 @@ class ProductCompanyDaoImplTest {
         assertFalse(productCompanyListBefore.isEmpty());
 
         ProductCompany productCompany = new ProductCompany(createNewProductCompanyName);
-        boolean condition = productCompanyDao.create(productCompany);
+        int id = productCompanyDao.create(productCompany);
 
-        assertTrue(condition);
+        assertTrue(id > 0);
 
         List<ProductCompany> productCompanyListAfter = productCompanyDao.getProductCompanies(offset, limit);
 
         assertFalse(productCompanyListAfter.isEmpty());
         assertTrue(productCompanyListAfter.size() > productCompanyListBefore.size());
 
+    }
+
+    @Test
+    @Transactional
+    public void update () {
+        ProductCompany company = new ProductCompany();
+        company.setName("Original Name");
+
+        Session session = sessionFactory.getCurrentSession();
+        session.save(company);
+        session.flush();
+
+        Integer id = company.getProductCompanyId();
+
+        company.setName("Updated Name");
+
+        boolean result = productCompanyDao.update(company);
+        assertTrue(result);
+
+        ProductCompany updatedCompany = session.get(ProductCompany.class, id);
+        assertEquals("Updated Name", updatedCompany.getName());
     }
 
     @Test
@@ -65,23 +92,6 @@ class ProductCompanyDaoImplTest {
         List<ProductCompany> productCompanyList = productCompanyDao.getProductCompanies(offset, limit);
         assertFalse(productCompanyList.isEmpty());
         assertTrue(productCompanyList.size() > 0);
-    }
-
-    @Test
-    void update() {
-        Optional<ProductCompany> productCompanyBefore = productCompanyDao.getById(productCompanyId);
-        assertTrue(productCompanyBefore.isPresent());
-
-        ProductCompany productCompany = productCompanyBefore.get();
-        productCompany.setName(newName);
-
-        productCompanyDao.update(productCompany);
-
-        Optional<ProductCompany> productCompanyAfter = productCompanyDao.getById(productCompanyId);
-        assertTrue(productCompanyAfter.isPresent());
-
-        assertEquals(newName, productCompanyAfter.get().getName());
-
     }
 
     @Test

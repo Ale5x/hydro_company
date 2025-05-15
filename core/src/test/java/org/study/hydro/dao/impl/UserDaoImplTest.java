@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.UserDao;
 import org.study.hydro.entity.UserCompany;
@@ -29,6 +32,10 @@ class UserDaoImplTest {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
     private UserCompany userCompany = null;
 
     private int offset = 1;
@@ -38,7 +45,6 @@ class UserDaoImplTest {
     @BeforeEach
     void setUp() {
         userCompany = new UserCompany(1, "Company 1", "USA");
-
     }
 
     @Test
@@ -50,6 +56,30 @@ class UserDaoImplTest {
         int countAfterOperation = userDao.users(limit, offset).size();
         assertTrue(userId >= 1);
         assertTrue(countAfterOperation > countBeforeOperation);
+    }
+
+    @Test
+    @Transactional
+    void update() {
+        User user = new User();
+        user.setFirstName("OldFirst");
+        user.setLastName("Last");
+        user.setEmail("test@example.com");
+        user.setPassword("pass");
+
+        Session session = sessionFactory.getCurrentSession();
+        session.save(user);
+        session.flush();
+
+        Integer id = user.getUserId();
+
+        user.setFirstName("NewFirst");
+        boolean updated = userDao.update(user);
+
+        assertTrue(updated);
+
+        User updatedUser = session.get(User.class, id);
+        assertEquals("NewFirst", updatedUser.getFirstName());
     }
 
     @Test

@@ -9,10 +9,8 @@ import org.study.hydro.entity.*;
 import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.entity.Dto.UserDto;
 import org.study.hydro.exception.CoreException;
-import org.study.hydro.service.EntityMapper;
-import org.study.hydro.service.UserCompanyService;
-import org.study.hydro.service.RoleService;
-import org.study.hydro.service.UserService;
+import org.study.hydro.service.*;
+import org.study.hydro.utill.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,33 +25,81 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class
-  UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
+public class UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
+
+    private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String USER_NOT_FOUND_BY_ID_MESSAGE = "User not found. [id = %s]";
+    private static final String USER_ROLE_NOT_EXIST_MESSAGE = "User's role doesn't exist. [role = %s]";
+    private static final String USER_COMPANY_NOT_FOUND_MESSAGE = "User company not found. [id = %s, name = %s, address = %s]";
+    private static final String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
 
     private final UserDao userDao;
 
     private final RoleService roleService;
 
-    private final UserCompanyService userCompanyService;
-
     private final PasswordEncoder passwordEncoder;
 
-    private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final String USER_NOT_FOUND_BY_ID_ERROR = "User by id not found.";
-    private static final String USER_ROLE_NOT_EXIST_ERROR = "The User's role doesn't exist. The role=%s";
+    private final ServiceMediator serviceMediator;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, RoleService roleService, UserCompanyService userCompanyService,
-                           PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDao userDao, RoleService roleService, PasswordEncoder passwordEncoder, ServiceMediator serviceMediator) {
         this.userDao = userDao;
         this.roleService = roleService;
-        this.userCompanyService = userCompanyService;
         this.passwordEncoder = passwordEncoder;
+        this.serviceMediator = serviceMediator;
     }
 
     @Override
     public boolean create(UserDto userDto) throws CoreException {
-        return userDao.save(mapToEntityFromDto(userDto, false)) > 0;
+        User user = new User();
+
+        user.setRole(addRoleToNewUser());
+
+        String password = userDto.getPassword();
+        if (password != null && !password.isEmpty()) {
+            user.setPassword(passwordEncoder.encode(password));
+        }
+
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+
+        user.setPathPhoto(userDto.getPathPhoto());
+
+        user.setRegistration( getLocalDate());
+
+        if (userDto.getUserCompanyDto() != null) {
+            user.setUserCompany(addCompanyToUser(userDto.getUserCompanyDto()));
+        }
+        return userDao.save(user) > 0;
+    }
+
+    @Override
+    public boolean update(UserDto userDto) throws CoreException {
+        User existingUser = userDao.getUserById(userDto.getUserDtoId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userDto.getUserDtoId()));
+                });
+        existingUser.setFirstName(StringUtils.isBlankOrNullText(userDto.getFirstName())
+                ? existingUser.getFirstName() : userDto.getFirstName());
+        existingUser.setLastName(StringUtils.isBlankOrNullText(userDto.getLastName())
+                ? existingUser.getLastName() : userDto.getLastName());
+        existingUser.setEmail(StringUtils.isBlankOrNullText(userDto.getEmail())
+                ? existingUser.getEmail() : userDto.getEmail());
+        existingUser.setPassword(StringUtils.isBlankOrNullText(userDto.getPassword())
+                ? existingUser.getPassword() : passwordEncoder.encode(userDto.getPassword()));
+        existingUser.setPathPhoto(StringUtils.isBlankOrNullText(userDto.getPathPhoto())
+                ? existingUser.getPathPhoto() : userDto.getPathPhoto());
+
+        UserCompanyDto userCompanyDto = userDto.getUserCompanyDto();
+        UserCompany currentCompany = existingUser.getUserCompany();
+
+        if (userCompanyDto != null && (currentCompany == null || !Objects.equals(currentCompany.getUserCompanyId(), userCompanyDto.getCompanyDtoId()))) {
+            existingUser.setUserCompany(addCompanyToUser(userCompanyDto));
+        }
+
+        return userDao.update(existingUser);
     }
 
     @Override
@@ -85,7 +131,7 @@ public class
      * @param userCompany is the company type.
      * @return the CompanyDto.
      */
-    private UserCompanyDto addCompanyDtoToUserDto(UserCompany userCompany) {
+    protected UserCompanyDto addCompanyDtoToUserDto(UserCompany userCompany) {
         UserCompanyDto userCompanyDto = new UserCompanyDto();
         userCompanyDto.setCompanyDtoId(userCompany.getUserCompanyId());
         userCompanyDto.setName(userCompany.getName());
@@ -118,7 +164,7 @@ public class
      */
     private Role addRoleToNewUser() {
         return roleService.findRole(ERole.USER).orElseThrow(
-                () -> new CoreException(USER_ROLE_NOT_EXIST_ERROR));
+                () -> new CoreException(USER_ROLE_NOT_EXIST_MESSAGE));
     }
 
     /**
@@ -126,19 +172,26 @@ public class
      * @param userCompanyDto contains some information for the company.
      * @return The Company instance.
      */
-    private UserCompany addCompanyToUser(UserCompanyDto userCompanyDto) {
+    UserCompany addCompanyToUser(UserCompanyDto userCompanyDto) {
         Integer companyId = userCompanyDto.getCompanyDtoId();
         UserCompany userCompany = null;
-
-        if (companyId != null && companyId > 0) {
-            Optional<UserCompany> existingCompany = userCompanyService.findCompanyById(companyId);
-            if (existingCompany.isPresent()) {
-                userCompany = existingCompany.get();
-            }
+        if (companyId != null) {
+            return serviceMediator.findUserCompanyById(companyId).orElseThrow(() -> {
+                //logger
+                throw new CoreException(String.format(USER_COMPANY_NOT_FOUND_MESSAGE, companyId,
+                        userCompanyDto.getName(),
+                        userCompanyDto.getAddress()));
+            });
         } else {
             userCompany = new UserCompany();
             userCompany.setName(userCompanyDto.getName());
             userCompany.setAddress(userCompanyDto.getAddress());
+            userCompany.setCountry(serviceMediator.countryById(userCompanyDto.getCountryDto().getCountryId()).orElseThrow(() -> {
+                //logger
+                throw new CoreException(String.format(COUNTRY_NOT_FOUND_MESSAGE,
+                        userCompanyDto.getCountryDto().getCountryId(),
+                        userCompanyDto.getCountryDto().getName()));
+            }));
         }
         return userCompany;
     }
@@ -171,41 +224,9 @@ public class
             userDto.setRole(mapRoles(object.getRole()));
         } else {
             //logging
-            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_ERROR, object.getRole()));
+            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, object.getRole()));
         }
         return userDto;
-    }
-
-    @Override
-    public User mapToEntityFromDto(UserDto objectDto, boolean isUpdate) {
-        User user = new User();
-
-        if (isUpdate && objectDto.getUserDtoId() != null) {
-            user.setUserId(objectDto.getUserDtoId());
-            user.setRole(extractUserRole(objectDto));
-        } else {
-            user.setRole(addRoleToNewUser());
-        }
-
-        String password = objectDto.getPassword();
-        if (password != null && !password.isEmpty()) {
-            user.setPassword(passwordEncoder.encode(password));
-        }
-
-        user.setFirstName(objectDto.getFirstName());
-        user.setLastName(objectDto.getLastName());
-        user.setEmail(objectDto.getEmail());
-
-        user.setPathPhoto(objectDto.getPathPhoto());
-
-        user.setRegistration(objectDto.getRegistration() != null
-                ? objectDto.getRegistration()
-                : getLocalDate());
-
-        if (objectDto.getUserCompanyDto() != null) {
-            user.setUserCompany(addCompanyToUser(objectDto.getUserCompanyDto()));
-        }
-        return user;
     }
 
     /**
@@ -240,7 +261,7 @@ public class
                return role.get();
             } else {
                 // logging
-                throw new CoreException(String.format(USER_ROLE_NOT_EXIST_ERROR, roleName));
+                throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, roleName));
             }
         }
         return new Role(ERole.USER);

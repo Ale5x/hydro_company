@@ -24,11 +24,18 @@ public class PictureDaoImpl extends CriteriaQueryHelper<Picture> implements Pict
             "JOIN pictures.product AS picture WHERE pictures.product.productId =: productId";
 
     @Override
-    public boolean create(Picture picture) {
+    public int create(Picture picture) {
         Session session = getCurrentSession();
         session.save(picture);
         session.flush();
-        return picture.getPictureId() > 0;
+        return picture.getPictureId();
+    }
+
+    @Override
+    public boolean update(Picture picture) {
+        Session session = getCurrentSession();
+        session.saveOrUpdate(picture);
+        return true;
     }
 
     @Override

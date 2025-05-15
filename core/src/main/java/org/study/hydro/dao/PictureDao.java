@@ -13,13 +13,28 @@ import java.util.Optional;
 public interface PictureDao {
 
     /**
-     * The method creates new record in the database table.
+     * Persists the given {@link Picture} entity in the database.
+     * <p>
+     * This method saves the {@code picture} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved picture.
      *
-     * @param picture entity that specifies creation of the new record in the database table.
-     *
-     * @return returns boolean's result if the row creates.
+     * @param picture the {@link Picture} entity to be persisted in the database
+     * @return the generated ID of the saved picture
      */
-    boolean create(Picture picture);
+    int create(Picture picture);
+
+    /**
+     * Updates the given {@link Picture} entity in the data store.
+     * <p>
+     * This method attempts to update the existing picture with the new data provided.
+     * If the picture does not exist or the update fails due to validation or persistence issues,
+     * the method returns {@code false}.
+     *
+     * @param picture the {@link Picture} entity containing updated information
+     * @return {@code true} if the update was successful; {@code false} if the picture was not found or not updated
+     */
+    boolean update (Picture picture);
 
     /**
      * The method creates new records in the database table from the list of the pictures.

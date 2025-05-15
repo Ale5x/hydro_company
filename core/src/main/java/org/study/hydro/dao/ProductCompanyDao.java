@@ -13,13 +13,16 @@ import java.util.Optional;
 public interface ProductCompanyDao {
 
     /**
-     * The method creates the new record in the database table.
+     * Persists the given {@link ProductCompany} entity in the database.
+     * <p>
+     * This method saves the {@code productCompany} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved productCompany.
      *
-     * @param productCompany entity that specifies the creation of the new record in the database table.
-     *
-     * @return returns boolean's result if the row creates.
+     * @param productCompany the {@link ProductCompany} entity to be persisted in the database
+     * @return the generated ID of the saved productCompany
      */
-    boolean create(ProductCompany productCompany);
+    int create(ProductCompany productCompany);
 
     /**
      * The method returns the specified ProductCompany by id.
@@ -39,11 +42,14 @@ public interface ProductCompanyDao {
     List<ProductCompany> getProductCompanies(int offset, int limit);
 
     /**
-     * The method updates an existing table record in the database.
+     * Updates the given {@link ProductCompany} entity in the data store.
+     * <p>
+     * This method attempts to update an existing product company record with the data
+     * provided in the {@link ProductCompany} entity. If the entity does not exist or the update
+     * operation fails (e.g., due to validation or persistence issues), the method returns {@code false}.
      *
-     * @param productCompany entity having new data to update an existing table record.
-     *
-     * @return returns always a true result.
+     * @param productCompany the {@link ProductCompany} entity containing updated information
+     * @return {@code true} if the update was successful; {@code false} if the entity was not found or the update failed
      */
     boolean update(ProductCompany productCompany);
 

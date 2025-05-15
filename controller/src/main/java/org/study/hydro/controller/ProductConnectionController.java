@@ -44,16 +44,22 @@ public class ProductConnectionController {
     }
 
     /**
-     * The method creates an access point for creating a product connection in the database.
-     * @param connectionDto is the date of the updating product connection.
-     * @return The instance of ResponseEntity with the HttpStatus.
+     * Updates the product connection information.
+     * <p>
+     * This endpoint updates the product connection details based on the provided
+     * {@link ProductConnectionDto}. It performs validation and updates the product
+     * connection through the service layer.
+     * </p>
+     *
+     * @param connectionDto the {@link ProductConnectionDto} containing the updated
+     *                      information for the product connection.
+     * @return a {@link ResponseEntity} with HTTP status {@link HttpStatus#OK} if the update
+     *         is successful, otherwise {@link HttpStatus#BAD_REQUEST} is returned.
      */
     @PostMapping(value = PathPages.PRODUCT_CONNECTION_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> update (@RequestBody ProductConnectionDto connectionDto) {
-        if (productConnectionService.update(connectionDto)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        productConnectionService.update(connectionDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

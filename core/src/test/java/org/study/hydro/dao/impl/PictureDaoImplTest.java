@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.PictureDao;
 import org.study.hydro.entity.Picture;
@@ -24,8 +27,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = DevelopmentConfig.class)
 class PictureDaoImplTest {
 
+    @Value("${file.multipart.max-size-file}")
+    private String maxSizeFile1;
+
     @Autowired
     private PictureDao pictureDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     private Product product = new Product(1);
     private Picture picture = new Picture("new path", product);
@@ -51,16 +60,36 @@ class PictureDaoImplTest {
     void create() {
         List<Picture> pictureListBefore = pictureDao.getPictures(maxLimit, offset);
         assertTrue(pictureListBefore.size() > 0);
-        boolean condition = pictureDao.create(picture);
-        assertTrue(condition);
+        int id = pictureDao.create(picture);
+        assertTrue(id > 0);
 
         List<Picture> pictureListAfter = pictureDao.getPictures(maxLimit, offset);
 
         assertTrue(pictureListAfter.size() > 0);
         assertTrue(pictureListAfter.size() > pictureListBefore.size());
     }
-    @Value("${file.multipart.max-size-file}")
-    private String maxSizeFile1;
+
+    @Test
+    @Transactional
+    public void testUpdatePicture_shouldModifyEntity() {
+        Picture picture = new Picture();
+        picture.setPath("initial/path.jpg");
+
+        Session session = sessionFactory.getCurrentSession();
+        session.save(picture);
+        session.flush();
+
+        Integer id = picture.getPictureId();
+
+        picture.setPath("updated/path.jpg");
+
+        boolean updated = pictureDao.update(picture);
+        assertTrue(updated);
+
+        Picture updatedPicture = session.get(Picture.class, id);
+        assertEquals("updated/path.jpg", updatedPicture.getPath());
+    }
+
     @Test
     void createList() {
         System.out.println("maxSizeFile1 " + maxSizeFile1);

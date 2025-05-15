@@ -42,16 +42,18 @@ public class ShelfController {
     }
 
     /**
-     * The method creates an access point for updating a shelf in the database.
-     * @param shelfDto is the date of the updating shelf.
-     * @return The instance of ResponseEntity with the HttpStatus.
+     * Updates the information of a shelf based on the provided {@link ShelfDto}.
+     * This method is invoked through a {@code POST} request to update the shelf details.
+     *
+     * @param shelfDto The {@link ShelfDto} containing the updated information of the shelf.
+     *                 This DTO should include all necessary fields to perform the update.
+     * @return A {@link ResponseEntity} with an HTTP status code. In this case, it returns {@code OK} (200),
+     *         indicating that the shelf has been successfully updated.
      */
     @PostMapping(value = PathPages.SHELF_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> update (@RequestBody ShelfDto shelfDto) {
-        if (shelfService.update(shelfDto)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        shelfService.update(shelfDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

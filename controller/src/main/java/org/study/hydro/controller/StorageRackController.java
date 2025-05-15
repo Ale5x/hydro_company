@@ -49,16 +49,18 @@ public class StorageRackController implements HypermediaListAssembler<StorageRac
     }
 
     /**
-     * The method creates an access point for updating a storage rack in the database.
-     * @param storageRackDto is the date of the updating storage rack.
-     * @return The instance of ResponseEntity with the HttpStatus.
+     * Updates the information of a storage rack based on the provided {@link StorageRackDto}.
+     * This method is invoked through a {@code POST} request to update the storage rack details.
+     *
+     * @param storageRackDto The {@link StorageRackDto} containing the updated information of the storage rack.
+     *                       This DTO should include all necessary fields to perform the update.
+     * @return A {@link ResponseEntity} with an HTTP status code. In this case, it returns {@code OK} (200),
+     *         indicating that the storage rack has been successfully updated.
      */
     @PostMapping(value = PathPages.STORAGE_RACK_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> update (@RequestBody StorageRackDto storageRackDto) {
-        if (storageRackService.update(storageRackDto)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        storageRackService.update(storageRackDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

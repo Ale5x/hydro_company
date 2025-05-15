@@ -28,11 +28,11 @@ public abstract class EntityMapper<T, K> {
      */
     public abstract T mapToObjectDto(K object);
 
-    /**
-     * The method converts the DTO entity into the of entity object.
-     * @param objectDto the DTO object.
-     * @param isUpdate the flag that provides additional logic if this entity will participate in the update.
-     * @return the entity object.
-     */
-    public abstract K mapToEntityFromDto(T objectDto, boolean isUpdate);
+//    /**
+//     * The method converts the DTO entity into the of entity object.
+//     * @param objectDto the DTO object.
+//     * @param isUpdate the flag that provides additional logic if this entity will participate in the update.
+//     * @return the entity object.
+//     */
+//    public abstract K mapToEntityFromDto(T objectDto, boolean isUpdate);
 }

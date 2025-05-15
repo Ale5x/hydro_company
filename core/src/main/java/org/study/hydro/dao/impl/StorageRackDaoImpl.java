@@ -23,12 +23,12 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
             STORAGE_RACK_ID);
 
     @Override
-    public boolean create(StorageRack storageRack) {
+    public int create(StorageRack storageRack) {
         Session session = getCurrentSession();
         session.save(storageRack);
 
         session.flush();
-        return storageRack.getStorageRackId() > 0;
+        return storageRack.getStorageRackId();
     }
 
     @Override
@@ -39,7 +39,6 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
                 .setParameter(STORAGE_RACK_ID, id)
                 .executeUpdate() > 0;
     }
-
 
     @Override
     public boolean update(StorageRack storageRack) {

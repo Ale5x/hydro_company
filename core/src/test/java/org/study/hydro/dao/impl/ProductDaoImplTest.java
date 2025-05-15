@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ProductDao;
 import org.study.hydro.entity.*;
@@ -24,6 +27,10 @@ class ProductDaoImplTest {
 
     @Autowired
     private ProductDao productDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
     private int productId = 1;
     private int limit = 3;
     private int maxLimit = 100;
@@ -64,19 +71,28 @@ class ProductDaoImplTest {
     }
 
     @Test
+    @Transactional
     void update() {
-        int newValueForCount = 500;
-        Optional<Product> optionalProductBefore = productDao.getProductById(productId);
-        assertTrue(optionalProductBefore.isPresent());
+        Product product = new Product();
+        product.setStockKeepingUnit("OldProduct");
+        product.setCount(100);
+        product.setAdditionalInformation("Category1");
 
-        Product product = optionalProductBefore.get();
-        product.setCount(newValueForCount);
-        productDao.update(product);
+        Session session = sessionFactory.getCurrentSession();
+        session.save(product);
+        session.flush();
 
-        Optional<Product> optionalProductAfter = productDao.getProductById(productId);
+        Integer id = product.getProductId();
 
-        assertTrue(optionalProductAfter.isPresent());
-        assertEquals(newValueForCount, optionalProductAfter.get().getCount());
+        product.setStockKeepingUnit("NewProduct");
+        product.setCount(150);
+        boolean result = productDao.update(product);
+
+        assertTrue(result);
+
+        Product updatedProduct = session.get(Product.class, id);
+        assertEquals("NewProduct", updatedProduct.getStockKeepingUnit());
+        assertEquals(150, updatedProduct.getCount());
     }
 
     @Test

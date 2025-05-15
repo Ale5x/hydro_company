@@ -29,7 +29,6 @@ public class UserCompanyDaoImpl extends CriteriaQueryHelper<UserCompany> impleme
     private final static String COMPANY_ID = "userCompanyId";
     private final static String COMPANY_NAME = "name";
 
-
     @Override
     public int save(UserCompany userCompany) {
         Session session = getCurrentSession();
@@ -37,6 +36,13 @@ public class UserCompanyDaoImpl extends CriteriaQueryHelper<UserCompany> impleme
         session.flush();
 
         return userCompany.getUserCompanyId();
+    }
+
+    @Override
+    public boolean update(UserCompany userCompany) {
+        Session session = getCurrentSession();
+        session.saveOrUpdate(userCompany);
+        return true;
     }
 
     @Override

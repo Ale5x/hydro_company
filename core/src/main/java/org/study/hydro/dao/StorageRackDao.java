@@ -13,13 +13,16 @@ import java.util.Optional;
 public interface StorageRackDao {
 
     /**
-     * The method creates the new record in the database table.
+     * Persists the given {@link StorageRack} entity in the database.
+     * <p>
+     * This method saves the {@code storageRack} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved storageRack.
      *
-     * @param storageRack entity that specifies the creation of new record in the database table.
-     *
-     * @return returns boolean's result if the row creates.
+     * @param storageRack the {@link StorageRack} entity to be persisted in the database
+     * @return the generated ID of the saved storageRack
      */
-    boolean create(StorageRack storageRack);
+    int create(StorageRack storageRack);
 
     /**
      * The method removes the current record in the database table.

@@ -1,11 +1,14 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ShelfDao;
 import org.study.hydro.entity.Shelf;
@@ -23,21 +26,10 @@ class ShelfDaoImplTest {
     @Autowired
     private ShelfDao shelfDao;
 
+    @Autowired
+    private SessionFactory sessionFactory;
+
     private Shelf newShelf = new Shelf("New shelf");
-
-    @Test
-    void findById() {
-        int shelfId = 1;
-        Optional<Shelf> shelf = shelfDao.findById(shelfId);
-        assertTrue(shelf.isPresent());
-    }
-
-    @Test
-    void findAll() {
-        List<Shelf> shelfList = shelfDao.getAllShelf();
-        assertTrue(shelfList.size() > 0);
-        assertFalse(shelfList.isEmpty());
-    }
 
     @Test
     void create() {
@@ -55,7 +47,40 @@ class ShelfDaoImplTest {
         assertTrue(shelfListAfter.size() > shelfListBefore.size());
     }
 
+    @Test
+    @Transactional
+    void update() {
+        Shelf shelf = new Shelf();
+        shelf.setName("Original Name");
 
+        Session session = sessionFactory.getCurrentSession();
+        session.save(shelf);
+        session.flush();
+        Integer id = shelf.getShelfId();
+
+        shelf.setName("Updated Name");
+        boolean result = shelfDao.update(shelf);
+
+        assertTrue(result);
+
+        Shelf updatedShelf = session.get(Shelf.class, id);
+        assertEquals("Updated Name", updatedShelf.getName());
+    }
+
+
+    @Test
+    void findById() {
+        int shelfId = 1;
+        Optional<Shelf> shelf = shelfDao.findById(shelfId);
+        assertTrue(shelf.isPresent());
+    }
+
+    @Test
+    void findAll() {
+        List<Shelf> shelfList = shelfDao.getAllShelf();
+        assertTrue(shelfList.size() > 0);
+        assertFalse(shelfList.isEmpty());
+    }
 
     @Test
     void findByName() {
@@ -66,23 +91,6 @@ class ShelfDaoImplTest {
 
         Optional<Shelf> shelf = shelfDao.findByName(shelfOptional.get().getName());
         assertTrue(shelf.isPresent());
-    }
-
-    @Test
-    void update() {
-        int shelfId = 1;
-        String numberUpdateShelf = "111";
-        Optional<Shelf> shelfBeforeOperation = shelfDao.findById(shelfId);
-        assertTrue(shelfBeforeOperation.isPresent());
-
-        Shelf shelf = new Shelf(shelfBeforeOperation.get().getShelfId(), shelfBeforeOperation.get().getName());
-        shelf.setName(numberUpdateShelf);
-        shelfDao.update(shelf);
-
-        Optional<Shelf> shelAfterOperation = shelfDao.findById(shelfId);
-        assertTrue(shelAfterOperation.isPresent());
-
-        assertEquals(numberUpdateShelf, shelAfterOperation.get().getName());
     }
 
     @Test

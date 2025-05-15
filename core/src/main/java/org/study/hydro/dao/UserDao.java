@@ -13,13 +13,28 @@ import java.util.Optional;
 public interface UserDao {
 
     /**
-     * The method creates the new record in the database table.
+     * Persists the given {@link User} entity in the database.
+     * <p>
+     * This method saves the {@code user} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved user.
      *
-     * @param user entity that specifies the creation of new record in the database table.
-     *
-     * @return returns the number of the modified rows in the table.
+     * @param user the {@link User} entity to be persisted in the database
+     * @return the generated ID of the saved user
      */
     int save(User user);
+
+    /**
+     * Updates the given {@link User} entity in the data store.
+     * <p>
+     * This method attempts to update an existing {@link User} with the data provided.
+     * It returns {@code true} if the update was successful, or {@code false} if the user
+     * does not exist or the update operation failed.
+     *
+     * @param user the {@link User} entity containing updated information
+     * @return {@code true} if the user was successfully updated; {@code false} otherwise
+     */
+    boolean update(User user);
 
     /**
      * The method will return list of the users.

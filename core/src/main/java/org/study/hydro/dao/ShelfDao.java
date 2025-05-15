@@ -56,11 +56,14 @@ public interface ShelfDao {
     List<Shelf> getAllShelf();
 
     /**
-     * The method creates the new record in the database table.
+     * Persists the given {@link Shelf} entity in the database.
+     * <p>
+     * This method saves the {@code shelf} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved shelf.
      *
-     * @param shelf entity that specifies the creation of new record in the database table.
-     *
-     * @return returns the number of the modified rows in the table.
+     * @param shelf the {@link Shelf} entity to be persisted in the database
+     * @return the generated ID of the saved shelf
      */
     int create(Shelf shelf);
 }

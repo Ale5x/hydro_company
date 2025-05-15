@@ -2,12 +2,15 @@ package org.study.hydro.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydro.dao.ProductTypeDao;
 import org.study.hydro.entity.Dto.ProductTypeDto;
 import org.study.hydro.entity.ProductType;
+import org.study.hydro.exception.CoreException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ProductTypeServiceImplTest {
 
     @Mock
@@ -42,22 +46,64 @@ class ProductTypeServiceImplTest {
 
     @Test
     void create() {
-        when(productTypeDao.create(any(ProductType.class))).thenReturn(true);
+        when(productTypeDao.create(any(ProductType.class))).thenReturn(3);
 
-        boolean condition = productTypeDao.create(productType);
+        int id = productTypeDao.create(productType);
 
-        assertTrue(condition);
+        assertTrue(id > 0);
         verify(productTypeDao, times(1)).create(any(ProductType.class));
     }
 
     @Test
-    void update() {
-        when(productTypeDao.update(productType)).thenReturn(true);
+    void testUpdate_successful() throws CoreException {
+        ProductTypeDto dto = new ProductTypeDto();
+        dto.setProductTypeId(1);
+        dto.setName("Updated Type");
 
-        boolean condition = productTypeDao.update(productType);
+        ProductType existing = new ProductType();
+        existing.setProductTypeId(1);
+        existing.setName("Old Type");
 
-        assertTrue(condition);
-        verify(productTypeDao, times(1)).update(productType);
+        when(productTypeDao.getProductTypeById(1)).thenReturn(Optional.of(existing));
+        when(productTypeDao.update(existing)).thenReturn(true);
+
+        boolean result = productTypeService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Updated Type", existing.getName());
+        verify(productTypeDao).update(existing);
+    }
+
+    @Test
+    void testUpdate_productTypeNotFound_throwsException() {
+        ProductTypeDto dto = new ProductTypeDto();
+        dto.setProductTypeId(404);
+
+        when(productTypeDao.getProductTypeById(404)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () -> productTypeService.update(dto));
+
+        assertTrue(ex.getMessage().contains("Product type not found"));
+    }
+
+    @Test
+    void testUpdate_blankName_shouldKeepOriginal() throws CoreException {
+        ProductTypeDto dto = new ProductTypeDto();
+        dto.setProductTypeId(1);
+        dto.setName(" ");
+
+        ProductType existing = new ProductType();
+        existing.setProductTypeId(1);
+        existing.setName("Existing Name");
+
+        when(productTypeDao.getProductTypeById(1)).thenReturn(Optional.of(existing));
+        when(productTypeDao.update(existing)).thenReturn(true);
+
+        boolean result = productTypeService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Existing Name", existing.getName());
+        verify(productTypeDao).update(existing);
     }
 
     @Test

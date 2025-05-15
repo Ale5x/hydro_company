@@ -2,14 +2,17 @@ package org.study.hydro.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydro.dao.StorageRackDao;
 import org.study.hydro.entity.Dto.ShelfDto;
 import org.study.hydro.entity.Dto.StorageRackDto;
 import org.study.hydro.entity.Shelf;
 import org.study.hydro.entity.StorageRack;
+import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.ShelfService;
 
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class StorageRackServiceImplTest {
 
     @Mock
@@ -52,7 +56,6 @@ class StorageRackServiceImplTest {
         shelfDto.setName("name");
         shelfDto.setShelfDtoId(1);
 
-//        storageRackDto.setStorageRackDtoId(1);
         storageRackDto.setName(storageRack.getName());
         storageRackDto.setShelfName(shelf.getName());
     }
@@ -60,28 +63,66 @@ class StorageRackServiceImplTest {
     @Test
     void create() {
         when(shelfService.findShelfByName(any(String.class))).thenReturn(Optional.of(shelf));
-        when(storageRackDao.create(any(StorageRack.class))).thenReturn(true);
-
-//        storageRackDto.setStorageRackDtoId(0);
+        when(storageRackDao.create(any(StorageRack.class))).thenReturn(3);
 
         boolean condition = storageRackService.create(storageRackDto);
 
-        System.out.println("Storage rack dao" + storageRackDto);
         assertTrue(condition);
         verify(shelfService, times(1)).findShelfByName(shelf.getName());
         verify(storageRackDao, times(1)).create(any(StorageRack.class));
     }
 
     @Test
-    void update() {
-        when(shelfService.findShelfByName(any(String.class))).thenReturn(Optional.of(shelf));
-        when(storageRackDao.update(any(StorageRack.class))).thenReturn(true);
+    void testUpdate_successful() throws CoreException {
+        StorageRackDto dto = new StorageRackDto();
+        dto.setStorageRackDtoId(1);
+        dto.setName("Updated Storage Rack");
 
-        boolean condition = storageRackService.update(storageRackDto);
+        StorageRack existing = new StorageRack();
+        existing.setStorageRackId(1);
+        existing.setName("Old Storage Rack");
 
-        assertTrue(condition);
-        verify(shelfService, times(1)).findShelfByName(shelf.getName());
-        verify(storageRackDao, times(1)).update(any(StorageRack.class));
+        when(storageRackDao.getStorageRackById(1)).thenReturn(Optional.of(existing));
+        when(storageRackDao.update(existing)).thenReturn(true);
+
+        boolean result = storageRackService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Updated Storage Rack", existing.getName());
+        verify(storageRackDao).update(existing);
+    }
+
+    @Test
+    void testUpdate_storageRackNotFound_throwsException() {
+        StorageRackDto dto = new StorageRackDto();
+        dto.setStorageRackDtoId(404);
+        dto.setName("Storage Rack");
+
+        when(storageRackDao.getStorageRackById(404)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () -> storageRackService.update(dto));
+
+        assertTrue(ex.getMessage().contains("Storage rack not found"));
+    }
+
+    @Test
+    void testUpdate_blankName_shouldKeepOriginal() throws CoreException {
+        StorageRackDto dto = new StorageRackDto();
+        dto.setStorageRackDtoId(1);
+        dto.setName(" ");
+
+        StorageRack existing = new StorageRack();
+        existing.setStorageRackId(1);
+        existing.setName("Existing Storage Rack");
+
+        when(storageRackDao.getStorageRackById(1)).thenReturn(Optional.of(existing));
+        when(storageRackDao.update(existing)).thenReturn(true);
+
+        boolean result = storageRackService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Existing Storage Rack", existing.getName());
+        verify(storageRackDao).update(existing);
     }
 
     @Test

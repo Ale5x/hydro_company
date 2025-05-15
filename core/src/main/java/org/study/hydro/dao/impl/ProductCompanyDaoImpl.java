@@ -25,11 +25,19 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
             PRODUCT_COMPANY_ID);
 
     @Override
-    public boolean create(ProductCompany productCompany) {
+    public int create(ProductCompany productCompany) {
         Session session = getCurrentSession();
         session.save(productCompany);
         session.flush();
-        return productCompany.getProductCompanyId() > 0;
+        return productCompany.getProductCompanyId();
+    }
+
+    @Override
+    public boolean update(ProductCompany productCompany) {
+        Session session = getCurrentSession();
+        session.saveOrUpdate(productCompany);
+
+        return true;
     }
 
     @Override
@@ -58,14 +66,6 @@ public class ProductCompanyDaoImpl extends CriteriaQueryHelper<ProductCompany> i
                 .setMaxResults(limit)
                 .setFirstResult(offset)
                 .getResultList();
-    }
-
-    @Override
-    public boolean update(ProductCompany productCompany) {
-        Session session = getCurrentSession();
-
-        session.saveOrUpdate(productCompany);
-        return true;
     }
 
     @Override

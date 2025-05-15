@@ -2,12 +2,15 @@ package org.study.hydro.entity.Dto;
 
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
     private Integer productCompanyDtoId;
     private String name;
+    private Integer countryId;
+    private List<CountryDto> countries;
 
     public ProductCompanyDto() {}
 
@@ -35,6 +38,22 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         this.name = name;
     }
 
+    public Integer getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Integer countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<CountryDto> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<CountryDto> countries) {
+        this.countries = countries;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,7 +64,9 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
         if (!Objects.equals(productCompanyDtoId, that.productCompanyDtoId))
             return false;
-        return Objects.equals(name, that.name);
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(countryId, that.countryId)) return false;
+        return Objects.equals(countries, that.countries);
     }
 
     @Override
@@ -53,6 +74,8 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         int result = super.hashCode();
         result = 31 * result + (productCompanyDtoId != null ? productCompanyDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (countryId != null ? countryId.hashCode() : 0);
+        result = 31 * result + (countries != null ? countries.hashCode() : 0);
         return result;
     }
 

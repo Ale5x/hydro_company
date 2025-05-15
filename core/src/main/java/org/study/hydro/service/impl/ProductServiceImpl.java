@@ -11,14 +11,24 @@ import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.ProductService;
 import org.study.hydro.service.ServiceMediator;
 import org.study.hydro.utill.ImageStorage;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implements ProductService {
+
+    private final static String PRODUCT_BY_ID_NOT_FOUND_MESSAGE = "Product not found. [id = %s]";
+    private final static String PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE = "Product Type not found. [id = %s]";
+    private final static String PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE = "Product Connection not found. [id = %s]";
+    private final static String PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "Product Company not found. [id = %s]";
+    private final static String STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE = "Storage rack not found. [id = %s]";
+    private final static String COUNTRY_BY_ID_NOT_FOUND_MESSAGE = "Country not found. [id = %s]";
+    private final static String FILED_REMOVING_FILES_ERROR = "Failed to remove some product's files: ";
 
     private final ProductDao productDao;
 
@@ -33,25 +43,96 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         this.imageStorage = imageStorage;
     }
 
-    private final static String PRODUCT_BY_ID_NOT_FOUND_ERROR = "Product by id not found.";
-    private final static String FILED_REMOVING_FILES_ERROR = "Failed to remove some product's files: ";
-
     @Override
     public boolean create(ProductDto productDto) throws CoreException {
-        int productId = productDao.create(mapToEntityFromDto(productDto, false));
+        Product product = new Product();
 
-        return productId > 0;
+        product.setCount(productDto.getCount());
+        product.setStockKeepingUnit(productDto.getStockKeepingUnit());
+        product.setFlowRate(productDto.getFlowRate());
+
+        product.setPressure(productDto.getPressure());
+        product.setPressureMax(productDto.getPressureMax());
+        product.setWeight(productDto.getWeight());
+
+        product.setPathHydraulicScheme(productDto.getPathHydraulicScheme());
+        product.setAdditionalInformation(productDto.getAdditionalInformation());
+
+        product.setProductCompany(resolveProductCompany(productDto.getProductCompanyDto()));
+        product.setProductType(resolveProductType(productDto.getProductTypeDto()));
+        product.setProductConnection(resolveProductConnection(productDto.getProductConnectionDto()));
+        product.setCountryProduct(resolveProductCountry(productDto.getCountryDto()));
+
+        product.setStorageRackList(convertFromStorageRackDtoList(productDto.getStorageRackDtoList()));
+
+        product.setPicturePath(generatePictureList(productDto.getImagesPaths(), product));
+        return productDao.create(product) > 0;
     }
 
     @Override
     public boolean update(ProductDto productDto) throws CoreException {
-        return productDao.update(mapToEntityFromDto(productDto, true));
+        Product existingProduct = productDao.getProductById(productDto.getProductDtoId()).orElseThrow(() -> {
+            //logger
+            throw new CoreException(String.format(PRODUCT_BY_ID_NOT_FOUND_MESSAGE, productDto.getProductDtoId()));
+        });
+
+        existingProduct.setCount(StringUtils.isNullNumericObject(productDto.getCount())
+                ? existingProduct.getCount() : productDto.getCount());
+        existingProduct.setStockKeepingUnit(StringUtils.isBlankOrNullText(productDto.getStockKeepingUnit())
+                ? existingProduct.getStockKeepingUnit() : productDto.getStockKeepingUnit());
+        existingProduct.setFlowRate(StringUtils.isNullNumericObject(productDto.getFlowRate())
+                ? existingProduct.getFlowRate() : productDto.getFlowRate());
+
+        existingProduct.setPressure(StringUtils.isNullNumericObject(productDto.getPressure())
+                ? existingProduct.getPressure() : productDto.getPressure());
+        existingProduct.setPressureMax(StringUtils.isNullNumericObject(productDto.getPressureMax())
+                ? existingProduct.getPressureMax() : productDto.getPressureMax());
+        existingProduct.setWeight(StringUtils.isNullNumericObject(productDto.getWeight())
+                ? existingProduct.getWeight(): productDto.getWeight());
+
+        existingProduct.setPathHydraulicScheme(StringUtils.isBlankOrNullText(productDto.getPathHydraulicScheme())
+                ? existingProduct.getPathHydraulicScheme() : productDto.getPathHydraulicScheme());
+        existingProduct.setAdditionalInformation(StringUtils.isBlankOrNullText(productDto.getAdditionalInformation())
+                ? existingProduct.getAdditionalInformation() : productDto.getAdditionalInformation());
+
+        CountryDto countryDto = productDto.getCountryDto();
+        Country currentCountry = existingProduct.getCountryProduct();
+
+        if (countryDto != null && (currentCountry == null
+                || !Objects.equals(currentCountry.getCountryId(), countryDto.getCountryId()))) {
+            existingProduct.setCountryProduct(resolveProductCountry(countryDto));
+        }
+
+        ProductConnectionDto connectionDto = productDto.getProductConnectionDto();
+        ProductConnection currentConnection = existingProduct.getProductConnection();
+
+        if (connectionDto != null && (currentConnection == null
+                || !Objects.equals(currentConnection.getProductConnectionId(), connectionDto.getProductConnectionId()))) {
+            existingProduct.setProductConnection(resolveProductConnection(connectionDto));
+        }
+
+        ProductCompanyDto companyDto = productDto.getProductCompanyDto();
+        ProductCompany currentCompany = existingProduct.getProductCompany();
+
+        if (companyDto != null &&
+                (currentCompany == null || !Objects.equals(currentCompany.getProductCompanyId(), companyDto.getProductCompanyDtoId()))) {
+            existingProduct.setProductCompany(resolveProductCompany(companyDto));
+        }
+
+        ProductTypeDto typeDto = productDto.getProductTypeDto();
+        ProductType currentType = existingProduct.getProductType();
+
+        if (typeDto != null &&
+                (currentType == null || !Objects.equals(currentType.getProductTypeId(), typeDto.getProductTypeId()))) {
+            existingProduct.setProductType(resolveProductType(typeDto));
+        }
+        return productDao.update(existingProduct);
     }
 
     @Override
     public boolean remove(int id) throws CoreException {
         Product product = productDao.getProductById(id).orElseThrow(
-                () -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_ERROR));
+                () -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_MESSAGE));
 
         if (productDao.remove(product.getProductId())) {
             removeAllProductFiles(product);
@@ -163,62 +244,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         return prDto;
     }
 
-    @Override
-    public Product mapToEntityFromDto(ProductDto objectDto, boolean isUpdate) {
-        Product product = new Product();
-
-        if (isUpdate) {
-            product.setProductId(objectDto.getProductDtoId());
-        }
-
-        product.setCount(objectDto.getCount());
-        product.setStockKeepingUnit(objectDto.getStockKeepingUnit());
-        product.setFlowRate(objectDto.getFlowRate());
-
-        product.setPressure(objectDto.getPressure());
-        product.setPressureMax(objectDto.getPressureMax());
-        product.setWeight(objectDto.getWeight());
-
-        product.setPathHydraulicScheme(objectDto.getPathHydraulicScheme());
-        product.setAdditionalInformation(objectDto.getAdditionalInformation());
-
-        if (objectDto.getProductTypeDto().getProductTypeId() == 0) {
-            product.setProductType(new ProductType(
-                    objectDto.getProductTypeDto().getName()));
-        } else {
-            product.setProductType(new ProductType(
-                    objectDto.getProductTypeDto().getProductTypeId(),
-                    objectDto.getProductTypeDto().getName()));
-        }
-         if (objectDto.getProductCompanyDto().getProductCompanyDtoId() == 0) {
-             product.setProductCompany(new ProductCompany(
-                     objectDto.getProductCompanyDto().getName()));
-         } else {
-             product.setProductCompany(new ProductCompany(
-                     objectDto.getProductCompanyDto().getProductCompanyDtoId(),
-                     objectDto.getProductCompanyDto().getName()));
-         }
-
-         if (objectDto.getProductConnectionDto().getProductConnectionId() == 0) {
-             product.setProductConnection(new ProductConnection(
-                     objectDto.getProductConnectionDto().getSize()));
-         } else {
-             product.setProductConnection(new ProductConnection(
-                     objectDto.getProductConnectionDto().getProductConnectionId(),
-                     objectDto.getProductConnectionDto().getSize()));
-         }
-
-
-        product.setStorageRackList(convertFromStorageRackDtoList(objectDto.getStorageRackDtoList()));
-
-        product.setPicturePath(generatePictureList(objectDto.getImagesPaths(), objectDto.getProductDtoId()));
-        product.setCountryProduct(new Country(
-                objectDto.getCountryDto().getCountryId(),
-                objectDto.getCountryDto().getName()));
-
-            return product;
-        }
-
     /**
      * The method converts storage racks objects into storage racks DTO objects.
      * @param storageList the storage racks objects
@@ -245,11 +270,12 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     private List<StorageRack> convertFromStorageRackDtoList(List<StorageRackDto> storageDtoList) {
         List<StorageRack> storageList = new ArrayList<>();
         for (StorageRackDto storageRackDto : storageDtoList) {
-            StorageRack storageRack = new StorageRack(
-                    storageRackDto.getStorageRackDtoId(),
-                    storageRackDto.getName(),
-                    new Shelf(storageRackDto.getShelfName())
-            );
+            StorageRack storageRack = serviceMediator.findStorageRackById(storageRackDto.getStorageRackDtoId())
+                    .orElseThrow(() -> {
+                        //logger
+                        throw new CoreException(String.format(STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE,
+                                storageRackDto.getStorageRackDtoId()));
+                    });
             storageList.add(storageRack);
         }
         return storageList;
@@ -275,21 +301,109 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
      * Optionally associates each picture with a {@link Product} if a valid product ID is provided.
      *
      * @param picturesPaths list of image file paths to be converted into Picture entities
-     * @param productId     the ID of the product to associate with each picture;
-     *                      if 0, no product will be linked
      * @return a list of {@link Picture} objects with paths and optional product reference
      */
-    private List<Picture> generatePictureList(List<String> picturesPaths, int productId) {
+    private List<Picture> generatePictureList(List<String> picturesPaths, Product product) {
         List<Picture> pictures = new ArrayList<>();
         for(String path : picturesPaths) {
-            if (productId == 0) {
-                Picture picture = new Picture();
-                picture.setPath(path);
-                pictures.add(picture);
-            } else {
-                pictures = serviceMediator.findPicturesByProduct(productId);
-            }
+            Picture picture = new Picture(path);
+            picture.setProduct(product);
+            pictures.add(picture);
         }
         return pictures;
+    }
+
+    /**
+     * Resolves a {@link ProductCompany} based on the provided {@link ProductCompanyDto}.
+     * <p>
+     * This method checks if the {@code productCompanyDtoId} is null or missing. If the ID is missing,
+     * a new {@link ProductCompany} is created using the provided name from the DTO. If the ID is present,
+     * it attempts to find the corresponding {@link ProductCompany} by its ID from the database. If no matching
+     * company is found, an exception is thrown.
+     *
+     * @param dto the {@link ProductCompanyDto} containing the company information (name and optional ID)
+     * @return a {@link ProductCompany} object either newly created or fetched from the database
+     * @throws CoreException if the company ID is provided but no company is found in the database
+     */
+    private ProductCompany resolveProductCompany(ProductCompanyDto dto) {
+        if (StringUtils.isNullNumericObject(dto.getProductCompanyDtoId())) {
+            return new ProductCompany(dto.getName());
+        }
+        return serviceMediator.findProductCompanyById(dto.getProductCompanyDtoId())
+                .orElseThrow(() -> {
+                    throw new CoreException(String.format(
+                            PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
+                            dto.getProductCompanyDtoId()));
+                });
+    }
+
+    /**
+     * Resolves a {@link ProductType} based on the provided {@link ProductTypeDto}.
+     * <p>
+     * This method checks if the {@code productTypeId} is null or missing. If the ID is missing,
+     * a new {@link ProductType} is created using the provided name from the DTO. If the ID is present,
+     * it attempts to find the corresponding {@link ProductType} by its ID from the database. If no matching
+     * type is found, an exception is thrown.
+     *
+     * @param dto the {@link ProductTypeDto} containing the product type information (name and optional ID)
+     * @return a {@link ProductType} object either newly created or fetched from the database
+     * @throws CoreException if the product type ID is provided but no matching product type is found in the database
+     */
+    private ProductType resolveProductType(ProductTypeDto dto) {
+        if (StringUtils.isNullNumericObject(dto.getProductTypeId())) {
+            return new ProductType(dto.getName());
+        }
+        return serviceMediator.findProductTypeById(
+                        dto.getProductTypeId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE,
+                            dto.getProductTypeId()));
+                });
+    }
+
+    /**
+     * Resolves a {@link ProductConnection} based on the provided {@link ProductConnectionDto}.
+     * <p>
+     * This method checks if the {@code productConnectionId} is null or missing. If the ID is missing,
+     * a new {@link ProductConnection} is created using the provided size from the DTO. If the ID is present,
+     * it attempts to find the corresponding {@link ProductConnection} by its ID from the database. If no matching
+     * connection is found, an exception is thrown.
+     *
+     * @param dto the {@link ProductConnectionDto} containing the product connection information (size and optional ID)
+     * @return a {@link ProductConnection} object either newly created or fetched from the database
+     * @throws CoreException if the product connection ID is provided but no matching product connection is found in the database
+     */
+    private ProductConnection resolveProductConnection(ProductConnectionDto dto) {
+        if (StringUtils.isNullNumericObject(dto.getProductConnectionId())) {
+            return new ProductConnection(dto.getSize());
+        }
+        return serviceMediator.findProductConnectionById(
+                        dto.getProductConnectionId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
+                            dto.getProductConnectionId()));
+                });
+    }
+
+    /**
+     * Resolves a {@link Country} based on the provided {@link CountryDto} DTO.
+     * <p>
+     * This method attempts to find the corresponding {@link Country} by its ID from the database.
+     * If no matching country is found, an exception is thrown.
+     *
+     * @param dto the {@link Country} object containing the country information (ID)
+     * @return a {@link Country} object fetched from the database
+     * @throws CoreException if the country ID is provided but no matching country is found in the database
+     */
+    private Country resolveProductCountry(CountryDto dto) {
+        Country country = serviceMediator.countryById(dto.getCountryId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(COUNTRY_BY_ID_NOT_FOUND_MESSAGE,
+                            dto.getCountryId()));
+                });
+        return country;
     }
 }

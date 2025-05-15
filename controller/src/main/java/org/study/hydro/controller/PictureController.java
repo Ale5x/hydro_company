@@ -32,7 +32,7 @@ public class PictureController implements HypermediaListAssembler<PictureDto> {
     private static final String PICTURE_NOT_FOUND_MESSAGE = "The requested picture was not found.";
 
     @Value("${file.upload-product-images-dir}")
-    private String productImages;
+    private String productImagesDir;
     private final PictureService pictureService;
     private final ImageStorage imageStorage;
 
@@ -54,13 +54,22 @@ public class PictureController implements HypermediaListAssembler<PictureDto> {
     @PostMapping(value = PathPages.PICTURE_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<HttpStatus> create(@RequestPart(ControllerConstants.FILE) MultipartFile file,
                                               @RequestPart(ControllerConstants.PICTURE) PictureDto pictureDto) {
-        pictureDto.setPath(imageStorage.save(file, productImages));
+        pictureDto.setPath(imageStorage.save(file, productImagesDir));
         if (pictureService.create(pictureDto)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         imageStorage.removeFile(pictureDto.getPath());
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    @PostMapping(value = PathPages.PICTURE_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> update ( @RequestPart(ControllerConstants.DATE) PictureDto pictureDto,
+                                               @RequestPart(ControllerConstants.FILE) MultipartFile file) {
+        pictureDto.setPath(imageStorage.save(file, productImagesDir));
+        pictureService.update(pictureDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     /**
      * Handles the removal of a picture entity based on the provided identifier.

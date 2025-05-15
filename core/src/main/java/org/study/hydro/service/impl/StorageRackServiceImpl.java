@@ -8,8 +8,8 @@ import org.study.hydro.entity.Dto.StorageRackDto;
 import org.study.hydro.entity.StorageRack;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
-import org.study.hydro.service.ShelfService;
 import org.study.hydro.service.StorageRackService;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,25 +19,33 @@ import java.util.Optional;
 @Transactional
 public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, StorageRack> implements StorageRackService {
 
-    private final static String NOT_FOUND_STORAGE_RACK_ERROR = "Storage rack not found";
-    private final static String SHELF_FOR_STORAGE_NOT_FOUND_ERROR = "Shelf for storage rack not found by name.";
+    private final static String STORAGE_RACK_NOT_FOUND_BY_ID_MESSAGE = "Storage rack not found. [id =%s]";
     private final StorageRackDao storageRackDao;
-    private final ShelfService shelfService;
 
     @Autowired
-    public StorageRackServiceImpl(StorageRackDao storageRackDao, ShelfService shelfService) {
+    public StorageRackServiceImpl(StorageRackDao storageRackDao) {
         this.storageRackDao = storageRackDao;
-        this.shelfService = shelfService;
     }
 
     @Override
     public boolean create(StorageRackDto storageRackDto) throws CoreException {
-        return storageRackDao.create(mapToEntityFromDto(storageRackDto, false));
+        StorageRack storageRack = new StorageRack();
+        storageRack.setName(storageRackDto.getName());
+
+        return storageRackDao.create(storageRack) > 0;
     }
 
     @Override
     public boolean update(StorageRackDto storageRackDto) throws CoreException {
-        return storageRackDao.update(mapToEntityFromDto(storageRackDto, true));
+        StorageRack existingStRack = storageRackDao.getStorageRackById(storageRackDto.getStorageRackDtoId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(STORAGE_RACK_NOT_FOUND_BY_ID_MESSAGE,
+                            storageRackDto.getStorageRackDtoId()));
+                });
+        existingStRack.setName(StringUtils.isBlankOrNullText(storageRackDto.getName())
+                ? existingStRack.getName() : storageRackDto.getName());
+        return storageRackDao.update(existingStRack);
     }
 
     @Override
@@ -73,20 +81,5 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
         storageRackDto.setShelfName(object.getShelf().getName());
 
         return storageRackDto;
-    }
-
-
-    @Override
-    public StorageRack mapToEntityFromDto(StorageRackDto objectDto, boolean isUpdate) {
-        StorageRack storageRack = new StorageRack();
-
-        if (isUpdate) {
-            storageRack.setStorageRackId(objectDto.getStorageRackDtoId());
-
-        }
-        storageRack.setName(objectDto.getName());
-        storageRack.setShelf(shelfService.findShelfByName(objectDto.getShelfName())
-                .orElseThrow(() -> new CoreException(SHELF_FOR_STORAGE_NOT_FOUND_ERROR)));
-        return storageRack;
     }
 }

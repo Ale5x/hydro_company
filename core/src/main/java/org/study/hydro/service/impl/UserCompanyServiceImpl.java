@@ -12,6 +12,7 @@ import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.CountryService;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.UserCompanyService;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.*;
 
@@ -25,8 +26,8 @@ import java.util.*;
 @Transactional
 public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCompany> implements UserCompanyService {
 
-    private final static String USER_COMPANY_BY_ID_NOT_FOUND_ERROR = "User company by id not found.";
-    private final static String COUNTRY_NOT_FOUND_ERROR = "Country not found. Country: name=%s, id=%s";
+    private final static String USER_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "User company not found. [id = %s]";
+    private final static String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
     private final UserCompanyDao userCompanyDao;
 
     private final CountryService countryService;
@@ -39,7 +40,33 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
 
     @Override
     public boolean create(UserCompanyDto userCompanyDto) throws CoreException {
-        return userCompanyDao.save(mapToEntityFromDto(userCompanyDto, false)) > 0;
+        UserCompany userCompany = new UserCompany();
+        userCompany.setAddress(userCompanyDto.getAddress());
+        userCompany.setName(userCompanyDto.getName());
+        userCompany.setCountry(findCountryForCompany(userCompanyDto.getCountryDto()));
+        return userCompanyDao.save(userCompany) > 0;
+    }
+
+    @Override
+    public boolean update(UserCompanyDto userCompanyDto) throws CoreException {
+        UserCompany existingUserCompany =userCompanyDao.companyById(userCompanyDto.getCompanyDtoId())
+                .orElseThrow(() -> {
+                    //logger
+                    return new CoreException(
+                            String.format(USER_COMPANY_BY_ID_NOT_FOUND_MESSAGE, userCompanyDto.getCompanyDtoId()));
+                });
+
+        existingUserCompany.setName(StringUtils.isBlankOrNullText(userCompanyDto.getName())
+                ? existingUserCompany.getName() : userCompanyDto.getName());
+        Country newCountry = findCountryForCompany(userCompanyDto.getCountryDto());
+        existingUserCompany.setCountry(
+                newCountry.getCountryId().equals(userCompanyDto.getCountryDto().getCountryId()) ? newCountry :
+                        existingUserCompany.getCountry());
+
+        existingUserCompany.setAddress(StringUtils.isBlankOrNullText(userCompanyDto.getAddress())
+                ? existingUserCompany.getAddress() : userCompanyDto.getAddress());
+
+        return userCompanyDao.update(existingUserCompany);
     }
 
     @Override
@@ -86,22 +113,15 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
         return userCompanyDao.companyById(id);
     }
 
-    @Override
-    public UserCompany mapToEntityFromDto(UserCompanyDto objectDto, boolean isUpdate) {
-        UserCompany userCompany = new UserCompany();
-
-        if (isUpdate) {
-            userCompany.setUserCompanyId(objectDto.getCompanyDtoId());
-        }
-
-        userCompany.setName(objectDto.getName());
-        userCompany.setAddress(objectDto.getAddress());
-        Country country = countryService.findCountryById(objectDto.getCountryDto().getCountryId())
-                .orElseThrow(
-                        () -> new CoreException(String.format(COUNTRY_NOT_FOUND_ERROR,
-                                                              objectDto.getCountryDto().getName(),
-                                                              objectDto.getCountryDto().getCountryId())));
-        userCompany.setCountry(country);
-        return userCompany;
+    protected Country findCountryForCompany(CountryDto countryDto) {
+        return countryService.findCountryById(countryDto.getCountryId())
+                .orElseThrow(() -> {
+                    // Logger
+                    throw new CoreException(
+                            String.format(COUNTRY_NOT_FOUND_MESSAGE,
+                                    countryDto.getCountryId(),
+                                    countryDto.getName())
+                    );
+                });
     }
 }

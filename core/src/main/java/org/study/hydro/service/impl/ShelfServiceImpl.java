@@ -9,6 +9,7 @@ import org.study.hydro.entity.Shelf;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.ShelfService;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,9 @@ import java.util.Optional;
 @Transactional
 public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements ShelfService {
 
-    private final ShelfDao shelfDao;
+    private final static String SHELF_BY_ID_NOT_FOUND_MESSAGE = "Shelf not found. [id = %s, name = %s]";
 
-    private final static String SHELF_BY_ID_NOT_FOUND_ERROR = "Shelf by id not found.";
-    private final static String SHELF_BY_NAME_NOT_FOUND_ERROR = "Shelf by name not found.";
+    private final ShelfDao shelfDao;
 
     @Autowired
     public ShelfServiceImpl(ShelfDao shelfDao) {
@@ -29,13 +29,22 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
     }
 
     @Override
-    public boolean update(ShelfDto shelfDto) throws CoreException {
-        return shelfDao.update(mapToEntityFromDto(shelfDto, true));
+    public boolean create(ShelfDto shelfDto) throws CoreException {
+        Shelf shelf = new Shelf(shelfDto.getName());
+        return shelfDao.create(shelf) > 0;
     }
 
     @Override
-    public boolean create(ShelfDto shelfDto) throws CoreException {
-        return shelfDao.create(mapToEntityFromDto(shelfDto, false)) > 0;
+    public boolean update(ShelfDto shelfDto) throws CoreException {
+        Shelf existingShelf = shelfDao.findById(shelfDto.getShelfDtoId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(SHELF_BY_ID_NOT_FOUND_MESSAGE,
+                            shelfDto.getShelfDtoId(), shelfDto.getName()));
+                });
+        existingShelf.setName(StringUtils.isBlankOrNullText(shelfDto.getName())
+                ? existingShelf.getName() : shelfDto.getName());
+        return shelfDao.update(existingShelf);
     }
 
     @Override
@@ -69,7 +78,7 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
         if (shelf.isPresent()) {
             return shelfDao.remove(id);
         } else {
-            throw new CoreException(SHELF_BY_ID_NOT_FOUND_ERROR);
+            throw new CoreException(SHELF_BY_ID_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -94,17 +103,5 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
         shelfDto.setShelfDtoId(object.getShelfId());
         shelfDto.setName(object.getName());
         return shelfDto;
-    }
-
-    @Override
-    public Shelf mapToEntityFromDto(ShelfDto objectDto, boolean isUpdate) {
-        Shelf shelf = new Shelf();
-
-        if (isUpdate) {
-            shelf.setShelfId(objectDto.getShelfDtoId());
-        }
-
-        shelf.setName(objectDto.getName());
-        return shelf;
     }
 }

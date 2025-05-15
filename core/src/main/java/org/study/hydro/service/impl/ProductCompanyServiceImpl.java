@@ -4,37 +4,70 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.dao.ProductCompanyDao;
+import org.study.hydro.entity.Country;
+import org.study.hydro.entity.Dto.CountryDto;
 import org.study.hydro.entity.Dto.ProductCompanyDto;
 import org.study.hydro.entity.ProductCompany;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.ProductCompanyService;
+import org.study.hydro.service.ServiceMediator;
+import org.study.hydro.utill.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
 public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, ProductCompany> implements ProductCompanyService {
 
-    private final ProductCompanyDao productCompanyDao;
+    private final static String PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "ProductCompany not found. [id = %s]";
+    private final static String COUNTRY_FOR_PRODUCT_COMPANY_NOT_FOUND_MESSAGE =
+            "Country not found for product company. [id = %s, name = %s]";
 
-    private final static String PRODUCT_COMPANY_BY_ID_NOT_FOUND_ERROR = "ProductCompany by id not found";
+    private final ProductCompanyDao productCompanyDao;
+    private final ServiceMediator serviceMediator;
 
     @Autowired
-    public ProductCompanyServiceImpl(ProductCompanyDao productCompanyDao) {
+    public ProductCompanyServiceImpl(ProductCompanyDao productCompanyDao, ServiceMediator serviceMediator) {
         this.productCompanyDao = productCompanyDao;
+        this.serviceMediator = serviceMediator;
     }
 
     @Override
     public boolean create(ProductCompanyDto productCompanyDto) throws CoreException {
-        return productCompanyDao.create(mapToEntityFromDto(productCompanyDto, false));
+        ProductCompany productCompany = new ProductCompany();
+        productCompany.setName(productCompanyDto.getName());
+        productCompany.setCompanyCountries(getCountriesFromDto(productCompanyDto));
+        return productCompanyDao.create(productCompany) > 0;
     }
 
     @Override
     public boolean update(ProductCompanyDto productCompanyDto) throws CoreException {
-        return productCompanyDao.update(mapToEntityFromDto(productCompanyDto, true));
+        ProductCompany existingCompany = productCompanyDao.getById(productCompanyDto.getProductCompanyDtoId())
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
+                            productCompanyDto.getProductCompanyDtoId()));
+                });
+        existingCompany.setName(StringUtils.isBlankOrNullText(productCompanyDto.getName())
+                ? existingCompany.getName() : productCompanyDto.getName());
+        existingCompany.setCompanyCountries(getCountriesFromDto(productCompanyDto));
+        return productCompanyDao.update(existingCompany);
+    }
+
+    protected Set<Country> getCountriesFromDto(ProductCompanyDto productCompanyDto) {
+        Set<Country> countrySet = new HashSet<>();
+        for(CountryDto countryDto : productCompanyDto.getCountries()) {
+            Country country = serviceMediator.countryById(countryDto.getCountryId())
+                    .orElseThrow(() -> {
+                        //logger
+                        throw new CoreException(String.format(COUNTRY_FOR_PRODUCT_COMPANY_NOT_FOUND_MESSAGE,
+                                countryDto.getCountryId(),
+                                countryDto.getName()));
+                    });
+            countrySet.add(country);
+        }
+        return countrySet;
     }
 
     @Override
@@ -73,17 +106,5 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
         productCompanyDto.setProductCompanyDtoId(object.getProductCompanyId());
         productCompanyDto.setName(object.getName());
         return productCompanyDto;
-    }
-
-    @Override
-    public ProductCompany mapToEntityFromDto(ProductCompanyDto objectDto, boolean isUpdate) {
-        ProductCompany productCompany = new ProductCompany();
-
-        if (isUpdate) {
-            productCompany.setProductCompanyId(objectDto.getProductCompanyDtoId());
-        }
-
-        productCompany.setName(objectDto.getName());
-        return productCompany;
     }
 }

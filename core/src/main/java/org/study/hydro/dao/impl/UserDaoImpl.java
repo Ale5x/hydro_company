@@ -38,6 +38,13 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
     }
 
     @Override
+    public boolean update(User user) {
+        Session session = getCurrentSession();
+        session.update(user);
+        return true;
+    }
+
+    @Override
     public List<User> users(int limit, int offset) {
         Session session = getCurrentSession();
 

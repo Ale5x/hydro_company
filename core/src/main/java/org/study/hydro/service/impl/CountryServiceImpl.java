@@ -75,9 +75,4 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
         countryDto.setName(object.getName());
         return countryDto;
     }
-
-    @Override
-    public Country mapToEntityFromDto(CountryDto objectDto, boolean isUpdate) {
-        return null;
-    }
 }

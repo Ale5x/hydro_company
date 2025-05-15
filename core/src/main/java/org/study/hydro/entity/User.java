@@ -42,7 +42,7 @@ public class User implements Serializable {
     @JoinColumn(name = "id_roles")
     private Role role;
 
-    @ManyToOne (cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToOne (cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user_company")
     private UserCompany userCompany;
 

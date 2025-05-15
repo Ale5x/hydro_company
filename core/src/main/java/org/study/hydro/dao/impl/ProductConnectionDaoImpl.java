@@ -29,6 +29,15 @@ public class ProductConnectionDaoImpl extends CriteriaQueryHelper<ProductConnect
     }
 
     @Override
+    public boolean updateProductConnection(ProductConnection productConnection) {
+        Session session = getCurrentSession();
+
+        session.update(productConnection);
+
+        return true;
+    }
+
+    @Override
     public Optional<ProductConnection> getProductConnectionById(Integer id) {
         Session session = getCurrentSession();
 
@@ -52,14 +61,5 @@ public class ProductConnectionDaoImpl extends CriteriaQueryHelper<ProductConnect
         criteriaQuery.select(criteriaQueryRoot);
 
         return session.createQuery(criteriaQuery).getResultList();
-    }
-
-    @Override
-    public boolean updateProductConnection(ProductConnection productConnection) {
-        Session session = getCurrentSession();
-
-        session.update(productConnection);
-
-        return true;
     }
 }

@@ -13,13 +13,28 @@ import java.util.Optional;
 public interface UserCompanyDao {
 
     /**
-     * The method creates new record in rhe database table.
+     * Persists the given {@link UserCompany} entity in the database.
+     * <p>
+     * This method saves the {@code userCompany} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved userCompany.
      *
-     * @param userCompany entity that specifies creation of the new record in the database table.
-     *
-     * @return returns the number of the modified rows in the table.
+     * @param userCompany the {@link UserCompany} entity to be persisted in the database
+     * @return the generated ID of the saved userCompany
      */
     int save(UserCompany userCompany);
+
+    /**
+     * Updates the given {@link UserCompany} entity in the data store.
+     * <p>
+     * This method attempts to apply changes to an existing {@link UserCompany} record.
+     * It returns {@code true} if the update was successful, or {@code false} if the entity
+     * was not found or the update could not be completed.
+     *
+     * @param userCompany the {@link UserCompany} entity containing the updated data
+     * @return {@code true} if the update was successful; {@code false} otherwise
+     */
+    boolean update(UserCompany userCompany);
 
     /**
      * The method will return list of the companies.

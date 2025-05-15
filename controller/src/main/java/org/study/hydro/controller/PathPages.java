@@ -56,6 +56,7 @@ public class PathPages {
 
     public static final String PRODUCT_CREATE = ADMIN_BRANCH + PRODUCT + "/create";
     public static final String PRODUCT_UPDATE = ADMIN_BRANCH + PRODUCT + "/update";
+    public static final String PRODUCT_UPDATE_IMAGES = PRODUCT_UPDATE + "/images";
     public static final String PRODUCT_REMOVE = ADMIN_BRANCH + PRODUCT + "/remove";
     public static final String PRODUCT_BY_ID = PRODUCT_BRANCH + "/id";
     public static final String PRODUCT_ALL = PRODUCT_BRANCH + "/all";
@@ -95,6 +96,7 @@ public class PathPages {
     public static final String USER_COMPANY = "/user_company";
     public static final String USER_COMPANY_BRANCH = GUEST_BRANCH + USER_COMPANY;
     public static final String USER_COMPANY_CREATE = ADMIN_BRANCH + USER_COMPANY + "/create";
+    public static final String USER_COMPANY_UPDATE = ADMIN_BRANCH + USER_COMPANY + "/update";
     public static final String USER_COMPANY_BY_NAME = USER_COMPANY_BRANCH + "/name";
     public static final String USER_COMPANY_BY_ID = USER_COMPANY_BRANCH + "/id";
     public static final String USER_COMPANY_ALL = USER_COMPANY_BRANCH + "/all";
@@ -105,11 +107,13 @@ public class PathPages {
     public static final String COUNTRY_NAME = COUNTRY + "/name";
 
     public static final String USER = "/user";
+    public static final String USER_UPDATE =USER_BRANCH +  "/update";
     public static final String USER_ALL = ADMIN_BRANCH + USER + "/get_all";
     public static final String USER_ID = ADMIN_BRANCH + USER + "/id";
 
     public static final String PICTURE_BRANCH = ADMIN_BRANCH + "/picture";
     public static final String PICTURE_CREATE = PICTURE_BRANCH + "/create";
+    public static final String PICTURE_UPDATE = PICTURE_BRANCH + "/update";
     public static final String PICTURE_REMOVE = PICTURE_BRANCH + "/remove";
     public static final String PICTURE_BY_PRODUCT = PICTURE_BRANCH + "/product_id";
     public static final String PICTURE_BY_ID = PICTURE_BRANCH + "/id";

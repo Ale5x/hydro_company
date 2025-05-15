@@ -1,30 +1,32 @@
 package org.study.hydro.service.impl;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.study.hydro.dao.UserDao;
-import org.study.hydro.entity.UserCompany;
 import org.study.hydro.entity.Dto.UserCompanyDto;
 import org.study.hydro.entity.Dto.UserDto;
 import org.study.hydro.entity.ERole;
 import org.study.hydro.entity.Role;
 import org.study.hydro.entity.User;
-import org.study.hydro.service.UserCompanyService;
+import org.study.hydro.entity.UserCompany;
+import org.study.hydro.exception.CoreException;
+import org.study.hydro.service.ServiceMediator;
 import org.study.hydro.service.RoleService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -33,7 +35,7 @@ class UserServiceImplTest {
     private UserDao userDao;
 
     @Mock
-    private UserCompanyService userCompanyService;
+    private ServiceMediator serviceMediator;
 
     @Mock
     private RoleService roleService;
@@ -78,8 +80,7 @@ class UserServiceImplTest {
     @Test
     void createTrueTest() {
         when(userDao.save(any(User.class))).thenReturn(expectedTrueTest);
-//        when(roleService.findRole(ERole.MANAGER)).thenReturn(Optional.ofNullable(role));
-        when(userCompanyService.findById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompanyDto));
+        when(serviceMediator.findUserCompanyById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompany));
         when(roleService.findRole(ERole.USER)).thenReturn(Optional.ofNullable(role));
         userDto.setUserCompanyDto(userCompanyDto);
         boolean condition = userService.create(userDto);
@@ -88,10 +89,152 @@ class UserServiceImplTest {
     }
 
     @Test
+    void testUpdate_successfulWithExistingCompany() throws CoreException {
+        UserDto userDto = new UserDto();
+        userDto.setUserDtoId(1);
+        userDto.setFirstName("Updated FirstName");
+        userDto.setLastName("Updated LastName");
+        userDto.setEmail("updated@example.com");
+        userDto.setPassword("newpassword");
+        userDto.setPathPhoto("new/photo/path");
+
+        UserCompanyDto userCompanyDto = new UserCompanyDto();
+        userCompanyDto.setCompanyDtoId(2);  // Company exists
+        userDto.setUserCompanyDto(userCompanyDto);
+
+        User existingUser = new User();
+        existingUser.setUserId(1);
+        existingUser.setFirstName("Old FirstName");
+        existingUser.setLastName("Old LastName");
+        existingUser.setEmail("old@example.com");
+        existingUser.setPassword("oldpassword");
+        existingUser.setPathPhoto("old/photo/path");
+        existingUser.setUserCompany(new UserCompany(2, "Old Company", "Address"));
+
+        UserCompany existingCompany = new UserCompany(2, "Existing Company", "Address");
+        when(userDao.getUserById(1)).thenReturn(Optional.of(existingUser));
+        when(passwordEncoder.encode("newpassword")).thenReturn("encodedpassword");
+        when(userDao.update(existingUser)).thenReturn(true);
+
+        boolean result = userService.update(userDto);
+
+        assertTrue(result);
+        assertEquals("Updated FirstName", existingUser.getFirstName());
+        assertEquals("Updated LastName", existingUser.getLastName());
+        assertEquals("updated@example.com", existingUser.getEmail());
+        assertEquals("encodedpassword", existingUser.getPassword());
+        assertEquals("new/photo/path", existingUser.getPathPhoto());
+        verify(userDao).update(existingUser);
+    }
+
+    @Test
+    void testUpdate_successfulWithNewCompany() throws CoreException {
+        UserDto userDto = new UserDto();
+        userDto.setUserDtoId(1);
+        userDto.setFirstName("Updated FirstName");
+
+        UserCompanyDto userCompanyDto = new UserCompanyDto();
+        userCompanyDto.setCompanyDtoId(null);
+        userCompanyDto.setName("New Company");
+        userDto.setUserCompanyDto(userCompanyDto);
+
+        User existingUser = new User();
+        existingUser.setUserId(1);
+        existingUser.setFirstName("Old FirstName");
+
+        existingUser.setUserCompany(new UserCompany(1, "name", "adress"));
+
+        when(userDao.getUserById(1)).thenReturn(Optional.of(existingUser));
+        when(userDao.update(existingUser)).thenReturn(true);
+
+        boolean result = userService.update(userDto);
+
+        assertTrue(result);
+        assertEquals("Updated FirstName", existingUser.getFirstName());
+        assertNotNull(existingUser.getUserCompany());
+        assertEquals("New Company", existingUser.getUserCompany().getName());
+        verify(userDao).update(existingUser);
+    }
+
+    @Test
+    void testUpdate_successfulWithChangeNewCompany() throws CoreException {
+        UserDto userDto = new UserDto();
+        userDto.setUserDtoId(1);
+
+        UserCompanyDto newCompanyDto = new UserCompanyDto();
+        newCompanyDto.setCompanyDtoId(2);
+        newCompanyDto.setName("NewCompany");
+        newCompanyDto.setAddress("New Address");
+        userDto.setUserCompanyDto(newCompanyDto);
+
+        User existingUser = new User();
+        existingUser.setUserId(1);
+
+        UserCompany oldCompany = new UserCompany();
+        oldCompany.setUserCompanyId(1);
+        oldCompany.setName("OldCompany");
+        existingUser.setUserCompany(oldCompany);
+
+        when(userDao.getUserById(1)).thenReturn(Optional.of(existingUser));
+
+        UserCompany newCompany = new UserCompany();
+        newCompany.setUserCompanyId(2);
+        newCompany.setName("NewCompany");
+        newCompany.setAddress("New Address");
+        when(serviceMediator.findUserCompanyById(2)).thenReturn(Optional.of(newCompany));
+
+        when(userDao.update(any(User.class))).thenReturn(true);
+
+        boolean result = userService.update(userDto);
+
+        assertTrue(result);
+        assertEquals(2, existingUser.getUserCompany().getUserCompanyId());
+        assertEquals("NewCompany", existingUser.getUserCompany().getName());
+
+        verify(userDao).update(existingUser);
+    }
+
+    @Test
+    void testUpdate_shouldHandleNullUserCompanyAndUserCompanyDto() throws CoreException {
+        UserDto userDto = new UserDto();
+        userDto.setFirstName("John");
+        userDto.setUserDtoId(1);
+
+        User existingUser = new User();
+        existingUser.setUserId(1);
+        existingUser.setFirstName("John");
+        existingUser.setLastName("Doe");
+        existingUser.setUserCompany(null);
+
+        when(userDao.getUserById(1)).thenReturn(Optional.of(existingUser));
+        when(userDao.update(any(User.class))).thenReturn(true); // Ожидаем успешное обновление
+
+        boolean result = userService.update(userDto);
+
+        assertTrue(result);
+
+        verify(serviceMediator, never()).findUserCompanyById(any());
+
+        verify(userDao, times(1)).update(existingUser);
+    }
+
+    @Test
+    void testUpdate_userNotFound_throwsException() {
+        UserDto userDto = new UserDto();
+        userDto.setUserDtoId(404);
+
+        when(userDao.getUserById(404)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () -> userService.update(userDto));
+
+        assertTrue(ex.getMessage().contains("User not found"));
+    }
+
+    @Test
     void createWrongTest() {
         when(userDao.save(any(User.class))).thenReturn(expectedWrongTest);
         when(roleService.findRole(ERole.USER)).thenReturn(Optional.ofNullable(role));
-        when(userCompanyService.findById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompanyDto));
+        when(serviceMediator.findUserCompanyById(userCompany.getUserCompanyId())).thenReturn(Optional.ofNullable(userCompany));
         UserDto user = new UserDto();
         user.setUserCompanyDto(userCompanyDto);
         boolean condition = userService.create(user);
@@ -126,5 +269,49 @@ class UserServiceImplTest {
         when(userDao.getUserById(userId)).thenReturn(Optional.empty());
         Optional<UserDto> userDto = userService.findUserById(userId);
         assertFalse(userDto.isPresent());
+    }
+
+    @Test
+    void shouldReturnRoleWhenRoleExistsInDto() {
+        // given
+        UserDto dto = new UserDto();
+        dto.setRole(Collections.singleton("admin"));
+
+        Role expectedRole = new Role(ERole.ADMIN);
+
+        Mockito.when(roleService.findRole(ERole.ADMIN)).thenReturn(Optional.of(expectedRole));
+
+        // when
+        Role result = userService.mapUserRole(dto);
+
+        // then
+        assertEquals(expectedRole, result);
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenRoleNotFound() {
+        // given
+        UserDto dto = new UserDto();
+        dto.setRole(Collections.singleton("user"));
+
+        Mockito.when(roleService.findRole(ERole.USER)).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(CoreException.class, () -> userService.mapUserRole(dto));
+    }
+
+    @Test
+    void shouldReturnDefaultUserRoleWhenDtoHasNoRole(){
+        // given
+        UserDto dto = new UserDto();
+        dto.setRole(null); // или Collections.emptySet()
+
+        // when
+        Role result = userService.mapUserRole(dto);
+
+        // then
+        assertNotNull(result);
+        assertEquals(ERole.USER, result.getName());
     }
 }

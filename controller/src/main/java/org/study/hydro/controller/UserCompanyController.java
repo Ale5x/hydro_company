@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
 /**
  * This class {@link UserCompanyController} provides endpoints for accessing user company data.
  *
@@ -48,6 +46,22 @@ public class UserCompanyController implements HypermediaListAssembler<UserCompan
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Updates the user company information.
+     *
+     * <p>This endpoint accepts a {@link UserCompanyDto} JSON object in the request body
+     * and attempts to update the corresponding user company data.</p>
+     *
+     * @param userCompanyDto the data transfer object containing updated company details
+     * @return {@link ResponseEntity} with {@link HttpStatus#OK} if the update was successful,
+     *         or {@link HttpStatus#BAD_REQUEST} if the update failed
+     */
+    @PostMapping(value = PathPages.USER_COMPANY_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> update (@RequestBody UserCompanyDto userCompanyDto) {
+        userCompanyService.update(userCompanyDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

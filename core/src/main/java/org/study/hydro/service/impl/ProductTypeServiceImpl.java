@@ -9,6 +9,7 @@ import org.study.hydro.entity.ProductType;
 import org.study.hydro.exception.CoreException;
 import org.study.hydro.service.EntityMapper;
 import org.study.hydro.service.ProductTypeService;
+import org.study.hydro.utill.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ import java.util.Optional;
 @Transactional
 public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, ProductType> implements ProductTypeService {
 
+    private final static String PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE = "Product type not found. [id = %s]";
+
     private final ProductTypeDao productTypeDao;
-    private final static String PRODUCT_TYPE_BY_ID_NOT_FOUND_ERROR = "Product Type by id not found.";
-    private final static String PRODUCT_TYPE_BY_NAME_NOT_FOUND_ERROR = "Product Type by name not found.";
 
     @Autowired
     public ProductTypeServiceImpl(ProductTypeDao productTypeDao) {
@@ -30,12 +31,22 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     @Override
     public boolean create(ProductTypeDto productTypeDto) throws CoreException {
-        return productTypeDao.create(mapToEntityFromDto(productTypeDto, false));
+        ProductType productType = new ProductType();
+        productType.setName(productTypeDto.getName());
+        return productTypeDao.create(productType) > 0;
     }
 
     @Override
     public boolean update(ProductTypeDto productTypeDto) throws CoreException {
-        return productTypeDao.update(mapToEntityFromDto(productTypeDto, true));
+        ProductType existingProductType = productTypeDao.getProductTypeById(productTypeDto.getProductTypeId())
+                .orElseThrow(() -> {
+                    //logger
+                    return new CoreException(
+                            String.format(PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE, productTypeDto.getProductTypeId()));
+                });
+        existingProductType.setName(StringUtils.isBlankOrNullText(productTypeDto.getName())
+                ? existingProductType.getName() : productTypeDto.getName());
+        return productTypeDao.update(existingProductType);
     }
 
     @Override
@@ -45,7 +56,7 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
             return productTypeDao.remove(id);
         } else {
             //logger
-            throw new CoreException(PRODUCT_TYPE_BY_ID_NOT_FOUND_ERROR);
+            throw new CoreException(PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -88,14 +99,17 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
         return productTypeDto;
     }
 
-    @Override
-    public ProductType mapToEntityFromDto(ProductTypeDto objectDto, boolean isUpdate) {
+    protected ProductType updateProductTypeFromDto (ProductTypeDto productTypeDto) {
         ProductType productType = new ProductType();
-
-        if (isUpdate) {
-            productType.setProductTypeId(objectDto.getProductTypeId());
+        Optional<ProductType> productTypeOpt = productTypeDao.getProductTypeById(productTypeDto.getProductTypeId());
+        if (productTypeOpt.isPresent()) {
+            productType.setProductTypeId(productTypeDto.getProductTypeId());
+            productType.setName(productTypeDto.getName() == null
+                    ? productTypeOpt.get().getName() : productTypeDto.getName());
+        } else {
+            //logger
+            throw new CoreException(String.format(PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE, productTypeDto.getProductTypeId()));
         }
-        productType.setName(objectDto.getName());
         return productType;
     }
 }

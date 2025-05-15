@@ -6,9 +6,11 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.study.hydro.auth.AuthUserDetailsServiceImpl;
 import org.study.hydro.entity.Dto.UserDto;
-import org.study.hydro.exception.ReportException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.UserService;
@@ -18,9 +20,6 @@ import org.study.hydro.utill.ValidatorParam;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
  * This class {@link UserController} provides endpoints for accessing user data.
@@ -37,6 +36,12 @@ public class UserController implements HypermediaListAssembler<UserDto> {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping(value = PathPages.USER_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> update ( @RequestBody UserDto userDto) {
+        userService.update(userDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

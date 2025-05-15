@@ -49,16 +49,18 @@ public class ProductCompanyController implements HypermediaListAssembler<Product
     }
 
     /**
-     * The method creates an access point for updating a product company in the database.
-     * @param productCompanyDto is the date of the updating product company.
-     * @return The instance of ResponseEntity with the HttpStatus.
+     * Updates the information of a product company based on the provided {@link ProductCompanyDto}.
+     * This method is typically called through a {@code POST} request.
+     *
+     * @param companyDto The {@link ProductCompanyDto} containing the updated information of the product company.
+     *                   The {@link ProductCompanyDto} should contain all necessary data to update an existing product company.
+     * @return A {@link ResponseEntity} containing the HTTP status code. A status of {@code OK} (200) is returned if the update is successful.
+     *         In case of failure, a different HTTP status can be returned (e.g., {@code BAD_REQUEST} or {@code INTERNAL_SERVER_ERROR}).
      */
     @PostMapping(value = PathPages.PRODUCT_COMPANY_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> update(@RequestBody ProductCompanyDto productCompanyDto) {
-        if (productCompanyService.update(productCompanyDto)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<HttpStatus> update ( @RequestBody ProductCompanyDto companyDto) {
+       productCompanyService.update(companyDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

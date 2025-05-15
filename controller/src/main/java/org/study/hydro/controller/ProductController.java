@@ -13,6 +13,7 @@ import org.study.hydro.entity.Dto.ProductCompanyDto;
 import org.study.hydro.entity.Dto.ProductDto;
 import org.study.hydro.entity.Dto.ProductTypeDto;
 import org.study.hydro.entity.Dto.StorageRackDto;
+import org.study.hydro.exception.AppRequestException;
 import org.study.hydro.hateoas.HateoasLinkHelper;
 import org.study.hydro.hateoas.HypermediaListAssembler;
 import org.study.hydro.service.ProductService;
@@ -21,6 +22,7 @@ import org.study.hydro.utill.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This class {@link ProductController} provides endpoints for accessing product data.
@@ -35,9 +37,14 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     private final ImageStorage localImageStorage;
 
     private static final String PRODUCT_NOT_FOUND_MESSAGE = "The specified product was not found.";
+    private static final String MANY_FILES_FOR_THIS_PRODUCT_MESSAGE =
+            "A product can have no more than 10 files. Please remove excess files before proceeding.";
 
     @Value("${file.upload-product-scheme-dir}")
     private String schemeDir;
+
+    @Value("${file.limit_pictures}")
+    private int limitFiles;
 
     @Value("${file.upload-product-images-dir}")
     private String imagesDir;
@@ -72,7 +79,51 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
      * @return The instance of ResponseEntity with the HttpStatus.
      */
     @PostMapping(value = PathPages.PRODUCT_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> update (@RequestBody ProductDto productDto) {
+    public ResponseEntity<HttpStatus> update (@RequestPart(ControllerConstants.DATE) ProductDto productDto,
+                                              @RequestPart(ControllerConstants.FILE_PRODUCT_SCHEME) MultipartFile fileScheme) {
+        if (fileScheme != null && !fileScheme.isEmpty()) {
+            productDto.setPathHydraulicScheme(localImageStorage.save(fileScheme, imagesDir));
+        }
+        if (productService.update(productDto)) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Updates the images associated with a product.
+     * <p>
+     * This endpoint accepts a product DTO and a list of image files, and attempts to update
+     * the product's image paths. If the total number of images exceeds the allowed limit,
+     * the update will be rejected.
+     * </p>
+     *
+     * @param productDto the product data containing the product ID to update
+     * @param files      the list of image files to add (can be null or empty)
+     * @return {@link ResponseEntity}:
+     * <ul>
+     *     <li>{@code 200 OK} if the update was successful</li>
+     *     <li>{@code 404 NOT FOUND} if the product already has the maximum number of images</li>
+     *     <li>{@code 400 BAD REQUEST} if the product is not found or the update fails</li>
+     * </ul>
+     *
+     * @throws AppRequestException if the product is not found
+     */
+    @PostMapping(value = PathPages.PRODUCT_UPDATE_IMAGES, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateImages (@RequestPart(ControllerConstants.DATE) ProductDto productDto,
+                                           @RequestPart(ControllerConstants.FILES) List<MultipartFile> files) {
+        ProductDto product = productService.findById(productDto.getProductDtoId()).orElseThrow(() -> {
+            // logger
+            throw new AppRequestException(PRODUCT_NOT_FOUND_MESSAGE, HttpStatus.BAD_REQUEST);
+        });
+        if (product.getImagesPaths().size() >= limitFiles) {
+            Map<String, String> body = Collections
+                    .singletonMap(ControllerConstants.MESSAGE, MANY_FILES_FOR_THIS_PRODUCT_MESSAGE);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        }
+        if (files != null && !files.isEmpty() && (product.getImagesPaths().size() + files.size()) <= limitFiles) {
+            productDto.setImagesPaths(localImageStorage.saveAll(files, imagesDir));
+        }
         if (productService.update(productDto)) {
             return new ResponseEntity<>(HttpStatus.OK);
         }

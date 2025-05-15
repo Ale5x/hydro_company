@@ -24,6 +24,30 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
 
 
     @Override
+    public int create(Shelf shelf) {
+        Session session = getCurrentSession();
+        session.save(shelf);
+        session.flush();
+        return shelf.getShelfId();
+    }
+
+    @Override
+    public boolean update(Shelf shelf) {
+        Session session = getCurrentSession();
+        session.update(shelf);
+        return true;
+    }
+
+    @Override
+    public boolean remove(Integer id) {
+        Session session = getCurrentSession();
+        int rows = session.createQuery(DELETE_SHELF_QUERY)
+                .setParameter(SHELF_ID, id)
+                .executeUpdate();
+        return rows > 0;
+    }
+
+    @Override
     public Optional<Shelf> findById(Integer id) {
         Session session = getCurrentSession();
 
@@ -50,22 +74,6 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
     }
 
     @Override
-    public boolean update(Shelf shelf) {
-        Session session = getCurrentSession();
-        session.update(shelf);
-        return true;
-    }
-
-    @Override
-    public boolean remove(Integer id) {
-        Session session = getCurrentSession();
-        int rows = session.createQuery(DELETE_SHELF_QUERY)
-                .setParameter(SHELF_ID, id)
-                .executeUpdate();
-        return rows > 0;
-    }
-
-    @Override
     public List<Shelf> getAllShelf() {
         Session session = getCurrentSession();
 
@@ -75,13 +83,5 @@ public class ShelfDaoImpl extends CriteriaQueryHelper<Shelf> implements ShelfDao
         criteriaQuery.select(shelfRoot);
 
         return session.createQuery(criteriaQuery).getResultList();
-    }
-
-    @Override
-    public int create(Shelf shelf) {
-        Session session = getCurrentSession();
-        session.save(shelf);
-        session.flush();
-        return shelf.getShelfId();
     }
 }

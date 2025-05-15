@@ -26,6 +26,19 @@ public interface PictureService {
     boolean create(PictureDto pictureDto) throws CoreException;
 
     /**
+     * Updates an existing picture entity using the data provided in the given {@link PictureDto}.
+     * <p>
+     * This method performs validation and business logic before delegating the update operation
+     * to the underlying persistence layer. If the picture with the given ID does not exist,
+     * or if any validation fails, a {@link CoreException} is thrown.
+     *
+     * @param pictureDto the data transfer object containing updated picture information
+     * @return {@code true} if the update was successful, {@code false} otherwise
+     * @throws CoreException if the picture cannot be updated due to business or system constraints
+     */
+    boolean update (PictureDto pictureDto) throws CoreException;
+
+    /**
      * Deletes the data of an existing picture.
      * @param id the unique identifier of the picture to be deleted.
      * @return true if the picture was successfully deleted; false otherwise.

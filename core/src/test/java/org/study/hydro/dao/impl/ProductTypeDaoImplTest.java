@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ProductTypeDao;
 import org.study.hydro.entity.ProductType;
@@ -24,6 +27,10 @@ class ProductTypeDaoImplTest {
     @Autowired
     private ProductTypeDao productTypeDao;
 
+    @Autowired
+    private SessionFactory sessionFactory;
+
+
     private int productTypeId = 1;
     private ProductType productType = new ProductType(111, "Test type");
 
@@ -36,13 +43,34 @@ class ProductTypeDaoImplTest {
         List<ProductType> productTypesListBefore = productTypeDao.getProductTypes();
         assertFalse(productTypesListBefore.isEmpty());
 
-        boolean condition = productTypeDao.create(productType);
-        assertTrue(condition);
+        int id = productTypeDao.create(productType);
+        assertTrue(id > 0);
 
         List<ProductType> productTypesListAfter = productTypeDao.getProductTypes();
         assertFalse(productTypesListAfter.isEmpty());
 
         assertTrue(productTypesListAfter.size() > productTypesListBefore.size());
+    }
+
+    @Test
+    @Transactional
+    void updateProductType() {
+        ProductType type = new ProductType();
+        type.setName("Original");
+
+        Session session = sessionFactory.getCurrentSession();
+        session.save(type);
+        session.flush();
+
+        Integer id = type.getProductTypeId();
+
+        type.setName("Updated");
+        boolean updated = productTypeDao.update(type);
+
+        assertTrue(updated);
+
+        ProductType updatedType = session.get(ProductType.class, id);
+        assertEquals("Updated", updatedType.getName());
     }
 
     @Test

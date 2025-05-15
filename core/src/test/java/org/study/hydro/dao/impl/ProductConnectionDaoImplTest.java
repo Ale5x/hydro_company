@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.ProductConnectionDao;
 import org.study.hydro.entity.ProductConnection;
@@ -23,6 +26,9 @@ class ProductConnectionDaoImplTest {
 
     @Autowired
     private ProductConnectionDao productConnectionDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     private int productConnectionId = 1;
     private String newSize = "Test";
@@ -48,6 +54,26 @@ class ProductConnectionDaoImplTest {
     }
 
     @Test
+    @Transactional
+    void updateProductConnection () {
+        ProductConnection connection = new ProductConnection();
+        connection.setSize("1/2 inch");
+
+        Session session = sessionFactory.getCurrentSession();
+        session.save(connection);
+        session.flush();
+
+        Integer id = connection.getProductConnectionId();
+
+        connection.setSize("3/4 inch");
+        boolean updated = productConnectionDao.updateProductConnection(connection);
+        assertTrue(updated);
+
+        ProductConnection updatedConnection = session.get(ProductConnection.class, id);
+        assertEquals("3/4 inch", updatedConnection.getSize());
+    }
+
+    @Test
     void getProductConnectionById() {
         Optional<ProductConnection> productConnection = productConnectionDao
                 .getProductConnectionById(productConnectionId);
@@ -61,28 +87,5 @@ class ProductConnectionDaoImplTest {
         System.out.println(connectionList);
         assertTrue(connectionList.size() > 0);
         assertFalse(connectionList.isEmpty());
-    }
-
-    @Test
-    void updateProductConnection() {
-        Optional<ProductConnection> productConnectionBefore =
-                productConnectionDao.getProductConnectionById(productConnectionId);
-        assertTrue(productConnectionBefore.isPresent());
-
-        ProductConnection productConnection = new ProductConnection(
-                productConnectionBefore.get().getProductConnectionId(),
-                productConnectionBefore.get().getSize()
-        );
-
-        productConnection.setSize(newSize);
-        productConnectionDao.updateProductConnection(productConnection);
-
-        Optional<ProductConnection> productConnectionAfter =
-                productConnectionDao.getProductConnectionById(productConnectionId);
-        assertTrue(productConnectionAfter.isPresent());
-
-        assertEquals(productConnectionBefore.get().getSize(), productConnectionBefore.get().getSize());
-        assertFalse(productConnectionAfter.get().getSize().equals(productConnectionBefore.get().getSize()));
-
     }
 }

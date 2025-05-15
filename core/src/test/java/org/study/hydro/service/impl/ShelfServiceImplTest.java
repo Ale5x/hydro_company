@@ -2,12 +2,15 @@ package org.study.hydro.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydro.dao.ShelfDao;
 import org.study.hydro.entity.Dto.ShelfDto;
 import org.study.hydro.entity.Shelf;
+import org.study.hydro.exception.CoreException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ShelfServiceImplTest {
 
     @Mock
@@ -41,15 +45,6 @@ class ShelfServiceImplTest {
     }
 
     @Test
-    void update() {
-        when(shelfDao.update(any(Shelf.class))).thenReturn(true);
-        boolean condition = shelfService.update(shelfDto);
-
-        assertTrue(condition);
-        verify(shelfDao, times(1)).update(shelf);
-    }
-
-    @Test
     void create() {
         Shelf sendShelf = new Shelf(0, "create");
         ShelfDto sendShelfDto = new ShelfDto();
@@ -61,6 +56,59 @@ class ShelfServiceImplTest {
 
         assertTrue(condition);
         verify(shelfDao, times(1)).create(sendShelf);
+    }
+
+    @Test
+    void testUpdate_successful() throws CoreException {
+        ShelfDto dto = new ShelfDto();
+        dto.setShelfDtoId(1);
+        dto.setName("Updated Shelf");
+
+        Shelf existing = new Shelf();
+        existing.setShelfId(1);
+        existing.setName("Old Shelf");
+
+        when(shelfDao.findById(1)).thenReturn(Optional.of(existing));
+        when(shelfDao.update(existing)).thenReturn(true);
+
+        boolean result = shelfService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Updated Shelf", existing.getName());
+        verify(shelfDao).update(existing);
+    }
+
+    @Test
+    void testUpdate_shelfNotFound_throwsException() {
+        ShelfDto dto = new ShelfDto();
+        dto.setShelfDtoId(404);
+        dto.setName("Shelf Name");
+
+        when(shelfDao.findById(404)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () -> shelfService.update(dto));
+
+        assertTrue(ex.getMessage().contains("Shelf not found"));
+    }
+
+    @Test
+    void testUpdate_blankName_shouldKeepOriginal() throws CoreException {
+        ShelfDto dto = new ShelfDto();
+        dto.setShelfDtoId(1);
+        dto.setName(" ");
+
+        Shelf existing = new Shelf();
+        existing.setShelfId(1);
+        existing.setName("Existing Shelf");
+
+        when(shelfDao.findById(1)).thenReturn(Optional.of(existing));
+        when(shelfDao.update(existing)).thenReturn(true);
+
+        boolean result = shelfService.update(dto);
+
+        assertTrue(result);
+        assertEquals("Existing Shelf", existing.getName());
+        verify(shelfDao).update(existing);
     }
 
     @Test

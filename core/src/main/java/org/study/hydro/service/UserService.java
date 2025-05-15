@@ -23,6 +23,20 @@ public interface UserService {
     boolean create(UserDto user) throws CoreException;
 
     /**
+     * Updates an existing user using the provided {@link UserDto} data.
+     * <p>
+     * This method performs validation and business logic checks before attempting
+     * to update the user in the underlying data store. If the user is not found,
+     * or if the update cannot be completed due to business rules or system constraints,
+     * a {@link CoreException} is thrown.
+     *
+     * @param userDto the {@link UserDto} containing the updated user information
+     * @return {@code true} if the update was successful; {@code false} if no changes were applied
+     * @throws CoreException if the user cannot be updated due to validation errors or internal issues
+     */
+    boolean update(UserDto userDto) throws CoreException;
+
+    /**
      * The method will return list of users.
      *
      * @param limit the number of rows to get at one time.

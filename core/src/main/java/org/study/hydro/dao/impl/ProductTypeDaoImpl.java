@@ -24,11 +24,18 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
             PRODUCT_TYPE_ID);
 
     @Override
-    public boolean create(ProductType productType) {
+    public int create(ProductType productType) {
         Session session = getCurrentSession();
         session.save(productType);
         session.flush();
-        return productType.getProductTypeId() > 0;
+        return productType.getProductTypeId();
+    }
+
+    @Override
+    public boolean update(ProductType productType) {
+        Session session = getCurrentSession();
+        session.saveOrUpdate(productType);
+        return true;
     }
 
     @Override
@@ -64,13 +71,6 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
 
         criteriaQuery.select(productTypeRoot).where(criteriaBuilder.equal(productTypeRoot.get(PRODUCT_TYPE_NAME), name));
         return session.createQuery(criteriaQuery).getResultList();
-    }
-
-    @Override
-    public boolean update(ProductType productType) {
-        Session session = getCurrentSession();
-        session.saveOrUpdate(productType);
-        return true;
     }
 
     @Override

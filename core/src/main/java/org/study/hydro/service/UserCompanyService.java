@@ -23,6 +23,8 @@ public interface UserCompanyService {
      */
     boolean create(UserCompanyDto userCompanyDto) throws CoreException;
 
+    boolean update(UserCompanyDto userCompanyDto) throws CoreException;
+
     /**
      * The method returns specified list of companies by name.
      *

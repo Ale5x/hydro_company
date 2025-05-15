@@ -44,16 +44,18 @@ public class ProductTypeController {
     }
 
     /**
-     * The method creates an access point for updating a product type in the database.
-     * @param productTypeDto is the date of the updating product type.
-     * @return The instance of ResponseEntity with the HttpStatus.
+     * Updates the information of a product type based on the provided {@link ProductTypeDto}.
+     * This method is typically called through a {@code POST} request.
+     *
+     * @param productTypeDto The {@link ProductTypeDto} containing the updated information of the product type.
+     *                       The {@link ProductTypeDto} should contain all necessary data to update an existing product type.
+     * @return A {@link ResponseEntity} containing the HTTP status code. In this case, a status of {@code OK} (200) is returned,
+     *         indicating that the product type has been successfully updated.
      */
     @PostMapping(value = PathPages.PRODUCT_TYPE_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> update (@RequestBody ProductTypeDto productTypeDto) {
-        if (productTypeService.update(productTypeDto)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        productTypeService.update(productTypeDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

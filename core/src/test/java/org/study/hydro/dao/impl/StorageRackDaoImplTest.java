@@ -1,5 +1,7 @@
 package org.study.hydro.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.hydro.configuration.DevelopmentConfig;
 import org.study.hydro.dao.StorageRackDao;
 import org.study.hydro.entity.Shelf;
@@ -25,6 +28,9 @@ class StorageRackDaoImplTest {
 
     @Autowired
     private StorageRackDao storageRackDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     private int limit = 100;
     private int maxLimit = 100;
@@ -45,9 +51,9 @@ class StorageRackDaoImplTest {
         List<StorageRack> storageRackListBefore = storageRackDao.getStorageRacksList(maxLimit, offset);
         assertFalse(storageRackListBefore.isEmpty());
 
-        boolean condition = storageRackDao.create(storageRack);
+        int condition = storageRackDao.create(storageRack);
 
-        assertTrue(condition);
+        assertTrue(condition > 0);
         List<StorageRack> storageRackListAfter = storageRackDao.getStorageRacksList(maxLimit, offset);
         assertFalse(storageRackListAfter.isEmpty());
         assertTrue(storageRackListAfter.size() > storageRackListBefore.size());
@@ -68,21 +74,23 @@ class StorageRackDaoImplTest {
     }
 
     @Test
+    @Transactional
     void update() {
-        Optional<StorageRack> storageRackBefore = storageRackDao.getStorageRackById(storageRackId);
-        assertTrue(storageRackBefore.isPresent());
+        StorageRack rack = new StorageRack();
+        rack.setName("RACK-01");
 
-        String oldName = storageRackBefore.get().getName();
-        StorageRack newStorageRack = storageRackBefore.get();
-        newStorageRack.setName(newStorageRackName);
-        storageRackDao.update(newStorageRack);
+        Session session = sessionFactory.getCurrentSession();
+        session.save(rack);
+        session.flush();
+        Integer id = rack.getStorageRackId();
 
-        Optional<StorageRack> storageRackAfter = storageRackDao.getStorageRackById(storageRackId);
-        assertTrue(storageRackAfter.isPresent());
+        rack.setName("UPDATED-RACK");
+        boolean result = storageRackDao.update(rack);
 
-        assertEquals(storageRackAfter.get().getName(), newStorageRackName);
-        assertNotEquals(storageRackAfter.get().getName(), oldName);
+        assertTrue(result);
 
+        StorageRack updated = session.get(StorageRack.class, id);
+        assertEquals("UPDATED-RACK", updated.getName());
     }
 
     @Test

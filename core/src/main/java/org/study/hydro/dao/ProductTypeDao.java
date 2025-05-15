@@ -13,13 +13,16 @@ import java.util.Optional;
 public interface ProductTypeDao {
 
     /**
-     * The method creates new record in the database table.
+     * Persists the given {@link ProductType} entity in the database.
+     * <p>
+     * This method saves the {@code productType} entity using the current Hibernate session.
+     * It explicitly flushes the session to ensure that the insert operation is executed immediately,
+     * and then returns the generated ID of the saved productType.
      *
-     * @param productType entity that specifies creation of the new record in database table.
-     *
-     * @return returns boolean's result if the row creates.
+     * @param productType the {@link ProductType} entity to be persisted in the database
+     * @return the generated ID of the saved productType
      */
-    boolean create(ProductType productType);
+    int create(ProductType productType);
 
     /**
      * The method will return list of the productTypes.

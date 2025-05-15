@@ -1,4 +1,4 @@
-rootProject.name = 'hydro'
+rootProject.name = 'hydrowarehouse'
 include 'core'
 include 'controller'
 

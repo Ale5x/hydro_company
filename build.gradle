@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'org.study.hydro'
+group = 'org.study.hydrowarehouse'
 version = '1.0-SNAPSHOT'
 
 repositories {

@@ -44,22 +44,25 @@ CREATE TABLE IF NOT EXISTS `hydro-company`.`users` (
   `last_name` VARCHAR(45) NOT NULL,
   `password` VARCHAR(320) NOT NULL,
   `path` VARCHAR(255) NULL,
-  `id_user_company` INT NOT NULL,
+  `id_user_company` INT NULL,
   `registration` DATETIME NOT NULL,
   `id_roles` INT NOT NULL,
   PRIMARY KEY (`id_users`),
   INDEX `fk_users_companies1_idx` (`id_user_company` ASC) VISIBLE,
   INDEX `fk_users_roles1_idx` (`id_roles` ASC) VISIBLE,
+
   CONSTRAINT `fk_users_companies1`
     FOREIGN KEY (`id_user_company`)
     REFERENCES `hydro-company`.`user_company` (`id_user_company`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
   CONSTRAINT `fk_users_roles1`
     FOREIGN KEY (`id_roles`)
     REFERENCES `hydro-company`.`roles` (`id_roles`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+)
 ENGINE = InnoDB;
 
 

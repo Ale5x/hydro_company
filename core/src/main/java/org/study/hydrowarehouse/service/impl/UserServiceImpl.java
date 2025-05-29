@@ -28,7 +28,9 @@ import java.util.*;
 public class UserServiceImpl  extends EntityMapper<UserDto, User> implements UserService {
 
     private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String USER_STATUS_ACTIVE = "ACTIVE";
     private static final String USER_NOT_FOUND_BY_ID_MESSAGE = "User not found. [id = %s]";
+    private static final String USER_STATUS_NOT_FOUND_MESSAGE = "User Status not found. [status = %s]";
     private static final String USER_ROLE_NOT_EXIST_MESSAGE = "User's role doesn't exist. [role = %s]";
     private static final String USER_COMPANY_NOT_FOUND_MESSAGE = "User company not found. [id = %s, name = %s, address = %s]";
     private static final String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
@@ -65,6 +67,8 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         user.setEmail(userDto.getEmail());
 
         user.setPathPhoto(userDto.getPathPhoto());
+        user.setStatus(serviceMediator.findByStatus(USER_STATUS_ACTIVE.toUpperCase()).orElseThrow(
+                () -> new CoreException(String.format(USER_STATUS_NOT_FOUND_MESSAGE, USER_STATUS_ACTIVE))));
 
         user.setRegistration( getLocalDate());
 
@@ -124,6 +128,26 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
             return Optional.empty();
         }
         return user.map(this::mapToObjectDto);
+    }
+
+    @Override
+    public boolean changeStatus(Integer userId, String newStatus) throws CoreException {
+        User user = userDao.getUserById(userId).orElseThrow(() -> {
+            //logger
+            throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userId));
+        });
+        UserStatus status = serviceMediator.findByStatus(newStatus).orElseThrow(() -> {
+            //logger
+            throw new CoreException(String.format(USER_STATUS_NOT_FOUND_MESSAGE, newStatus));
+        });
+        user.setStatus(status);
+        userDao.update(user);
+        return true;
+    }
+
+    @Override
+    public List<UserDto> findAllByStatus(String status, int offset, int limit) throws CoreException {
+        return mapToListObjectsDto(userDao.findByStatus(status.toUpperCase(), limit, offset));
     }
 
     /**
@@ -215,6 +239,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         userDto.setEmail(object.getEmail());
         userDto.setPathPhoto(object.getPathPhoto());
         userDto.setRegistration(object.getRegistration());
+        userDto.setStatus(object.getStatus().getStatus());
 
         if (object.getUserCompany() != null) {
             userDto.setUserCompanyDto(addCompanyDtoToUserDto(object.getUserCompany()));

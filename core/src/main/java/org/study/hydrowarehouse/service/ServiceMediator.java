@@ -25,11 +25,13 @@ public class ServiceMediator {
     private final StorageRackDao storageRackDao;
     private final UserCompanyDao userCompanyDao;
 
+    private final UserStatusDao userStatusDao;
+
     @Autowired
     public ServiceMediator(ProductDao productDao, PictureDao pictureDao, CountryDao countryDao,
                            ProductTypeDao productTypeDao, ProductCompanyDao productCompanyDao,
                            ProductConnectionDao productConnectionDao, StorageRackDao storageRackDao,
-                           UserCompanyDao userCompanyDao) {
+                           UserCompanyDao userCompanyDao, UserStatusDao userStatusDao) {
         this.productDao = productDao;
         this.pictureDao = pictureDao;
         this.countryDao = countryDao;
@@ -38,6 +40,7 @@ public class ServiceMediator {
         this.productConnectionDao = productConnectionDao;
         this.storageRackDao = storageRackDao;
         this.userCompanyDao = userCompanyDao;
+        this.userStatusDao = userStatusDao;
     }
 
     /**
@@ -122,4 +125,16 @@ public class ServiceMediator {
     public Optional<StorageRack> findStorageRackById(Integer id) {
         return storageRackDao.getStorageRackById(id);
     }
+
+    /**
+     * Finds a {@link UserStatus} entity by its status name.
+     *
+     * @param status the name of the status to search for.
+     * @return an {@link Optional} containing the found {@link UserStatus},
+     *         or an empty {@link Optional} if not found.
+     */
+    public Optional<UserStatus> findByStatus(String status) {
+        return userStatusDao.findByStatus(status);
+    }
+
 }

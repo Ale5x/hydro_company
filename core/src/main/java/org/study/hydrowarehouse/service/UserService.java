@@ -48,6 +48,17 @@ public interface UserService {
     List<UserDto> findAll(int offset, int limit) throws CoreException;
 
     /**
+     * Retrieves a list of users with the specified status, using pagination.
+     *
+     * @param status the status of users to filter by (e.g., "ACTIVE", "BLOCKED")
+     * @param offset the starting index of the result set (for pagination)
+     * @param limit the maximum number of results to return
+     * @return a list of {@link UserDto} objects matching the given status
+     * @throws CoreException if an error occurs during the retrieval process
+     */
+    List<UserDto> findAllByStatus(String status, int offset, int limit) throws CoreException;
+
+    /**
      * The method returns specified UserDto by id.
      *
      * @param id the User's id.
@@ -66,4 +77,14 @@ public interface UserService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     Optional<UserDto> findUserByEmail(String email) throws CoreException;
+
+    /**
+     * Changes the status of a user by their ID.
+     *
+     * @param userId the ID of the user whose status should be changed
+     * @param newStatus the new status to set (e.g., "ACTIVE", "BLOCKED", "INACTIVE")
+     * @return {@code true} if the status was successfully changed, {@code false} otherwise
+     * @throws CoreException if the user is not found or the status is invalid
+     */
+    boolean changeStatus(Integer userId, String newStatus) throws CoreException;
 }

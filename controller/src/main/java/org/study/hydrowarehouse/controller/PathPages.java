@@ -107,8 +107,11 @@ public class PathPages {
     public static final String COUNTRY_NAME = COUNTRY + "/name";
 
     public static final String USER = "/user";
+    public static final String USER_CURRENT = API + USER + "/me";
     public static final String USER_UPDATE =USER_BRANCH +  "/update";
     public static final String USER_ALL = ADMIN_BRANCH + USER + "/get_all";
+    public static final String USER_UPDATE_STATUS = ADMIN_BRANCH + USER + "/update_status";
+    public static final String USER_FIND_BY_STATUS = ADMIN_BRANCH + USER + "/get_all_by_status";
     public static final String USER_ID = ADMIN_BRANCH + USER + "/id";
 
     public static final String PICTURE_BRANCH = ADMIN_BRANCH + "/picture";

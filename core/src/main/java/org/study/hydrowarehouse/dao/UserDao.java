@@ -63,4 +63,14 @@ public interface UserDao {
      * @return the specified Optional User by email.
      */
     Optional<User> getUserByEmail(String email);
+
+    /**
+     * Finds a list of users filtered by their status with pagination support.
+     *
+     * @param status the status to filter users by (e.g., "ACTIVE", "BLOCKED")
+     * @param limit the maximum number of users to return
+     * @param offset the number of users to skip before starting to collect the result set
+     * @return a list of users matching the specified status within the given pagination constraints; empty list if no users found
+     */
+    List<User> findByStatus(String status, int limit, int offset);
 }

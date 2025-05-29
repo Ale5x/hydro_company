@@ -12,7 +12,7 @@ import java.util.Objects;
 @Table(name = "users")
 public class User implements Serializable {
 
-    private static final long serialVersionUID = -8105493629569357675L;
+    private static final long serialVersionUID = -6231215672234453741L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,10 @@ public class User implements Serializable {
     @ManyToOne (cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user_company")
     private UserCompany userCompany;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_status_id", nullable = false)
+    private UserStatus status;
 
     public User() {
     }
@@ -158,6 +162,14 @@ public class User implements Serializable {
         this.userCompany = userCompany;
     }
 
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,7 +185,8 @@ public class User implements Serializable {
         if (!Objects.equals(pathPhoto, user.pathPhoto)) return false;
         if (!Objects.equals(registration, user.registration)) return false;
         if (!Objects.equals(role, user.role)) return false;
-        return Objects.equals(userCompany, user.userCompany);
+        if (!Objects.equals(userCompany, user.userCompany)) return false;
+        return Objects.equals(status, user.status);
     }
 
     @Override
@@ -187,6 +200,7 @@ public class User implements Serializable {
         result = 31 * result + (registration != null ? registration.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (userCompany != null ? userCompany.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;
     }
 
@@ -202,6 +216,7 @@ public class User implements Serializable {
                 ", registration=" + registration +
                 ", role=" + role +
                 ", userCompany=" + userCompany +
+                ", status=" + status +
                 '}';
     }
 }

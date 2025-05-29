@@ -1,6 +1,8 @@
 insert into roles (id_roles, name) values(1, 'CEO'),
 (2, 'ADMIN'), (3, 'MANAGER'), (4, 'CUSTOMER'), (5, 'USER');
 
+INSERT INTO user_statuses (status) VALUES ('ACTIVE'), ('INACTIVE'), ('BLOCKED');
+
 insert into products_connection (size) values('1/2'),
 ('1'), ('1/8'), ('1/16'), ('2');
 
@@ -22,10 +24,10 @@ insert into products_type (name) values('Valve 1'),
 insert into companies_has_countries (id_companies, id_countries) values(1, 2),
 (2, 2), (3, 1);
 
-insert into users (first_name, last_name, email, password, path, id_user_company, registration, id_roles)
-values('Alex', 'Human', 'email@email.com', '123456', 'large-path', 1, '2020-01-01', 1),
-('Donald', 'Hammer', 'email1@email.com', '232edf', 'large-path 1', 1, '2010-01-01', 1),
-('Gringo', 'Axe', 'email2@email.com', 'dsdfsd', 'large-path 33', 1, '2020-07-25', 2);
+insert into users (first_name, last_name, email, password, path, id_user_company, registration, id_roles, user_status_id)
+values('Alex', 'Human', 'email@email.com', '123456', 'large-path', 1, '2020-01-01', 1, 1),
+('Donald', 'Hammer', 'email1@email.com', '232edf', 'large-path 1', 1, '2010-01-01', 1, 2),
+('Gringo', 'Axe', 'email2@email.com', 'dsdfsd', 'large-path 33', 1, '2020-07-25', 2, 3);
 
 insert into products (count, pressure, pressure_max, weight, path_hydraulic_scheme, additional_inf, sku,
 flow_rate, id_products_type, id_products_connection, id_product_companies, id_countries)

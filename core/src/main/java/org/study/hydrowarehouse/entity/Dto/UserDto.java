@@ -14,6 +14,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     private String email;
     private String password;
     private String pathPhoto;
+    private String status;
     private LocalDateTime registration;
 
     private Collection<String> role;
@@ -102,6 +103,14 @@ public class UserDto extends RepresentationModel<UserDto> {
         this.userCompanyDto = userCompanyDto;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -114,6 +123,7 @@ public class UserDto extends RepresentationModel<UserDto> {
         if (!Objects.equals(firstName, userDto.firstName)) return false;
         if (!Objects.equals(lastName, userDto.lastName)) return false;
         if (!Objects.equals(email, userDto.email)) return false;
+        if (!Objects.equals(status, userDto.status)) return false;
         if (!Objects.equals(password, userDto.password)) return false;
         if (!Objects.equals(pathPhoto, userDto.pathPhoto)) return false;
         if (!Objects.equals(registration, userDto.registration))
@@ -129,6 +139,7 @@ public class UserDto extends RepresentationModel<UserDto> {
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (pathPhoto != null ? pathPhoto.hashCode() : 0);
         result = 31 * result + (registration != null ? registration.hashCode() : 0);
@@ -144,6 +155,7 @@ public class UserDto extends RepresentationModel<UserDto> {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", status='" + status + '\'' +
                 ", password='" + password + '\'' +
                 ", pathPhoto='" + pathPhoto + '\'' +
                 ", registration=" + registration +

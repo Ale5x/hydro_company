@@ -35,7 +35,7 @@ class UserDaoImplTest {
 
     private UserCompany userCompany = null;
 
-    private int offset = 1;
+    private int offset = 0;
     private int limit = 10;
 
 
@@ -100,5 +100,11 @@ class UserDaoImplTest {
         Optional<User> user = userDao.getUserByEmail(email);
         assertTrue(user.isPresent());
         assertEquals(email, user.orElseThrow().getEmail());
+    }
+
+    @Test
+    void findByStatus () {
+        List<User> users = userDao.findByStatus("active".toUpperCase(), limit, offset);
+        assertFalse(users.isEmpty());
     }
 }

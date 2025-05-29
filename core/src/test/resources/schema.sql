@@ -1,4 +1,4 @@
-CREATE SCHEMA hydro_company;
+CREATE SCHEMA hydrowarehouse;
 
 create table roles (
   id_roles bigint primary key auto_increment,
@@ -31,6 +31,11 @@ create table companies_has_countries (
     FOREIGN KEY (id_countries) REFERENCES countries(id_countries)
 );
 
+CREATE TABLE user_statuses (
+  user_statuses_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  status VARCHAR(50) NOT NULL UNIQUE
+);
+
 create table users (
   id_users bigint primary key auto_increment,
   first_name varchar(45),
@@ -41,6 +46,8 @@ create table users (
   id_user_company bigint,
   registration timestamp,
   id_roles bigint,
+  user_status_id BIGINT NOT NULL,
+  CONSTRAINT fk_status FOREIGN KEY (user_status_id) REFERENCES user_statuses(user_statuses_id),
 foreign key (id_user_company) references user_company (id_user_company),
 foreign key (id_roles) references roles (id_roles)
 );

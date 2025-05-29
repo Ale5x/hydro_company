@@ -8,12 +8,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.study.hydrowarehouse.dao.UserDao;
+import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
-import org.study.hydrowarehouse.entity.ERole;
-import org.study.hydrowarehouse.entity.Role;
-import org.study.hydrowarehouse.entity.User;
-import org.study.hydrowarehouse.entity.UserCompany;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.service.RoleService;
@@ -272,7 +269,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldReturnRoleWhenRoleExistsInDto() {
-        // given
         UserDto dto = new UserDto();
         dto.setRole(Collections.singleton("admin"));
 
@@ -280,37 +276,116 @@ class UserServiceImplTest {
 
         Mockito.when(roleService.findRole(ERole.ADMIN)).thenReturn(Optional.of(expectedRole));
 
-        // when
         Role result = userService.mapUserRole(dto);
 
-        // then
         assertEquals(expectedRole, result);
     }
 
 
     @Test
     void shouldThrowExceptionWhenRoleNotFound() {
-        // given
         UserDto dto = new UserDto();
         dto.setRole(Collections.singleton("user"));
 
         Mockito.when(roleService.findRole(ERole.USER)).thenReturn(Optional.empty());
 
-        // then
         assertThrows(CoreException.class, () -> userService.mapUserRole(dto));
     }
 
     @Test
     void shouldReturnDefaultUserRoleWhenDtoHasNoRole(){
-        // given
         UserDto dto = new UserDto();
-        dto.setRole(null); // или Collections.emptySet()
+        dto.setRole(null);
 
-        // when
         Role result = userService.mapUserRole(dto);
 
-        // then
         assertNotNull(result);
         assertEquals(ERole.USER, result.getName());
+    }
+
+    @Test
+    void findAllByStatus_shouldReturnUserDtoList() throws CoreException {
+        String status = "active";
+        int offset = 0;
+        int limit = 10;
+
+        User user = new User();
+        user.setUserId(1);
+        user.setFirstName("john");
+        user.setRole(new Role(ERole.USER));
+        user.setStatus(new UserStatus(1L, "ACTIVE"));
+
+        List<User> users = List.of(user);
+
+        Mockito.when(userDao.findByStatus("ACTIVE", limit, offset)).thenReturn(users);
+
+        List<UserDto> result = userService.findAllByStatus(status, offset, limit);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("john", result.get(0).getFirstName());
+        assertEquals("ACTIVE", result.get(0).getStatus());
+    }
+
+    @Test
+    void findAllByStatus_shouldThrowCoreExceptionWhenDaoFails() {
+        int offset = 0;
+        int limit = 5;
+
+        when(userDao.findByStatus(anyString(), eq(limit), eq(offset)))
+                .thenThrow(new CoreException());
+
+        assertThrows(CoreException.class, () -> userService.findAllByStatus("blocked", offset, limit));
+    }
+
+    @Test
+    void changeStatus_success() throws CoreException {
+        Integer userId = 1;
+        String newStatus = "ACTIVE";
+
+        User user = new User();
+        UserStatus status = new UserStatus();
+        status.setStatus("ACTIVE");
+
+        Mockito.when(userDao.getUserById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(serviceMediator.findByStatus(newStatus)).thenReturn(Optional.of(status));
+
+        boolean result = userService.changeStatus(userId, newStatus);
+
+        assertTrue(result);
+        verify(userDao).update(user);
+        assertEquals(status, user.getStatus());
+    }
+
+    @Test
+    void changeStatus_userNotFound_shouldThrowException() {
+        Integer userId = 1;
+        String newStatus = "ACTIVE";
+
+        Mockito.when(userDao.getUserById(userId)).thenReturn(Optional.empty());
+
+        CoreException exception = assertThrows(CoreException.class, () ->
+                userService.changeStatus(userId, newStatus)
+        );
+
+        assertTrue(exception.getMessage().contains("User not found"));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void changeStatus_statusNotFound_shouldThrowException() {
+        Integer userId = 1;
+        String newStatus = "UNKNOWN";
+
+        User user = new User();
+        Mockito.when(userDao.getUserById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(serviceMediator.findByStatus(newStatus)).thenReturn(Optional.empty());
+
+        CoreException exception = assertThrows(CoreException.class, () ->
+                userService.changeStatus(userId, newStatus)
+        );
+
+        assertTrue(exception.getMessage().contains("User Status"));
+        verify(userDao, never()).update(any());
     }
 }

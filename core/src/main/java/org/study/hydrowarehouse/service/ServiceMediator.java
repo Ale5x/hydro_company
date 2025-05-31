@@ -24,14 +24,14 @@ public class ServiceMediator {
     private final ProductConnectionDao productConnectionDao;
     private final StorageRackDao storageRackDao;
     private final UserCompanyDao userCompanyDao;
-
+    private final RoleDao roleDao;
     private final UserStatusDao userStatusDao;
 
     @Autowired
     public ServiceMediator(ProductDao productDao, PictureDao pictureDao, CountryDao countryDao,
                            ProductTypeDao productTypeDao, ProductCompanyDao productCompanyDao,
                            ProductConnectionDao productConnectionDao, StorageRackDao storageRackDao,
-                           UserCompanyDao userCompanyDao, UserStatusDao userStatusDao) {
+                           UserCompanyDao userCompanyDao, RoleDao roleDao, UserStatusDao userStatusDao) {
         this.productDao = productDao;
         this.pictureDao = pictureDao;
         this.countryDao = countryDao;
@@ -40,6 +40,7 @@ public class ServiceMediator {
         this.productConnectionDao = productConnectionDao;
         this.storageRackDao = storageRackDao;
         this.userCompanyDao = userCompanyDao;
+        this.roleDao = roleDao;
         this.userStatusDao = userStatusDao;
     }
 
@@ -135,6 +136,16 @@ public class ServiceMediator {
      */
     public Optional<UserStatus> findByStatus(String status) {
         return userStatusDao.findByStatus(status);
+    }
+
+    /**
+     * Finds a {@link Role} entity by its {@link ERole} enum value.
+     *
+     * @param role the role enum value to search for
+     * @return an {@link Optional} containing the found {@link Role}, or empty if no role matches
+     */
+    public Optional<Role> findRole(ERole role) {
+        return roleDao.findRole(role);
     }
 
 }

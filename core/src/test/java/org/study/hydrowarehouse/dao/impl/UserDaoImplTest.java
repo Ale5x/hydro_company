@@ -107,4 +107,10 @@ class UserDaoImplTest {
         List<User> users = userDao.findByStatus("active".toUpperCase(), limit, offset);
         assertFalse(users.isEmpty());
     }
+
+    @Test
+    void findByRole() {
+        List<User> users = userDao.findAllByRole(ERole.ADMIN, limit, offset);
+        assertFalse(users.isEmpty());
+    }
 }

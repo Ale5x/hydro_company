@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.CriteriaQueryHelper;
 import org.study.hydrowarehouse.dao.UserDao;
+import org.study.hydrowarehouse.entity.ERole;
+import org.study.hydrowarehouse.entity.Role;
 import org.study.hydrowarehouse.entity.User;
 import org.study.hydrowarehouse.entity.UserStatus;
 
@@ -27,7 +29,7 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
 
     private static final String USER_ID = "userId";
     private static final String USER_EMAIL = "email";
-    private static final String USER_STATUS = "status";
+    private static final String FIND_USERS_BY_ROLE_QUERY = "FROM User u WHERE u.role.name = :roleName";
 
     @Override
     public int save(User user) {
@@ -100,5 +102,15 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
                 .setMaxResults(limit)
                 .setFirstResult(offset)
                 .getResultList();
+    }
+
+    @Override
+    public List<User> findAllByRole(ERole roleName, int limit, int offset) {
+        Session session = getCurrentSession();
+        return session.createQuery(FIND_USERS_BY_ROLE_QUERY, User.class)
+                .setParameter("roleName", roleName)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .list();
     }
 }

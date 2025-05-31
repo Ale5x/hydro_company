@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.study.hydrowarehouse.dao.UserDao;
@@ -68,6 +69,7 @@ class UserServiceImplTest {
             user.setRole(role);
             user.setRegistration(LocalDateTime.now());
             user.setUserCompany(userCompany);
+            user.setStatus(new UserStatus("ACTIVE"));
 
             userList.add(user);
         }
@@ -387,5 +389,71 @@ class UserServiceImplTest {
 
         assertTrue(exception.getMessage().contains("User Status"));
         verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void testFindAllByRole_ValidRole_ReturnsUserDtos() throws CoreException {
+        String role = "ADMIN";
+        int offset = 0;
+        int limit = 10;
+
+        Mockito.when(userDao.findAllByRole(ERole.ADMIN, limit, offset)).thenReturn(userList);
+
+        List<UserDto> result = userService.findAllByRole(role, offset, limit);
+
+        assertFalse(result.isEmpty());
+        verify(userDao).findAllByRole(ERole.ADMIN, limit, offset);
+    }
+
+    @Test
+    void testFindAllByRole_InvalidRole_ThrowsCoreException() {
+        String invalidRole = "STUDENT";
+
+        CoreException ex = assertThrows(CoreException.class,
+                () -> userService.findAllByRole(invalidRole, 0, 10));
+
+        assertTrue(ex.getMessage().contains("User Role"));
+    }
+
+    @Test
+    void changeRole_WhenUserNotFound_ThrowsCoreException() {
+        String role = ERole.ADMIN.name();
+        when(userDao.getUserById(1)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () ->
+                userService.changeRole(1, role));
+
+        assertTrue(ex.getMessage().contains("User not found"));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void changeRole_WhenRoleNotFound_ThrowsCoreException() throws CoreException {
+        User user = new User();
+        String role = ERole.USER.name();
+        when(userDao.getUserById(1)).thenReturn(Optional.of(user));
+        when(serviceMediator.findRole(ERole.USER)).thenReturn(Optional.empty());
+
+        CoreException ex = assertThrows(CoreException.class, () ->
+                userService.changeRole(1, role));
+
+        assertTrue(ex.getMessage().contains("User Role"));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void changeRole_WhenValidUserAndRole_UpdatesUserAndReturnsTrue() throws CoreException {
+        User user = new User();
+        Role role = new Role();
+        String roleString = ERole.USER.name();
+
+        when(userDao.getUserById(1)).thenReturn(Optional.of(user));
+        when(serviceMediator.findRole(ERole.USER)).thenReturn(Optional.of(role));
+
+        boolean result = userService.changeRole(1, roleString);
+
+        assertTrue(result);
+        assertEquals(role, user.getRole());
+        verify(userDao).update(user);
     }
 }

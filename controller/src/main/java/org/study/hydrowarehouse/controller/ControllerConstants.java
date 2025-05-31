@@ -22,6 +22,7 @@ public class ControllerConstants {
     public final static String PAGE = "page";
     public final static String SIZE = "size";
     public final static String STATUS = "status";
+    public final static String ROLE = "role";
     public final static String PRODUCT_PRESSURE = "pressure";
     public final static String PRODUCT_FLOW_RATE = "flowRate";
     public final static String NAME = "name";

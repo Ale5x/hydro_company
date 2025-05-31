@@ -59,6 +59,17 @@ public interface UserService {
     List<UserDto> findAllByStatus(String status, int offset, int limit) throws CoreException;
 
     /**
+     * Retrieves a paginated list of users filtered by their role.
+     *
+     * @param role   the role of the users to find (e.g., "ADMIN", "USER")
+     * @param offset the starting position (zero-based) from which to retrieve users
+     * @param limit  the maximum number of users to retrieve
+     * @return a list of {@link UserDto} matching the specified role within the given range
+     * @throws CoreException if an error occurs during the retrieval process
+     */
+    List<UserDto> findAllByRole(String role, int offset, int limit) throws CoreException;
+
+    /**
      * The method returns specified UserDto by id.
      *
      * @param id the User's id.
@@ -87,4 +98,14 @@ public interface UserService {
      * @throws CoreException if the user is not found or the status is invalid
      */
     boolean changeStatus(Integer userId, String newStatus) throws CoreException;
+
+    /**
+     * Changes the role of a user identified by the given user ID.
+     *
+     * @param userId  the unique identifier of the user whose role is to be changed
+     * @param newRole the new role to assign to the user; must be a valid role name
+     * @return {@code true} if the role was successfully changed; {@code false} otherwise
+     * @throws CoreException if the new role is invalid or if the role change operation fails
+     */
+    boolean changeRole(Integer userId, String newRole) throws CoreException;
 }

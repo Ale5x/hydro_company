@@ -1,5 +1,7 @@
 package org.study.hydrowarehouse.dao;
 
+import org.study.hydrowarehouse.entity.ERole;
+import org.study.hydrowarehouse.entity.Role;
 import org.study.hydrowarehouse.entity.User;
 
 import java.util.List;
@@ -45,6 +47,16 @@ public interface UserDao {
      * @return the specified list of the users.
      */
     List<User> users(int limit, int offset);
+
+    /**
+     * Retrieves a paginated list of users filtered by their role.
+     *
+     * @param roleName   the role of the users to find
+     * @param limit  the maximum number of users to retrieve
+     * @param offset the starting position (zero-based) from which to retrieve users
+     * @return a list of {@link User} matching the specified role within the given range
+     */
+    List<User> findAllByRole(ERole roleName, int limit, int offset);
 
     /**
      * The method returns the specified User by id.

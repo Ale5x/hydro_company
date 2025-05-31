@@ -31,7 +31,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     private static final String USER_STATUS_ACTIVE = "ACTIVE";
     private static final String USER_NOT_FOUND_BY_ID_MESSAGE = "User not found. [id = %s]";
     private static final String USER_STATUS_NOT_FOUND_MESSAGE = "User Status not found. [status = %s]";
-    private static final String USER_ROLE_NOT_EXIST_MESSAGE = "User's role doesn't exist. [role = %s]";
+    private static final String USER_ROLE_NOT_EXIST_MESSAGE = "User Role doesn't exist. [role = %s]";
     private static final String USER_COMPANY_NOT_FOUND_MESSAGE = "User company not found. [id = %s, name = %s, address = %s]";
     private static final String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
 
@@ -143,6 +143,35 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         user.setStatus(status);
         userDao.update(user);
         return true;
+    }
+
+    @Override
+    public boolean changeRole(Integer userId, String newRole) throws CoreException {
+        User user = userDao.getUserById(userId).orElseThrow(() -> {
+            //logger
+            throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userId));
+        });
+        Role role = serviceMediator.findRole(parseRole(newRole)).orElseThrow(() -> {
+            //logger
+            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, newRole));
+        });
+        user.setRole(role);
+        userDao.update(user);
+        return true;
+    }
+
+    @Override
+    public List<UserDto> findAllByRole(String role, int offset, int limit) throws CoreException {
+        ERole eRole = parseRole(role);
+        return mapToListObjectsDto(userDao.findAllByRole(eRole, limit, offset));
+    }
+
+    private ERole parseRole(String role) {
+        try {
+            return ERole.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, role));
+        }
     }
 
     @Override

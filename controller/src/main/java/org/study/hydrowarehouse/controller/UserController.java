@@ -37,10 +37,30 @@ public class UserController implements HypermediaListAssembler<UserDto> {
         this.userService = userService;
     }
 
+    /**
+     * Updates the current user's information.
+     * <p>
+     * Retrieves the user based on the authenticated principal's email,
+     * updates the user data with the provided {@code UserDto}, and saves the changes.
+     * If the user is not found, returns HTTP 404 with an error message.
+     *
+     * @param userDto   the new user data to update (without ID, which is set internally)
+     * @param principal the security principal containing the authenticated user's details
+     * @return {@link ResponseEntity} with HTTP status 200 OK if update is successful,
+     *         or 404 NOT FOUND with an error message if the user does not exist
+     */
     @PostMapping(value = PathPages.USER_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> update (@RequestBody UserDto userDto) {
-        userService.update(userDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> update (@RequestBody UserDto userDto, Principal principal) {
+        return userService.findUserByEmail(principal.getName())
+                .map(currentUser -> {
+                    userDto.setUserDtoId(currentUser.getUserDtoId());
+                    userService.update(userDto);
+                    return ResponseEntity.ok().build();
+                })
+                .orElseGet(() -> {
+                    Map<String, String> body = Collections.singletonMap(ControllerConstants.MESSAGE, USER_NOT_FOUND_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                });
     }
 
     /**
@@ -57,6 +77,24 @@ public class UserController implements HypermediaListAssembler<UserDto> {
     public ResponseEntity<HttpStatus> updateStatus (@RequestParam(ControllerConstants.STATUS) String status,
                                                     @RequestParam(ControllerConstants.ID) Integer userId) {
         userService.changeStatus(userId, status);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Updates the role of a user by their ID.
+     * <p>
+     * This method accepts the user's ID and the new role name as request parameters.
+     * If the operation is successful, it returns HTTP 200 OK. If the user or role is invalid,
+     * an exception will be thrown and handled appropriately.
+     *
+     * @param newRole the new role to assign to the user (e.g., "USER", "ADMIN", "CEO")
+     * @param userId  the ID of the user whose role is to be updated
+     * @return a {@link ResponseEntity} with HTTP status 200 OK if the role is successfully updated
+     */
+    @GetMapping(value = PathPages.USER_UPDATE_ROLE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> updateRole (@RequestParam(ControllerConstants.ROLE) String newRole,
+                                                    @RequestParam(ControllerConstants.ID) Integer userId) {
+        userService.changeRole(userId, newRole);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -132,6 +170,17 @@ public class UserController implements HypermediaListAssembler<UserDto> {
         return createPaginatedModel(userList, nextDataList, previousLink, nextLink);
     }
 
+    /**
+     * Retrieves a paginated list of users filtered by their status.
+     * <p>
+     * The method supports pagination using page and size parameters, and includes HATEOAS links
+     * for navigating to previous and next pages.
+     *
+     * @param page   the current page number as a String (starting from 0)
+     * @param size   the number of records per page as a String
+     * @param status the user status to filter by (e.g., "ACTIVE", "INACTIVE", "BLOCKED")
+     * @return a {@link CollectionModel} containing a list of {@link UserDto} and pagination links
+     */
     @GetMapping(value = PathPages.USER_FIND_BY_STATUS, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<UserDto> getUsersByStatus(@RequestParam(ControllerConstants.PAGE) String page,
                                                      @RequestParam(ControllerConstants.SIZE) String size,
@@ -156,6 +205,47 @@ public class UserController implements HypermediaListAssembler<UserDto> {
                 Integer.parseInt(size));
         List<UserDto> nextDataList = userService.findAllByStatus(
                 status,
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
+
+        return createPaginatedModel(userList, nextDataList, previousLink, nextLink);
+    }
+
+    /**
+     * Retrieves a paginated list of users filtered by their role.
+     * <p>
+     * The method supports pagination using page and size parameters, and adds HATEOAS links
+     * for navigating to previous and next pages.
+     *
+     * @param page the current page number as a String (starting from 0)
+     * @param size the number of records per page as a String
+     * @param role the role name to filter users by (e.g., "USER", "ADMIN", "CEO")
+     * @return a {@link CollectionModel} containing a list of {@link UserDto} and pagination links
+     */
+    @GetMapping(value = PathPages.USER_FIND_BY_ROLE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<UserDto> getUsersByRole(@RequestParam(ControllerConstants.PAGE) String page,
+                                                     @RequestParam(ControllerConstants.SIZE) String size,
+                                                     @RequestParam(ControllerConstants.ROLE) String role) {
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size,
+                ControllerConstants.ROLE, role);
+
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_ROLE,
+                searchCriteria);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_ROLE,
+                searchCriteria);
+
+        List<UserDto> userList = userService.findAllByRole(
+                role,
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<UserDto> nextDataList = userService.findAllByRole(
+                role,
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size));
 

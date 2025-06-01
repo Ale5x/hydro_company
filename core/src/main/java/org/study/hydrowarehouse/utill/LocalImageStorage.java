@@ -58,7 +58,7 @@ public class LocalImageStorage implements ImageStorage {
             Path filePath = Paths.get(uploadDir + generateUniqueName(file.getOriginalFilename()));
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return filePath.getFileName().toString();
+            return filePath.toString();
         } catch (IOException e) {
             throw new CoreException(FILE_NOT_SAVE_ERROR + e);
         }

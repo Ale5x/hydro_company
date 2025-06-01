@@ -1,116 +1,134 @@
-CREATE SCHEMA hydrowarehouse;
+DROP SCHEMA IF EXISTS hydrowarehouse CASCADE;
+CREATE SCHEMA IF NOT EXISTS hydrowarehouse;
+SET SCHEMA hydrowarehouse;
 
-create table roles (
-  id_roles bigint primary key auto_increment,
-  name varchar(15)
+-- countries
+CREATE TABLE countries (
+  country_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45) NOT NULL
 );
 
-create table products_connection (
-  id_products_connection bigint primary key auto_increment,
-  size varchar(45)
+-- user_companies
+CREATE TABLE user_companies (
+  user_company_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45) NOT NULL,
+  address VARCHAR(100) NOT NULL,
+  country_id INT NOT NULL,
+  FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE RESTRICT
 );
 
-create table countries (
-  id_countries bigint primary key auto_increment,
-  name varchar(45)
+-- roles
+CREATE TABLE roles (
+  role_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(15) NOT NULL
 );
 
-create table user_company (
-  id_user_company bigint primary key auto_increment,
-  name varchar(45),
-  address varchar(100),
-  countries_id bigint,
-  foreign key (countries_id) references countries (id_countries)
-);
-
-create table companies_has_countries (
-    id_companies bigint,
-    id_countries bigint,
-    PRIMARY KEY (id_companies, id_countries),
-    FOREIGN KEY (id_companies) REFERENCES user_company(id_user_company),
-    FOREIGN KEY (id_countries) REFERENCES countries(id_countries)
-);
-
+-- user_statuses
 CREATE TABLE user_statuses (
-  user_statuses_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  status VARCHAR(50) NOT NULL UNIQUE
+  user_status_id INT AUTO_INCREMENT PRIMARY KEY,
+  status VARCHAR(45) NOT NULL
 );
 
-create table users (
-  id_users bigint primary key auto_increment,
-  first_name varchar(45),
-  last_name varchar(45),
-  email varchar(200),
-  password varchar(320),
-  path varchar(255),
-  id_user_company bigint,
-  registration timestamp,
-  id_roles bigint,
-  user_status_id BIGINT NOT NULL,
-  CONSTRAINT fk_status FOREIGN KEY (user_status_id) REFERENCES user_statuses(user_statuses_id),
-foreign key (id_user_company) references user_company (id_user_company),
-foreign key (id_roles) references roles (id_roles)
+-- users
+CREATE TABLE users (
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(45) NOT NULL,
+  last_name VARCHAR(45) NOT NULL,
+  password VARCHAR(320) NOT NULL,
+  path VARCHAR(255),
+  user_company_id INT,
+  registration TIMESTAMP NOT NULL,
+  role_id INT NOT NULL,
+  email VARCHAR(55) NOT NULL UNIQUE,
+  user_status_id INT NOT NULL,
+  FOREIGN KEY (user_company_id) REFERENCES user_companies(user_company_id) ON DELETE SET NULL,
+  FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE RESTRICT,
+  FOREIGN KEY (user_status_id) REFERENCES user_statuses(user_status_id) ON DELETE RESTRICT
 );
 
-create table products_type (
-  id_products_type bigint primary key auto_increment,
-  name varchar(15)
+-- products_type
+CREATE TABLE products_type (
+  product_type_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45) NOT NULL
 );
 
-create table product_companies (
-  id_product_companies bigint primary key auto_increment,
-  name varchar(30)
+-- products_connections
+CREATE TABLE products_connections (
+  product_connection_id INT AUTO_INCREMENT PRIMARY KEY,
+  size VARCHAR(45) NOT NULL
 );
 
-create table products (
-  id_products bigint primary key auto_increment,
-  id_products_type bigint,
-  id_products_connection bigint,
-  id_product_companies bigint,
-  id_countries bigint,
-  flow_rate bigint,
-  count bigint,
-  pressure bigint,
-  pressure_max bigint,
-  sku varchar(45),
-  weight varchar(45),
-  path_hydraulic_scheme varchar(254),
-  additional_inf varchar(320),
-  foreign key (id_countries) references countries (id_countries),
-  foreign key (id_products_type) references products_type (id_products_type),
-  foreign key (id_product_companies) references product_companies (id_product_companies),
-  foreign key (id_products_connection) references products_connection (id_products_connection)
-  on delete cascade on update cascade
+-- product_companies
+CREATE TABLE product_companies (
+  product_company_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45) NOT NULL
 );
 
-create table pictures (
-  id_pictures bigint primary key auto_increment,
-  id_products bigint,
-  path varchar(254),
-  foreign key (id_products) references products (id_products)
-  on delete cascade on update cascade
+-- products
+CREATE TABLE products (
+  product_id INT AUTO_INCREMENT PRIMARY KEY,
+  flow_rate INT NOT NULL,
+  pressure INT NOT NULL,
+  weight DOUBLE NOT NULL,
+  path_hydraulic_scheme VARCHAR(255) NOT NULL,
+  pressure_max INT NOT NULL,
+  additional_inf CLOB,
+  product_type_id INT NOT NULL,
+  count INT NOT NULL,
+  product_connection_id INT NOT NULL,
+  product_company_id INT NOT NULL,
+  FOREIGN KEY (product_type_id) REFERENCES products_type(product_type_id) ON DELETE RESTRICT,
+  FOREIGN KEY (product_connection_id) REFERENCES products_connections(product_connection_id) ON DELETE RESTRICT,
+  FOREIGN KEY (product_company_id) REFERENCES product_companies(product_company_id) ON DELETE RESTRICT
 );
 
-
-create table shelf (
-  id_shelf bigint primary key auto_increment,
-  name varchar(45)
+-- pictures
+CREATE TABLE pictures (
+  picture_id INT AUTO_INCREMENT PRIMARY KEY,
+  path VARCHAR(320) NOT NULL,
+  product_id INT NOT NULL,
+  FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
-create table storage_racks (
-  id_racks bigint primary key auto_increment,
-  name varchar(45),
-  shelf_id bigint,
-  foreign key (shelf_id) references shelf (id_shelf)
+-- storage_racks
+CREATE TABLE storage_racks (
+  rack_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45) NOT NULL
 );
 
-create table storage_racks_products (
-  id_products bigint,
-  id_storage_racks bigint
+-- shelves
+CREATE TABLE shelves (
+  shelf_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(10) NOT NULL,
+  storage_racks_id INT NOT NULL,
+  FOREIGN KEY (storage_racks_id) REFERENCES storage_racks(rack_id) ON DELETE RESTRICT
 );
 
-create table countries_has_product_companies (
-  id_countries bigint,
-  id_product_companies bigint
+-- countries_has_product_companies
+CREATE TABLE countries_has_product_companies (
+  country_id INT NOT NULL,
+  product_company_id INT NOT NULL,
+  PRIMARY KEY (country_id, product_company_id),
+  FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE CASCADE,
+  FOREIGN KEY (product_company_id) REFERENCES product_companies(product_company_id) ON DELETE CASCADE
 );
 
+-- product_sku_status
+CREATE TABLE product_sku_status (
+  product_sku_status_id INT AUTO_INCREMENT PRIMARY KEY,
+  status VARCHAR(45) NOT NULL
+);
+
+-- product_sku
+CREATE TABLE product_sku (
+  product_sku_id INT AUTO_INCREMENT PRIMARY KEY,
+  sku_code VARCHAR(55) NOT NULL,
+  product_id INT NOT NULL,
+  status_id INT NOT NULL,
+  country_id INT NOT NULL,
+  shelf_id INT NOT NULL,
+  FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+  FOREIGN KEY (status_id) REFERENCES product_sku_status(product_sku_status_id) ON DELETE RESTRICT,
+  FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE RESTRICT,
+  FOREIGN KEY (shelf_id) REFERENCES shelves(shelf_id) ON DELETE RESTRICT
+);

@@ -15,13 +15,30 @@ CREATE SCHEMA IF NOT EXISTS `hydrowarehouse` DEFAULT CHARACTER SET utf8 ;
 USE `hydrowarehouse` ;
 
 -- -----------------------------------------------------
--- Table `hydrowarehouse`.`user_company`
+-- Table `hydrowarehouse`.`countries`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`user_company` (
-  `id_user_company` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`countries` (
+  `country_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`country_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hydrowarehouse`.`user_companies`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`user_companies` (
+  `user_company_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `address` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`id_user_company`))
+  `country_id` INT NOT NULL,
+  PRIMARY KEY (`user_company_id`),
+  INDEX `fk_user_company_countries1_idx` (`country_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_company_countries1`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `hydrowarehouse`.`countries` (`country_id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -29,58 +46,56 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`roles`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`roles` (
-  `id_roles` INT NOT NULL AUTO_INCREMENT,
+  `role_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(15) NOT NULL,
-  PRIMARY KEY (`id_roles`))
+  PRIMARY KEY (`role_id`))
 ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `hydrowarehouse`.`user_statuses`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`user_statuses` (
-  `user_statuses_id` INT NOT NULL AUTO_INCREMENT,
+  `user_status_id` INT NOT NULL AUTO_INCREMENT,
   `status` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`user_statuses_id`))
+  PRIMARY KEY (`user_status_id`))
 ENGINE = InnoDB;
-
 
 
 -- -----------------------------------------------------
 -- Table `hydrowarehouse`.`users`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`users` (
-  `id_users` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL AUTO_INCREMENT,
   `first_name` VARCHAR(45) NOT NULL,
   `last_name` VARCHAR(45) NOT NULL,
-  `email` VARCHAR(45) NOT NULL,
   `password` VARCHAR(320) NOT NULL,
   `path` VARCHAR(255) NULL,
-  `id_user_company` INT NULL,
+  `user_company_id` INT NULL,
   `registration` DATETIME NOT NULL,
-  `id_roles` INT NOT NULL,
+  `role_id` INT NOT NULL,
+  `email` VARCHAR(55) NOT NULL,
   `user_status_id` INT NOT NULL,
-  PRIMARY KEY (`id_users`),
-  INDEX `fk_users_companies1_idx` (`id_user_company` ASC) VISIBLE,
-  INDEX `fk_users_roles1_idx` (`id_roles` ASC) VISIBLE,
-
+  PRIMARY KEY (`user_id`),
+  INDEX `fk_users_roles1_idx` (`role_id` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
+  INDEX `fk_users_companies1_idx` (`user_company_id` ASC) VISIBLE,
+  INDEX `fk_users_user_statuses1_idx` (`user_status_id` ASC) VISIBLE,
   CONSTRAINT `fk_users_companies1`
-    FOREIGN KEY (`id_user_company`)
-    REFERENCES `hydrowarehouse`.`user_company` (`id_user_company`)
+    FOREIGN KEY (`user_company_id`)
+    REFERENCES `hydrowarehouse`.`user_companies` (`user_company_id`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-
   CONSTRAINT `fk_users_roles1`
-    FOREIGN KEY (`id_roles`)
-    REFERENCES `hydrowarehouse`.`roles` (`id_roles`)
+    FOREIGN KEY (`role_id`)
+    REFERENCES `hydrowarehouse`.`roles` (`role_id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-
-     CONSTRAINT `fk_users_user_statuses1`
-        FOREIGN KEY (`user_status_id`)
-        REFERENCES `hydrowarehouse`.`user_statuses` (`user_statuses_id`)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION)
-)
+  CONSTRAINT `fk_users_user_statuses1`
+    FOREIGN KEY (`user_status_id`)
+    REFERENCES `hydrowarehouse`.`user_statuses` (`user_status_id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -88,19 +103,19 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`products_type`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`products_type` (
-  `id_products_type` INT NOT NULL AUTO_INCREMENT,
+  `product_type_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_products_type`))
+  PRIMARY KEY (`product_type_id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hydrowarehouse`.`products_connection`
+-- Table `hydrowarehouse`.`products_connections`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`products_connection` (
-  `id_products_connection` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`products_connections` (
+  `product_connection_id` INT NOT NULL AUTO_INCREMENT,
   `size` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_products_connection`))
+  PRIMARY KEY (`product_connection_id`))
 ENGINE = InnoDB;
 
 
@@ -108,9 +123,9 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`product_companies`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`product_companies` (
-  `id_product_companies` INT NOT NULL AUTO_INCREMENT,
+  `product_company_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_product_companies`))
+  PRIMARY KEY (`product_company_id`))
 ENGINE = InnoDB;
 
 
@@ -118,54 +133,36 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`products`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`products` (
-  `id_products` INT NOT NULL AUTO_INCREMENT,
-  `sku` VARCHAR(45) NOT NULL,
+  `product_id` INT NOT NULL AUTO_INCREMENT,
   `flow_rate` INT NOT NULL,
   `pressure` INT NOT NULL,
   `weight` DOUBLE NOT NULL,
   `path_hydraulic_scheme` VARCHAR(255) NOT NULL,
   `pressure_max` INT NOT NULL,
-  `additional_inf` VARCHAR(45) NOT NULL,
-  `id_products_type` INT NOT NULL,
+  `additional_inf` TEXT NULL,
+  `product_type_id` INT NOT NULL,
   `count` INT NOT NULL,
-  `id_products_connection` INT NOT NULL,
-  `id_product_companies` INT NOT NULL,
-  `id_countries` INT NULL, -- добавлено поле для связи с таблицей countries
-  PRIMARY KEY (`id_products`),
-  INDEX `fk_products_products_type1_idx` (`id_products_type` ASC) VISIBLE,
-  INDEX `fk_products_products_connection1_idx` (`id_products_connection` ASC) VISIBLE,
-  INDEX `fk_products_product_companies1_idx` (`id_product_companies` ASC) VISIBLE,
-  INDEX `fk_products_countries_idx` (`id_countries` ASC) VISIBLE,
+  `product_connection_id` INT NOT NULL,
+  `product_company_id` INT NOT NULL,
+  PRIMARY KEY (`product_id`),
+  INDEX `fk_products_products_type1_idx` (`product_type_id` ASC) VISIBLE,
+  INDEX `fk_products_products_connection1_idx` (`product_connection_id` ASC) VISIBLE,
+  INDEX `fk_products_product_companies1_idx` (`product_company_id` ASC) VISIBLE,
   CONSTRAINT `fk_products_products_type1`
-    FOREIGN KEY (`id_products_type`)
-    REFERENCES `hydrowarehouse`.`products_type` (`id_products_type`)
-    ON DELETE NO ACTION
+    FOREIGN KEY (`product_type_id`)
+    REFERENCES `hydrowarehouse`.`products_type` (`product_type_id`)
+    ON DELETE RESTRICT
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_products_products_connection1`
-    FOREIGN KEY (`id_products_connection`)
-    REFERENCES `hydrowarehouse`.`products_connection` (`id_products_connection`)
-    ON DELETE NO ACTION
+    FOREIGN KEY (`product_connection_id`)
+    REFERENCES `hydrowarehouse`.`products_connections` (`product_connection_id`)
+    ON DELETE RESTRICT
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_products_product_companies1`
-    FOREIGN KEY (`id_product_companies`)
-    REFERENCES `hydrowarehouse`.`product_companies` (`id_product_companies`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_products_countries`
-    FOREIGN KEY (`id_countries`)
-    REFERENCES `hydrowarehouse`.`countries` (`id_countries`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-) ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `hydro-company`.`countries`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`countries` (
-  `id_countries` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_countries`))
+    FOREIGN KEY (`product_company_id`)
+    REFERENCES `hydrowarehouse`.`product_companies` (`product_company_id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -173,36 +170,15 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`pictures`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`pictures` (
-  `id_pictures` INT NOT NULL AUTO_INCREMENT,
+  `picture_id` INT NOT NULL AUTO_INCREMENT,
   `path` VARCHAR(320) NOT NULL,
-  `id_products` INT NOT NULL,
-  PRIMARY KEY (`id_pictures`),
-  INDEX `fk_pictures_products1_idx` (`id_products` ASC) VISIBLE,
+  `product_id` INT NOT NULL,
+  PRIMARY KEY (`picture_id`),
+  INDEX `fk_pictures_products1_idx` (`product_id` ASC) VISIBLE,
   CONSTRAINT `fk_pictures_products1`
-    FOREIGN KEY (`id_products`)
-    REFERENCES `hydrowarehouse`.`products` (`id_products`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `hydrowarehouse`.`products_countries`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`products_countries` (
-  `id_products` INT NOT NULL,
-  `id_countries` INT NOT NULL,
-  INDEX `fk_products_has_countries_products1_idx` (`id_products` ASC) VISIBLE,
-  INDEX `fk_products_countries_countries1_idx` (`id_countries` ASC) VISIBLE,
-  CONSTRAINT `fk_products_has_countries_products1`
-    FOREIGN KEY (`id_products`)
-    REFERENCES `hydrowarehouse`.`products` (`id_products`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_products_countries_countries1`
-    FOREIGN KEY (`id_countries`)
-    REFERENCES `hydrowarehouse`.`countries` (`id_countries`)
-    ON DELETE NO ACTION
+    FOREIGN KEY (`product_id`)
+    REFERENCES `hydrowarehouse`.`products` (`product_id`)
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -211,69 +187,25 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`storage_racks`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`storage_racks` (
-  `id_racks` INT NOT NULL AUTO_INCREMENT,
+  `rack_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_racks`))
+  PRIMARY KEY (`rack_id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `hydrowarehouse`.`storage_racks_products`
+-- Table `hydrowarehouse`.`shelves`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`storage_racks_products` (
-  `id_products` INT NOT NULL,
-  `id_storage_racks` INT NOT NULL,
-  PRIMARY KEY (`id_products`, `id_storage_racks`),
-  INDEX `fk_products_has_racks_racks1_idx` (`id_storage_racks` ASC) VISIBLE,
-  INDEX `fk_products_has_racks_products1_idx` (`id_products` ASC) VISIBLE,
-  CONSTRAINT `fk_products_has_racks_products1`
-    FOREIGN KEY (`id_products`)
-    REFERENCES `hydrowarehouse`.`products` (`id_products`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_products_has_racks_racks1`
-    FOREIGN KEY (`id_storage_racks`)
-    REFERENCES `hydrowarehouse`.`storage_racks` (`id_racks`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `hydrowarehouse`.`Shelf`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`Shelf` (
-  `id_shelf` INT NOT NULL AUTO_INCREMENT,
-  `number` INT NOT NULL,
-  `id_storage_racks` INT NOT NULL,
-  PRIMARY KEY (`id_shelf`),
-  INDEX `fk_Shelf_storage_racks1_idx` (`id_storage_racks` ASC) VISIBLE,
-  CONSTRAINT `fk_Shelf_storage_racks1`
-    FOREIGN KEY (`id_storage_racks`)
-    REFERENCES `hydrowarehouse`.`storage_racks` (`id_racks`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `hydrowarehouse`.`companies_has_countries`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`companies_has_countries` (
-  `id_companies` INT NOT NULL,
-  `id_countries` INT NOT NULL,
-  PRIMARY KEY (`id_companies`, `id_countries`),
-  INDEX `fk_companies_has_countries_countries1_idx` (`id_countries` ASC) VISIBLE,
-  INDEX `fk_companies_has_countries_companies1_idx` (`id_companies` ASC) VISIBLE,
-  CONSTRAINT `fk_companies_has_countries_companies1`
-    FOREIGN KEY (`id_companies`)
-    REFERENCES `hydrowarehouse`.`user_company` (`id_user_company`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_companies_has_countries_countries1`
-    FOREIGN KEY (`id_countries`)
-    REFERENCES `hydrowarehouse`.`countries` (`id_countries`)
-    ON DELETE NO ACTION
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`shelves` (
+  `shelf_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(10) NOT NULL,
+  `storage_racks_id` INT NOT NULL,
+  PRIMARY KEY (`shelf_id`),
+  INDEX `fk_shelf_storage_racks1_idx` (`storage_racks_id` ASC) VISIBLE,
+  CONSTRAINT `fk_shelf_storage_racks1`
+    FOREIGN KEY (`storage_racks_id`)
+    REFERENCES `hydrowarehouse`.`storage_racks` (`rack_id`)
+    ON DELETE RESTRICT
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -282,19 +214,68 @@ ENGINE = InnoDB;
 -- Table `hydrowarehouse`.`countries_has_product_companies`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`countries_has_product_companies` (
-  `id_countries` INT NOT NULL,
-  `id_product_companies` INT NOT NULL,
-  INDEX `fk_countries_has_product_companies_product_companies1_idx` (`id_product_companies` ASC) VISIBLE,
-  INDEX `fk_countries_has_product_companies_countries1_idx` (`id_countries` ASC) VISIBLE,
+  `country_id` INT NOT NULL,
+  `product_company_id` INT NOT NULL,
+  INDEX `fk_countries_has_product_companies_product_companies1_idx` (`product_company_id` ASC) VISIBLE,
+  INDEX `fk_countries_has_product_companies_countries1_idx` (`country_id` ASC) VISIBLE,
+  PRIMARY KEY (`country_id`, `product_company_id`),
   CONSTRAINT `fk_countries_has_product_companies_countries1`
-    FOREIGN KEY (`id_countries`)
-    REFERENCES `hydrowarehouse`.`countries` (`id_countries`)
-    ON DELETE NO ACTION
+    FOREIGN KEY (`country_id`)
+    REFERENCES `hydrowarehouse`.`countries` (`country_id`)
+    ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_countries_has_product_companies_product_companies1`
-    FOREIGN KEY (`id_product_companies`)
-    REFERENCES `hydrowarehouse`.`product_companies` (`id_product_companies`)
-    ON DELETE NO ACTION
+    FOREIGN KEY (`product_company_id`)
+    REFERENCES `hydrowarehouse`.`product_companies` (`product_company_id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hydrowarehouse`.`product_sku_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`product_sku_status` (
+  `product_sku_status_id` INT NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`product_sku_status_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hydrowarehouse`.`product_sku`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hydrowarehouse`.`product_sku` (
+  `product_sku_id` INT NOT NULL AUTO_INCREMENT,
+  `sku_code` VARCHAR(55) NOT NULL,
+  `product_id` INT NOT NULL,
+  `status_id` INT NOT NULL,
+  `country_id` INT NOT NULL,
+  `shelf_id` INT NOT NULL,
+  PRIMARY KEY (`product_sku_id`),
+  INDEX `fk_product_sku_products1_idx` (`product_id` ASC) VISIBLE,
+  INDEX `fk_product_sku_product_sku_status1_idx` (`status_id` ASC) VISIBLE,
+  INDEX `fk_product_sku_countries1_idx` (`country_id` ASC) VISIBLE,
+  INDEX `fk_product_sku_shelf1_idx` (`shelf_id` ASC) VISIBLE,
+  CONSTRAINT `fk_product_sku_products1`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `hydrowarehouse`.`products` (`product_id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_product_sku_product_sku_status1`
+    FOREIGN KEY (`status_id`)
+    REFERENCES `hydrowarehouse`.`product_sku_status` (`product_sku_status_id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_product_sku_countries1`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `hydrowarehouse`.`countries` (`country_id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_product_sku_shelf1`
+    FOREIGN KEY (`shelf_id`)
+    REFERENCES `hydrowarehouse`.`shelves` (`shelf_id`)
+    ON DELETE RESTRICT
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -302,14 +283,3 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
---- Data
-
-INSERT INTO roles (id_roles, name) values (1, 'CEO'), (2, 'ADMIN'), (3, 'MANAGER'), (4, 'USER'), (5, 'CUSTOMER');
-insert into countries(name) values('USA'), ('Belarus'), ('Canada');
-insert into user_company(name, address) values('BOSH', 'Street 1'), ('AlG', 'Street AlG');
-insert into companies_has_countries(id_companies, id_countries) values(1, 1), (2,2);
-Insert into users (first_name, last_name, registration, password, path, id_user_company, id_roles, email)
-value('Postman firstName 22', 'Postman lastName 2', '2017-06-15',
-'$2a$10$85fO2hl1JE3mLTNGa7/rquyyr8m7KAN.vxBXJ96Ck/A15JAg2sP/6', 'Postman photo', '1', '1', 'admin@gmail.com');

@@ -1,52 +1,53 @@
-insert into roles (id_roles, name) values(1, 'CEO'),
-(2, 'ADMIN'), (3, 'MANAGER'), (4, 'CUSTOMER'), (5, 'USER');
+INSERT INTO countries (name) VALUES
+('Belarus'), ('USA'), ('Germany'), ('China'), ('Brazil');
 
-INSERT INTO user_statuses (status) VALUES ('ACTIVE'), ('INACTIVE'), ('BLOCKED');
+INSERT INTO user_companies (name, address, country_id) VALUES
+('TechCorp', '123 Silicon Ave', 1), ('AutoMakers', '456 Autobahn St', 2), ('MegaTrade', '789 Commerce Rd', 3),
+('GreenEnergy', '101 Forest Ln', 4), ('SpaceXplore', '202 Cosmo Blvd', 1);
 
-insert into products_connection (size) values('1/2'),
-('1'), ('1/8'), ('1/16'), ('2');
+INSERT INTO roles (name) VALUES ('Admin'), ('User'), ('Manager'), ('Guest'), ('Support');
 
-insert into products_type (name) values('pipeline'),
-('side'), ('wall'), ('into');
+INSERT INTO user_statuses (status) VALUES ('Active'), ('Inactive'), ('Pending'), ('Banned'), ('Deleted');
 
-insert into product_companies (name) values('BOSH'),
-('REXHROTH'), ('GY'), ('IMages');
+INSERT INTO users (first_name, last_name, password, path, user_company_id, registration, role_id, email,
+user_status_id) VALUES
+('John', 'Doe', 'pass123', NULL, 1, CURRENT_TIMESTAMP, 1, 'john.doe@example.com', 1),
+('Anna', 'Smith', 'pass234', NULL, 2, CURRENT_TIMESTAMP, 2, 'anna.smith@example.com', 1),
+('Peter', 'Brown', 'pass345', NULL, NULL, CURRENT_TIMESTAMP, 3, 'peter.brown@example.com', 2),
+('Linda', 'Taylor', 'pass456', NULL, 3, CURRENT_TIMESTAMP, 4, 'linda.taylor@example.com', 1),
+('James', 'Wilson', 'pass567', NULL, 4, CURRENT_TIMESTAMP, 5, 'james.wilson@example.com', 3);
 
-insert into countries (name) values('USA'),
-('Belarus'), ('UK'), ('Bela'), ('IT'), ('Belar');
+INSERT INTO products_type (name) VALUES ('Valve'), ('Pump'), ('Filter'), ('Compressor'), ('Tank');
 
-insert into user_company (name, address, countries_id) values('Company 1', 'Street 1', 1),
-('Company 2', 'Street 2', 2), ('Company 3', 'Street 3', 3);
+INSERT INTO products_connections (size) VALUES
+('Small'), ('Medium'), ('Large'), ('Extra Large'), ('Custom');
 
-insert into products_type (name) values('Valve 1'),
-('Valve 2'), ('Valve 3'), ('Valve 4'), ('Valve 5'), ('Valve 6');
+INSERT INTO product_companies (name) VALUES
+('HydroFlow'), ('PumpTech'), ('FilterPro'), ('AirComp'), ('TankWorks');
 
-insert into companies_has_countries (id_companies, id_countries) values(1, 2),
-(2, 2), (3, 1);
+INSERT INTO products (flow_rate, pressure, weight, path_hydraulic_scheme, pressure_max, additional_inf,
+product_type_id, count, product_connection_id, product_company_id) VALUES
+(100, 200, 15.5, '/schemes/valve1.png', 250, 'High durability', 1, 10, 1, 1),
+(150, 300, 20.0, '/schemes/pump1.png', 350, NULL, 2, 5, 2, 2),
+(80, 180, 10.0, '/schemes/filter1.png', 200, 'Low maintenance', 3, 15, 3, 3),
+(200, 400, 30.0, '/schemes/compressor1.png', 450, NULL, 4, 3, 4, 4),
+(120, 250, 25.0, '/schemes/tank1.png', 300, 'For industrial use', 5, 7, 5, 5);
 
-insert into users (first_name, last_name, email, password, path, id_user_company, registration, id_roles, user_status_id)
-values('Alex', 'Human', 'email@email.com', '123456', 'large-path', 1, '2020-01-01', 1, 1),
-('Donald', 'Hammer', 'email1@email.com', '232edf', 'large-path 1', 1, '2010-01-01', 1, 2),
-('Gringo', 'Axe', 'email2@email.com', 'dsdfsd', 'large-path 33', 1, '2020-07-25', 2, 3);
+INSERT INTO pictures (path, product_id) VALUES
+('/images/prod1_pic1.jpg', 1), ('/images/prod2_pic1.jpg', 2), ('/images/prod3_pic1.jpg', 3),
+('/images/prod4_pic1.jpg', 4), ('/images/prod5_pic1.jpg', 5);
 
-insert into products (count, pressure, pressure_max, weight, path_hydraulic_scheme, additional_inf, sku,
-flow_rate, id_products_type, id_products_connection, id_product_companies, id_countries)
-values (25, 335, 375, 1, 'large-path', '2020-additional_inf-01', 'sku #1', 150, 2, 1, 1, 1),
-(11, 415, 450, 1.5, 'large-path 1', '2020-additional_inf-02', 'sku #2', 200, 3, 1, 1, 2),
-(158, 176, 150, 0.9, 'large-path 2', '2020-additional_inf-03', 'sku #3', 250, 2, 2, 2, 3),
-(325, 184, 210, 5, 'large-path 3', '2020-additional_inf-04', 'sku #4', 270, 3, 2, 1, 4),
-(75, 125, 250, 10.5, 'large-path 4', '2020-additional_inf-01_5', 'sku #5', 130, 2, 3, 3, 5);
+INSERT INTO storage_racks (name) VALUES
+('Rack A'), ('Rack B'), ('Rack C'), ('Rack D'), ('Rack E');
 
-insert into pictures (path, id_products) values('path_product-1', 1),
-('path_product-1', 1), ('path_product-2', 2), ('path_product-2', 2), ('path_product-3', 3);
+INSERT INTO shelves (name, storage_racks_id) VALUES
+('S1', 1), ('S2', 2), ('S3', 3), ('S4', 4), ('S5', 5);
 
-insert into storage_racks_products (id_products, id_storage_racks) values(1, 1),
-(2, 2), (5, 1), (3, 1), (4, 2);
+INSERT INTO countries_has_product_companies (country_id, product_company_id) VALUES
+(1, 1), (2, 2), (3, 3), (4, 4), (5, 5);
 
-insert into shelf (name) values('#1'), ('#2'), ('#3'), ('#4'), ('#5'), ('#6');
+INSERT INTO product_sku_status (status) VALUES
+('In Stock'), ('Out of Stock'), ('Discontinued'), ('Backordered'), ('Reserved');
 
-insert into storage_racks (name, shelf_id) values('storage_racks-name-1', 1),
-('storage_racks-name-2', 2), ('storage_racks-name-3', 3), ('storage_racks-name-4', 4), ('storage_racks-name-5', 5);
-
-insert into countries_has_product_companies (id_countries, id_product_companies) values(1, 1),
-(1, 2), (1, 3);
+INSERT INTO product_sku (sku_code, product_id, status_id, country_id, shelf_id) VALUES
+('SKU1001', 1, 1, 1, 1), ('SKU1002', 2, 2, 2, 2), ('SKU1003', 3, 3, 3, 3),('SKU1004', 4, 4, 4, 4), ('SKU1005', 5, 5, 5, 5);

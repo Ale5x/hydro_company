@@ -23,20 +23,28 @@ public interface ImageStorage {
     String save(MultipartFile file, String uploadDir) throws CoreException;
 
     /**
-     * Generates a unique name for the uploaded file, typically to avoid overwriting files with the same name or
-     * to add timestamps, UUIDs, etc.
-     * @param fileName the original name of the file
-     * @return a unique file name
-     * @throws CoreException if generation fails
+     * Generates a unique name for the given uploaded file.
+     *
+     * <p>This method creates a unique file name based on the original filename
+     * and potentially other factors such as a UUID or timestamp. It is used to prevent
+     * filename collisions when storing files.</p>
+     *
+     * @param file the uploaded file for which to generate a unique name; must not be {@code null}
+     * @return a unique filename as a {@link String}, preserving the original file extension if present
+     * @throws CoreException if the file is {@code null}, has no original filename, or an error occurs during name generation
      */
-    String generateUniqueName(String fileName) throws CoreException;
+    String generateUniqueName(MultipartFile file) throws CoreException;
 
     /**
-     * Checks whether the uploaded file size exceeds a predefined maximum limit.
-     * @param uploadedFileSize the size of the uploaded file in bytes.
-     * @throws CoreException if the size file is bigger than its allowed.
+     * Checks whether the provided uploaded file exceeds the allowed maximum file size.
+     *
+     * <p>This method validates the size of the given {@link MultipartFile}. If the file size
+     * exceeds the configured limit, a {@link CoreException} is thrown.</p>
+     *
+     * @param uploadedFile the file to check; must not be {@code null}
+     * @throws CoreException if the file size exceeds the maximum allowed limit
      */
-    void isBigSizeFile(long uploadedFileSize) throws CoreException;
+    void isBigSizeFile(MultipartFile uploadedFile) throws CoreException;
 
     /**
      * Removes a file from the system based on the provided file path. This method attempts to delete the file
@@ -50,11 +58,16 @@ public interface ImageStorage {
     boolean removeFile(String path) throws CoreException;
 
     /**
-     * Checks whether the file name length (in characters) exceeds a predefined maximum limit.
-     * @param length the length of the file name in bytes
-     * @throws CoreException if the name's file is bigger than its allowed.
+     * Checks if the provided file name exceeds the maximum allowed length.
+     * <p>
+     * Throws a {@link CoreException} if the file name is {@code null}, empty,
+     * or its length is greater than or equal to the configured maximum length.
+     *
+     * @param fileName the name of the file to check
+     * @throws CoreException if {@code fileName} is {@code null} or empty,
+     *                       or if its length exceeds the maximum allowed length
      */
-    void isBigLengthName(int length);
+    void isBigLengthName(String fileName) throws CoreException;
 
     /**
      * Adds additional information before the file extension to make unique name.
@@ -72,4 +85,32 @@ public interface ImageStorage {
      * @throws CoreException if any file fails to save or if the directory is invalid
      */
     List<String> saveAll(List<MultipartFile> files, String uploadDir) throws CoreException;
+
+    /**
+     * Validates that the provided string is not {@code null} or empty.
+     *
+     * <p>This method is typically used to ensure that required string input
+     * for a specific operation is present and non-empty. If the input string
+     * is {@code null} or empty, a {@link CoreException} is thrown with
+     * a message related to the provided operation name.</p>
+     *
+     * @param line the string to validate; may be {@code null} or empty
+     * @param nameOperation the name of the operation being validated; used in the exception message
+     * @throws CoreException if the input string is {@code null} or empty
+     */
+    void isEmptyString(String line, String nameOperation) throws CoreException;
+
+    /**
+     * Validates that the provided object is not {@code null}.
+     *
+     * <p>This method checks whether the specified object is {@code null} and
+     * throws a {@link CoreException} if it is. The {@code nameOperation} parameter
+     * is used to provide context in the exception message, typically indicating
+     * which operation or field failed the validation.</p>
+     *
+     * @param object the object to validate; may be {@code null}
+     * @param nameOperation the name or description of the operation being validated
+     * @throws CoreException if the provided object is {@code null}
+     */
+    void isNull(Object object, String nameOperation) throws CoreException;
 }

@@ -24,15 +24,22 @@ import java.util.List;
 @Service
 public class LocalImageStorage implements ImageStorage {
 
-    private final FileNameConverter fileNameConvector;
+   private final FileNameConverter fileNameConvector;
 
-    private final static String FILE_NOT_SAVE_ERROR = "The file wasn't save.";
-    private final static String MAX_FILE_SIZE_EXCEEDED_ERROR = "File size exceeded. The size - ";
-    private final static String MAX_NAME_LENGTH_EXCEEDED_ERROR = "The file's name length exceeded. The length - ";
-    private final static String FILE_PATH_EMPTY_OR_NULL_ERROR = "The path of the file is empty or null.";
-    private final static String FILE_PATH_NOT_EXIST_ERROR = "The file doesn't exist.";
-    private final static String FILES_NOT_SAVE_ERROR = "Failed to save all files. Rollback completed.";
-    private final static String FILES_LIMIT_EXCEEDED_ERROR = "File upload limit exceeded. Maximum allowed files per request: ";
+    public static final String OBJECT_IS_NULL_MESSAGE = "Object is null. Operation - %s";
+    public static final String LINE_IS_EMPTY_MESSAGE = "Line is empty. Operation - %s";
+    public static final String CHECK_FILE_NAME_LENGTH_OPERATION = "Checking file name length";
+    public static final String CHECK_FILE_SIZE_BLANK_OPERATION = "Checking file size";
+    public static final String CHECK_DIR_OPERATION = "Checking directory";
+    public static final String REMOVE_FILE_OPERATION = "Removing file";
+    public static final String GENERATE_UNIQUE_NAME_OPERATION = "Generate unique name";
+    private final static String FILE_NOT_SAVE_MESSAGE = "The file wasn't save.";
+    private final static String MAX_FILE_SIZE_EXCEEDED_MESSAGE = "File size exceeded. The size - ";
+    private final static String MAX_NAME_LENGTH_EXCEEDED_MESSAGE = "The file's name length exceeded. The length - ";
+    private final static String FILE_PATH_NOT_EXIST_MESSAGE = "File does not exist. Path - %s";
+    private final static String FILES_NOT_SAVE_MESSAGE = "Failed to save all files. Rollback completed.";
+    private final static String FILED_REMOVING_FILE_MESSAGE = "Filed removing file. Path - %s";
+    private final static String FILES_LIMIT_EXCEEDED_MESSAGE = "File upload limit exceeded. Maximum allowed files per request: ";
 
     @Autowired
     public LocalImageStorage(FileNameConverter fileNameConvector) {
@@ -52,26 +59,28 @@ public class LocalImageStorage implements ImageStorage {
     @Override
     public String save(MultipartFile file, String uploadDir) throws CoreException {
         try {
-            isBigSizeFile(file.getSize());
-            isBigLengthName(file.getOriginalFilename().length());
+            isBigSizeFile(file);
+            isBigLengthName(file.getOriginalFilename());
             isDir(uploadDir);
-            Path filePath = Paths.get(uploadDir + generateUniqueName(file.getOriginalFilename()));
+            Path filePath = Paths.get(uploadDir + generateUniqueName(file));
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
             return filePath.toString();
         } catch (IOException e) {
-            throw new CoreException(FILE_NOT_SAVE_ERROR + e);
+            throw new CoreException(FILE_NOT_SAVE_MESSAGE + e);
         }
     }
 
     @Override
-    public String generateUniqueName(String fileName) {
+    public String generateUniqueName(MultipartFile file) throws CoreException {
+        isNull(file.getOriginalFilename(), GENERATE_UNIQUE_NAME_OPERATION);
+        isEmptyString(file.getOriginalFilename(),GENERATE_UNIQUE_NAME_OPERATION);
         String uniqueFileName  = String.valueOf(System.currentTimeMillis());
-        return addAdditionalInfoBeforeExtension(fileNameConvector.sanitizeAndTransliterateFileName(fileName), uniqueFileName);
+        return addAdditionalInfoBeforeExtension(fileNameConvector.sanitizeAndTransliterateFileName(
+                file.getOriginalFilename()), uniqueFileName);
     }
 
     @Override
-    public String addAdditionalInfoBeforeExtension(String fileName, String additionalText) {
+    public String addAdditionalInfoBeforeExtension(String fileName, String additionalText) throws CoreException {
         int dotIndex = fileName.lastIndexOf(".");
         String baseName = (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
         String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
@@ -80,16 +89,19 @@ public class LocalImageStorage implements ImageStorage {
     }
 
     @Override
-    public void isBigSizeFile(long uploadedFileSize ) {
-        if (uploadedFileSize >= maxSizeFile) {
-            throw new CoreException(MAX_FILE_SIZE_EXCEEDED_ERROR + uploadedFileSize);
+    public void isBigSizeFile(MultipartFile uploadedFile) throws CoreException {
+        isNull(uploadedFile, CHECK_FILE_SIZE_BLANK_OPERATION);
+        if (uploadedFile.getSize() >= maxSizeFile) {
+            throw new CoreException(String.format(MAX_FILE_SIZE_EXCEEDED_MESSAGE, uploadedFile));
         }
     }
 
     @Override
-    public void isBigLengthName(int length) {
-        if (length >= maxLengthFile) {
-            throw new CoreException(MAX_NAME_LENGTH_EXCEEDED_ERROR + length);
+    public void isBigLengthName(String fileName) throws CoreException {
+        isNull(fileName, CHECK_FILE_NAME_LENGTH_OPERATION);
+        isEmptyString(fileName, CHECK_FILE_NAME_LENGTH_OPERATION);
+        if (fileName.length() >= maxLengthFile) {
+            throw new CoreException(MAX_NAME_LENGTH_EXCEEDED_MESSAGE + fileName.length());
         }
     }
 
@@ -101,9 +113,26 @@ public class LocalImageStorage implements ImageStorage {
      * @throws IOException if an I/O error occurs while creating the directory
      */
     private void isDir(String uploadDir) throws IOException {
+        isNull(uploadDir, CHECK_DIR_OPERATION);
+        isEmptyString(uploadDir, CHECK_DIR_OPERATION);
         Path path = Paths.get(uploadDir);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
+        }
+    }
+
+    @Override
+    public void isEmptyString(String line, String nameOperation) throws CoreException {
+        isNull(line, nameOperation);
+        if (line.isBlank()) {
+            throw new CoreException(String.format(LINE_IS_EMPTY_MESSAGE, nameOperation));
+        }
+    }
+
+    @Override
+    public void isNull(Object object, String nameOperation) throws CoreException {
+        if (object == null) {
+            throw new CoreException(String.format(OBJECT_IS_NULL_MESSAGE, nameOperation));
         }
     }
 
@@ -112,7 +141,7 @@ public class LocalImageStorage implements ImageStorage {
         List<String> savedPaths = new ArrayList<>();
 
         if (files.size() > maxAllowedFiles) {
-            throw new CoreException(FILES_LIMIT_EXCEEDED_ERROR + files.size());
+            throw new CoreException(FILES_LIMIT_EXCEEDED_MESSAGE + files.size());
         }
         for (MultipartFile file : files) {
             try {
@@ -126,7 +155,7 @@ public class LocalImageStorage implements ImageStorage {
                         // for logging
                     }
                 }
-                throw new CoreException(FILES_NOT_SAVE_ERROR, e);
+                throw new CoreException(FILES_NOT_SAVE_MESSAGE, e);
             }
         }
         return savedPaths;
@@ -134,15 +163,20 @@ public class LocalImageStorage implements ImageStorage {
 
     @Override
     public boolean removeFile(String path) throws CoreException {
-        if (path.isEmpty() || path == null) {
-            throw new CoreException(FILE_PATH_EMPTY_OR_NULL_ERROR);
-        }
+        isNull(path, REMOVE_FILE_OPERATION);
+        isEmptyString(path, REMOVE_FILE_OPERATION);
+
         Path pathFile = Paths.get(path);
+        if (!Files.exists(pathFile) || !Files.isRegularFile(pathFile)) {
+            // logger
+            throw new CoreException(String.format(FILE_PATH_NOT_EXIST_MESSAGE, path));
+        }
+
         try {
-            Files.deleteIfExists(pathFile);
-            return true;
-        }catch (IOException e) {
-            throw new CoreException(FILE_PATH_NOT_EXIST_ERROR);
+            return Files.deleteIfExists(pathFile);
+        } catch (IOException e) {
+            // logger
+            throw new CoreException(String.format(FILED_REMOVING_FILE_MESSAGE, path));
         }
     }
 }

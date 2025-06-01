@@ -1,4 +1,4 @@
-package org.study.hydrowarehouse.utill.filestorage;
+package org.study.hydrowarehouse.utill;
 
 public class StringUtils {
 

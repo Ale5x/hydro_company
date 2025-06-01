@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.study.hydrowarehouse.controller.ControllerConstants;
 import org.study.hydrowarehouse.controller.PathPages;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
-import org.study.hydrowarehouse.utill.ImageStorage;
+import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
 
 /**

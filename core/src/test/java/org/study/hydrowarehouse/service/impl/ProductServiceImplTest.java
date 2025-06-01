@@ -12,7 +12,7 @@ import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.ServiceMediator;
-import org.study.hydrowarehouse.utill.ImageStorage;
+import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
 import java.util.ArrayList;
 import java.util.Arrays;

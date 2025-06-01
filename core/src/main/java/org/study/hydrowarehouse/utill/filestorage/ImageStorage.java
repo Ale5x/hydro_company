@@ -1,4 +1,4 @@
-package org.study.hydrowarehouse.utill;
+package org.study.hydrowarehouse.utill.filestorage;
 
 import org.springframework.web.multipart.MultipartFile;
 import org.study.hydrowarehouse.exception.CoreException;

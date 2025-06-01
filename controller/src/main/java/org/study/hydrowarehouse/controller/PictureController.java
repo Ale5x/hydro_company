@@ -13,7 +13,7 @@ import org.study.hydrowarehouse.entity.Dto.PictureDto;
 import org.study.hydrowarehouse.hateoas.HateoasLinkHelper;
 import org.study.hydrowarehouse.hateoas.HypermediaListAssembler;
 import org.study.hydrowarehouse.service.PictureService;
-import org.study.hydrowarehouse.utill.ImageStorage;
+import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 import org.study.hydrowarehouse.utill.Pagination;
 import org.study.hydrowarehouse.utill.ValidatorParam;
 

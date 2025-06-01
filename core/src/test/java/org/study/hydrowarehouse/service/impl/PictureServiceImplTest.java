@@ -13,7 +13,7 @@ import org.study.hydrowarehouse.entity.Picture;
 import org.study.hydrowarehouse.entity.Product;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.ServiceMediator;
-import org.study.hydrowarehouse.utill.ImageStorage;
+import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.study.hydrowarehouse.utill;
+package org.study.hydrowarehouse.utill.filestorage;
 
 /**
  * Interface {@link FileNameTransliterator} for transliterating file names. Intended to convert characters from one

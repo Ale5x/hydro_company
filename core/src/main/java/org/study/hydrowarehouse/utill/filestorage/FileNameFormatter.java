@@ -1,4 +1,4 @@
-package org.study.hydrowarehouse.utill;
+package org.study.hydrowarehouse.utill.filestorage;
 
 /**
  * An interface {@link FileNameFormatter} for formatting file names by applying basic transformations to strings.

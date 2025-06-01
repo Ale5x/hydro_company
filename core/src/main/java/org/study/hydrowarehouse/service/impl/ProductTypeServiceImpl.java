@@ -9,7 +9,7 @@ import org.study.hydrowarehouse.entity.ProductType;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductTypeService;
-import org.study.hydrowarehouse.utill.StringUtils;
+import org.study.hydrowarehouse.utill.filestorage.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,8 +10,8 @@ import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductService;
 import org.study.hydrowarehouse.service.ServiceMediator;
-import org.study.hydrowarehouse.utill.ImageStorage;
-import org.study.hydrowarehouse.utill.StringUtils;
+import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
+import org.study.hydrowarehouse.utill.filestorage.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

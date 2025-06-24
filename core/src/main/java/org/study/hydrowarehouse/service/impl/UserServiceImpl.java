@@ -54,7 +54,6 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     @Override
     public boolean create(UserDto userDto) throws CoreException {
         User user = new User();
-
         user.setRole(addRoleToNewUser());
 
         String password = userDto.getPassword();

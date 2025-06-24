@@ -44,10 +44,6 @@ class ProductServiceImplTest {
     private ProductCompany productCompany = new ProductCompany(1, "company");
     private ProductConnection productConnection = new ProductConnection(1, "size");
 
-    private Country country = new Country(1, "SW");
-    private StorageRackDto storageRackDto = new StorageRackDto();
-    private StorageRack storageRack = new StorageRack(1, "storage", new Shelf(1, "#39-1"));
-
     List<Product> productList = new ArrayList<>();
     private int productId = 1;
     private int limit = 0;
@@ -55,14 +51,8 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() {
-//        MockitoAnnotations.openMocks(this);
-
-        storageRackDto.setName("name");
-        storageRackDto.setStorageRackDtoId(1);
-        storageRackDto.setShelfName("name");
 
         productDto.setCount(100);
-        productDto.setStockKeepingUnit("#12-3");
         productDto.setFlowRate(50);
         productDto.setPressure(320);
         productDto.setPressureMax(400);
@@ -73,15 +63,11 @@ class ProductServiceImplTest {
         productDto.setProductCompanyDto(new ProductCompanyDto(1, "product company #1"));
         productDto.setProductConnectionDto(new ProductConnectionDto(1, "size type #3"));
         productDto.setImagesPaths(Arrays.asList("path1", "path 2"));
-        productDto.setStorageRackDtoList(Arrays.asList(storageRackDto));
-        productDto.setCountryDto(new CountryDto(1, "Country"));
 
 
         product.setProductConnection(productConnection);
         product.setProductCompany(productCompany);
         product.setProductType(productType);
-        product.setStorageRackList(Arrays.asList(storageRack));
-        product.setCountryProduct(country);
         product.setProductId(1);
         product.setPicturePath(List.of(new Picture("some path")));
 
@@ -107,14 +93,12 @@ class ProductServiceImplTest {
         CountryDto countryDto =new CountryDto();
         countryDto.setCountryId(2);
 
-        dto.setCountryDto(countryDto);
         dto.setProductCompanyDto(new ProductCompanyDto(3, "NewCompany"));
         dto.setProductConnectionDto(new ProductConnectionDto(4, "1/2''"));
         dto.setProductTypeDto(new ProductTypeDto(5, "NewType"));
 
         Product existing = new Product();
         existing.setProductId(1);
-        existing.setCountryProduct(new Country(1, "OldCountry"));
         existing.setProductCompany(new ProductCompany(10, "OldCompany"));
         existing.setProductConnection(new ProductConnection(11, "3/4''"));
         existing.setProductType(new ProductType(12, "OldType"));
@@ -139,7 +123,6 @@ class ProductServiceImplTest {
 
         CountryDto countryDto = new CountryDto();
         countryDto.setCountryId(1);
-        dto.setCountryDto(countryDto);
 
         ProductCompanyDto companyDto = new ProductCompanyDto();
         companyDto.setProductCompanyDtoId(10);
@@ -155,7 +138,6 @@ class ProductServiceImplTest {
 
         Product existing = new Product();
         existing.setProductId(1);
-        existing.setCountryProduct(new Country(1, "OldCountry"));
         existing.setProductCompany(new ProductCompany(10, "OldCompany"));
         existing.setProductConnection(new ProductConnection(11, "3/4''"));
         existing.setProductType(new ProductType(12, "OldType"));
@@ -261,11 +243,9 @@ class ProductServiceImplTest {
         dto.setProductDtoId(1);
         CountryDto countryDto = new CountryDto();
         countryDto.setCountryId(99);
-        dto.setCountryDto(countryDto);
 
         Product existing = new Product();
         existing.setProductId(1);
-        existing.setCountryProduct(new Country(1, "OldCountry"));
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
         when(serviceMediator.countryById(99)).thenReturn(Optional.empty());
@@ -435,16 +415,5 @@ class ProductServiceImplTest {
 
         assertNotNull(list);
         verify(productDao, times(1)).getProductsByCompanyId(limit, offset, 1);
-    }
-
-    @Test
-    void findAllByStorageRack() {
-        String storageName = "name";
-        when(productDao.getProductsByStorageRackName(offset, limit, storageName)).thenReturn(productList);
-
-        List<ProductDto> list = productService.findAllByStorageRack(limit, offset, storageRackDto);
-
-        assertNotNull(list);
-        verify(productDao, times(1)).getProductsByStorageRackName(limit, offset, storageName);
     }
 }

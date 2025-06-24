@@ -50,14 +50,11 @@ class StorageRackServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        storageRack.setShelf(shelf);
-
         storageList.add(storageRack);
         shelfDto.setName("name");
         shelfDto.setShelfDtoId(1);
 
         storageRackDto.setName(storageRack.getName());
-        storageRackDto.setShelfName(shelf.getName());
     }
 
     @Test
@@ -79,7 +76,7 @@ class StorageRackServiceImplTest {
         dto.setName("Updated Storage Rack");
 
         StorageRack existing = new StorageRack();
-        existing.setStorageRackId(1);
+        existing.setRackId(1);
         existing.setName("Old Storage Rack");
 
         when(storageRackDao.getStorageRackById(1)).thenReturn(Optional.of(existing));
@@ -112,7 +109,7 @@ class StorageRackServiceImplTest {
         dto.setName(" ");
 
         StorageRack existing = new StorageRack();
-        existing.setStorageRackId(1);
+        existing.setRackId(1);
         existing.setName("Existing Storage Rack");
 
         when(storageRackDao.getStorageRackById(1)).thenReturn(Optional.of(existing));

@@ -15,6 +15,7 @@ import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -105,6 +106,40 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
         productCompanyDto.setProductCompanyDtoId(object.getProductCompanyId());
         productCompanyDto.setName(object.getName());
+        productCompanyDto.setCountries(toCountryDtoList(object.getCompanyCountries()));
         return productCompanyDto;
+    }
+
+    /**
+     * Converts a set of Country entities to a list of CountryDto objects.
+     *
+     * @param countrySet the set of Country entities to convert
+     * @return a list of corresponding CountryDto objects
+     */
+    public List<CountryDto> toCountryDtoList(Set<Country> countrySet) {
+        if (countrySet == null || countrySet.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return countrySet.stream()
+                .map(this::mapToCountryDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Converts a {@link Country} entity to its corresponding {@link CountryDto}.
+     * <p>
+     * This method extracts the identifier and name from the {@code Country} object
+     * and maps them into a new instance of {@code CountryDto}.
+     * </p>
+     *
+     * @param country the {@code Country} entity to convert; must not be {@code null}
+     * @return a {@code CountryDto} containing mapped data from the input entity
+     * @throws NullPointerException if the input {@code country} is {@code null}
+     */
+    private CountryDto mapToCountryDto(Country country) {
+        CountryDto dto = new CountryDto();
+        dto.setCountryId(country.getCountryId());
+        dto.setName(country.getName());
+        return dto;
     }
 }

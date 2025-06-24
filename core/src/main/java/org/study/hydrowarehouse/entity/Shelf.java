@@ -2,41 +2,35 @@ package org.study.hydrowarehouse.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "shelf")
+@Table(name = "shelves")
 public class Shelf implements Serializable {
 
-    private static final long serialVersionUID = -7734520313839121890L;
+    private static final long serialVersionUID = 8409769357195142703L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_shelf")
+    @Column(name = "shelf_id")
     private Integer shelfId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 10)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shelf")
-    private List<StorageRack> storageRackList;
-
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "storage_racks_id", nullable = false)
+    private StorageRack storageRack;
 
     public Shelf() {
     }
 
-    public Shelf(String name, List<StorageRack> storageRackList) {
+    public Shelf(String name) {
         this.name = name;
-        this.storageRackList = storageRackList;
     }
 
     public Shelf(Integer shelfId, String name) {
         this.shelfId = shelfId;
-        this.name = name;
-    }
-
-    public Shelf(String name) {
         this.name = name;
     }
 
@@ -56,12 +50,12 @@ public class Shelf implements Serializable {
         this.name = name;
     }
 
-    public List<StorageRack> getStorageRackList() {
-        return storageRackList;
+    public StorageRack getStorageRack() {
+        return storageRack;
     }
 
-    public void setStorageRackList(List<StorageRack> storageRackList) {
-        this.storageRackList = storageRackList;
+    public void setStorageRack(StorageRack storageRack) {
+        this.storageRack = storageRack;
     }
 
     @Override
@@ -73,14 +67,14 @@ public class Shelf implements Serializable {
 
         if (!Objects.equals(shelfId, shelf.shelfId)) return false;
         if (!Objects.equals(name, shelf.name)) return false;
-        return Objects.equals(storageRackList, shelf.storageRackList);
+        return Objects.equals(storageRack, shelf.storageRack);
     }
 
     @Override
     public int hashCode() {
         int result = shelfId != null ? shelfId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (storageRackList != null ? storageRackList.hashCode() : 0);
+        result = 31 * result + (storageRack != null ? storageRack.hashCode() : 0);
         return result;
     }
 
@@ -89,7 +83,7 @@ public class Shelf implements Serializable {
         return "Shelf{" +
                 "shelfId=" + shelfId +
                 ", name='" + name + '\'' +
-                ", storageRackList=" + storageRackList +
+                ", storageRack=" + storageRack +
                 '}';
     }
 }

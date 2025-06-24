@@ -8,12 +8,14 @@ import java.util.Objects;
 @Table(name = "user_statuses")
 public class UserStatus implements Serializable {
 
+    private static final long serialVersionUID = -2641116756767715650L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_statuses_id")
+    @Column(name = "user_status_id")
     private Long userStatusId;
 
-    @Column(name = "status", nullable = false, unique = true, length = 50)
+    @Column(name = "status")
     private String status;
 
     public UserStatus() {}

@@ -1,5 +1,7 @@
 package org.study.hydrowarehouse.service;
 
+import org.study.hydrowarehouse.exception.CoreException;
+
 import java.util.List;
 
 /**
@@ -15,24 +17,25 @@ public abstract class EntityMapper<T, K> {
     }
 
     /**
-     * The method converts a list of entity objects into a list of entity DTO objects.
-     * @param objectsList the list of the entities objects.
-     * @return the list of DTO objects.
+     * Converts a list of entity objects of type {@code K} into a list of corresponding DTOs of type {@code T}.
+     *
+     * <p>Each object in the input list is mapped to its DTO representation using the defined mapping logic.</p>
+     *
+     * @param objectsList the list of entity objects to convert
+     * @return a list of DTOs corresponding to the input entity list
+     * @throws CoreException if an error occurs during the mapping process
      */
-    public abstract List<T> mapToListObjectsDto(List<K> objectsList);
+    public abstract List<T> mapToListObjectsDto(List<K> objectsList)  throws CoreException;
 
     /**
-     * The method converts the entity into the of entity DTO object.
-     * @param object the entity object.
-     * @return the DTO object.
+     * Converts the given entity object of type {@code K} into its corresponding DTO representation of type {@code T}.
+     *
+     * <p>This method is intended to be implemented by subclasses to define how a specific entity should be mapped
+     * to its Data Transfer Object (DTO) counterpart.</p>
+     *
+     * @param object the entity object to be converted to DTO
+     * @return the DTO representation of the provided entity
+     * @throws CoreException if mapping fails due to invalid data or internal errors
      */
-    public abstract T mapToObjectDto(K object);
-
-//    /**
-//     * The method converts the DTO entity into the of entity object.
-//     * @param objectDto the DTO object.
-//     * @param isUpdate the flag that provides additional logic if this entity will participate in the update.
-//     * @return the entity object.
-//     */
-//    public abstract K mapToEntityFromDto(T objectDto, boolean isUpdate);
+    public abstract T mapToObjectDto(K object)  throws CoreException;
 }

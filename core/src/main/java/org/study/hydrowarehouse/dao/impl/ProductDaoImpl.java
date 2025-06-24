@@ -24,26 +24,18 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     private final static String PRODUCT_FLOW_RATE = "flowRate";
     private final static String STORAGE_RACK_NAME = "name";
     private final static String DELETE_PRODUCT_QUERY = String.format("DELETE Product WHERE id =: %s", PRODUCT_ID);
-    private final static String GET_PRODUCTS_BY_TYPE_ID_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt " +
-            "LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c " +
-            "LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr " +
-            "WHERE p.productType.productTypeId =: " + PRODUCT_TYPE_ID;
-    private final static String GET_PRODUCTS_BY_PRESSURE_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt " +
-            "LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c " +
-            "LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr" +
-            " WHERE p.pressure <: " + PRODUCT_PRESSURE + " order by p.pressure";
-    private final static String GET_PRODUCTS_BY_FLOW_RATE_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt " +
-            "LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c " +
-            "LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr " +
-            "WHERE p.flowRate <=: " + PRODUCT_FLOW_RATE + " order by p.flowRate";
-    private final static String GET_PRODUCTS_BY_COMPANY_ID_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt " +
-            "LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c " +
-            "LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr " +
-            "WHERE p.productCompany.productCompanyId =: " + COMPANY_ID;
-    private final static String GET_PRODUCTS_BY_STORAGE_RACK_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt" +
-            " LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c" +
-            " LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr" +
-            " WHERE sr.name =: " + STORAGE_RACK_NAME + " order by p.productId";
+    private final static String GET_PRODUCTS_BY_TYPE_ID_QUERY = "SELECT p FROM Product p WHERE p.productType.productTypeId = " +
+            ":productTypeId GROUP BY p.productId";
+    private final static String GET_PRODUCTS_BY_PRESSURE_QUERY = "SELECT p FROM Product p WHERE p.pressure <= :" +
+            "pressure GROUP BY p.productId";
+    private final static String GET_PRODUCTS_BY_FLOW_RATE_QUERY = "SELECT p FROM Product p WHERE " +
+            "p.flowRate <= :flowRate GROUP BY p.productId";
+    private final static String GET_PRODUCTS_BY_COMPANY_ID_QUERY = "SELECT p FROM Product p WHERE " +
+            "p.productCompany.productCompanyId = :companyId GROUP BY p.productId";
+//    private final static String GET_PRODUCTS_BY_STORAGE_RACK_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt" +
+//            " LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c" +
+//            " LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr" +
+//            " WHERE sr.name =: " + STORAGE_RACK_NAME + " order by p.productId";
 
     @Override
     public int create(Product product) {
@@ -141,7 +133,7 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     public List<Product> getProductsByStorageRackName(int limit, int offset, String storageRackName){
         Session session = getCurrentSession();
 
-        return session.createQuery(GET_PRODUCTS_BY_STORAGE_RACK_QUERY)
+        return session.createQuery("GET_PRODUCTS_BY_STORAGE_RACK_QUERY")
                 .setParameter(STORAGE_RACK_NAME, storageRackName)
                 .setFirstResult(offset)
                 .setMaxResults(limit)

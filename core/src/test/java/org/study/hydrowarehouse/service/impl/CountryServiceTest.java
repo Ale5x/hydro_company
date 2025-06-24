@@ -26,10 +26,9 @@ public class CountryServiceTest {
     @Mock
     private CountryDaoImpl countryDao;
 
-    private List<UserCompany> companies = new ArrayList<>();
     private Set<Country> countriesSet = new HashSet<>();
     private Set<Country> countriesSearchCriteriaSet = new HashSet<>();
-    private Country optionalCountry = new Country(1, "Name ", companies);
+    private Country optionalCountry = new Country(1, "Name ");
     private List<CountryDto> countryDtoList = new ArrayList<>();
     private List<CountryDto> countryDtoSearchCriteriaList = new ArrayList<>();
     private List<CountryDto> expectedCountryDtoSearchCriteriaList = new ArrayList<>();
@@ -51,9 +50,9 @@ public class CountryServiceTest {
             countriesSet.add(country);
         }
 
-        Country countrySearchCriteria1 = new Country(111, "Search", companies);
-        Country countrySearchCriteria2 = new Country(333, "Sea", companies);
-        Country countrySearchCriteria3 = new Country(222, "Se", companies);
+        Country countrySearchCriteria1 = new Country(111, "Search");
+        Country countrySearchCriteria2 = new Country(333, "Sea");
+        Country countrySearchCriteria3 = new Country(222, "Se");
 
         countriesSearchCriteriaSet.add(countrySearchCriteria1);
         countriesSearchCriteriaSet.add(countrySearchCriteria2);

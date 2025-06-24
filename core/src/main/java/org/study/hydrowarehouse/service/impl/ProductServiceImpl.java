@@ -13,10 +13,8 @@ import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 import org.study.hydrowarehouse.utill.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -46,9 +44,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     @Override
     public boolean create(ProductDto productDto) throws CoreException {
         Product product = new Product();
-
-        product.setCount(productDto.getCount());
-        product.setStockKeepingUnit(productDto.getStockKeepingUnit());
+        product.setCount(productDto.getProductSkuDtos().size());
         product.setFlowRate(productDto.getFlowRate());
 
         product.setPressure(productDto.getPressure());
@@ -61,9 +57,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         product.setProductCompany(resolveProductCompany(productDto.getProductCompanyDto()));
         product.setProductType(resolveProductType(productDto.getProductTypeDto()));
         product.setProductConnection(resolveProductConnection(productDto.getProductConnectionDto()));
-        product.setCountryProduct(resolveProductCountry(productDto.getCountryDto()));
-
-        product.setStorageRackList(convertFromStorageRackDtoList(productDto.getStorageRackDtoList()));
 
         product.setPicturePath(generatePictureList(productDto.getImagesPaths(), product));
         return productDao.create(product) > 0;
@@ -76,10 +69,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
             throw new CoreException(String.format(PRODUCT_BY_ID_NOT_FOUND_MESSAGE, productDto.getProductDtoId()));
         });
 
-        existingProduct.setCount(StringUtils.isNullNumericObject(productDto.getCount())
-                ? existingProduct.getCount() : productDto.getCount());
-        existingProduct.setStockKeepingUnit(StringUtils.isBlankOrNullText(productDto.getStockKeepingUnit())
-                ? existingProduct.getStockKeepingUnit() : productDto.getStockKeepingUnit());
         existingProduct.setFlowRate(StringUtils.isNullNumericObject(productDto.getFlowRate())
                 ? existingProduct.getFlowRate() : productDto.getFlowRate());
 
@@ -94,14 +83,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                 ? existingProduct.getPathHydraulicScheme() : productDto.getPathHydraulicScheme());
         existingProduct.setAdditionalInformation(StringUtils.isBlankOrNullText(productDto.getAdditionalInformation())
                 ? existingProduct.getAdditionalInformation() : productDto.getAdditionalInformation());
-
-        CountryDto countryDto = productDto.getCountryDto();
-        Country currentCountry = existingProduct.getCountryProduct();
-
-        if (countryDto != null && (currentCountry == null
-                || !Objects.equals(currentCountry.getCountryId(), countryDto.getCountryId()))) {
-            existingProduct.setCountryProduct(resolveProductCountry(countryDto));
-        }
 
         ProductConnectionDto connectionDto = productDto.getProductConnectionDto();
         ProductConnection currentConnection = existingProduct.getProductConnection();
@@ -212,7 +193,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         prDto.setProductDtoId(object.getProductId());
         prDto.setCount(object.getCount());
-        prDto.setStockKeepingUnit(object.getStockKeepingUnit());
 
         prDto.setFlowRate(object.getFlowRate());
         prDto.setPressure(object.getPressure());
@@ -224,9 +204,12 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                 object.getProductType().getProductTypeId(),
                 object.getProductType().getName()));
 
+        List<CountryDto> countryDtoList = toCountryDtoList(object.getProductCompany().getCompanyCountries());
         prDto.setProductCompanyDto(new ProductCompanyDto(
                 object.getProductCompany().getProductCompanyId(),
-                object.getProductCompany().getName()));
+                object.getProductCompany().getName(),
+                toCountryDtoList(object.getProductCompany().getCompanyCountries())));
+
 
         prDto.setProductConnectionDto(new ProductConnectionDto(
                 object.getProductConnection().getProductConnectionId(),
@@ -234,32 +217,10 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         prDto.setPathHydraulicScheme(object.getPathHydraulicScheme());
 
-        prDto.setCountryDto(new CountryDto(
-                object.getCountryProduct().getCountryId(),
-                object.getCountryProduct().getName()));
 
         prDto.setImagesPaths(convertToPicturesDtoList(object.getPicturePath()));
-        prDto.setStorageRackDtoList(convertToStorageRackDtoList(object.getStorageRackList()));
 
         return prDto;
-    }
-
-    /**
-     * The method converts storage racks objects into storage racks DTO objects.
-     * @param storageList the storage racks objects
-     * @return the list of storage racks DTO objects.
-     */
-    private List<StorageRackDto> convertToStorageRackDtoList(List<StorageRack> storageList) {
-        List<StorageRackDto> storageDtoList = new ArrayList<>();
-        for (StorageRack storageRack : storageList) {
-            StorageRackDto storageRackDto = new StorageRackDto();
-            storageRackDto.setStorageRackDtoId(storageRack.getStorageRackId());
-            storageRackDto.setName(storageRack.getName());
-            storageRackDto.setShelfName(storageRack.getShelf().getName());
-
-            storageDtoList.add(storageRackDto);
-        }
-        return storageDtoList;
     }
 
     /**
@@ -388,22 +349,35 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     }
 
     /**
-     * Resolves a {@link Country} based on the provided {@link CountryDto} DTO.
-     * <p>
-     * This method attempts to find the corresponding {@link Country} by its ID from the database.
-     * If no matching country is found, an exception is thrown.
+     * Converts a set of Country entities to a list of CountryDto objects.
      *
-     * @param dto the {@link Country} object containing the country information (ID)
-     * @return a {@link Country} object fetched from the database
-     * @throws CoreException if the country ID is provided but no matching country is found in the database
+     * @param countrySet the set of Country entities to convert
+     * @return a list of corresponding CountryDto objects
      */
-    private Country resolveProductCountry(CountryDto dto) {
-        Country country = serviceMediator.countryById(dto.getCountryId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(COUNTRY_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getCountryId()));
-                });
-        return country;
+    public List<CountryDto> toCountryDtoList(Set<Country> countrySet) {
+        if (countrySet == null || countrySet.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return countrySet.stream()
+                .map(this::mapToCountryDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Converts a {@link Country} entity to its corresponding {@link CountryDto}.
+     * <p>
+     * This method extracts the identifier and name from the {@code Country} object
+     * and maps them into a new instance of {@code CountryDto}.
+     * </p>
+     *
+     * @param country the {@code Country} entity to convert; must not be {@code null}
+     * @return a {@code CountryDto} containing mapped data from the input entity
+     * @throws NullPointerException if the input {@code country} is {@code null}
+     */
+    private CountryDto mapToCountryDto(Country country) {
+        CountryDto dto = new CountryDto();
+        dto.setCountryId(country.getCountryId());
+        dto.setName(country.getName());
+        return dto;
     }
 }

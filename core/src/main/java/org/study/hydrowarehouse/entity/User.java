@@ -16,7 +16,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_users")
+    @Column(name = "user_id")
     private Integer userId;
 
     @Column(name = "first_name")
@@ -39,11 +39,11 @@ public class User implements Serializable {
     private LocalDateTime registration;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_roles")
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @ManyToOne (cascade = CascadeType.ALL , fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user_company")
+    @JoinColumn(name = "user_company_id")
     private UserCompany userCompany;
 
     @ManyToOne(fetch = FetchType.LAZY)

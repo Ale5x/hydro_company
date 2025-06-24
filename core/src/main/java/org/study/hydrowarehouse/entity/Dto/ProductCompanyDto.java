@@ -9,7 +9,6 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
     private Integer productCompanyDtoId;
     private String name;
-    private Integer countryId;
     private List<CountryDto> countries;
 
     public ProductCompanyDto() {}
@@ -22,6 +21,13 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         this.productCompanyDtoId = productCompanyDtoId;
         this.name = name;
     }
+
+    public ProductCompanyDto(Integer productCompanyDtoId, String name, List<CountryDto> countries) {
+        this.productCompanyDtoId = productCompanyDtoId;
+        this.name = name;
+        this.countries = countries;
+    }
+
     public Integer getProductCompanyDtoId() {
         return productCompanyDtoId;
     }
@@ -36,14 +42,6 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Integer countryId) {
-        this.countryId = countryId;
     }
 
     public List<CountryDto> getCountries() {
@@ -65,7 +63,6 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         if (!Objects.equals(productCompanyDtoId, that.productCompanyDtoId))
             return false;
         if (!Objects.equals(name, that.name)) return false;
-        if (!Objects.equals(countryId, that.countryId)) return false;
         return Objects.equals(countries, that.countries);
     }
 
@@ -74,7 +71,6 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         int result = super.hashCode();
         result = 31 * result + (productCompanyDtoId != null ? productCompanyDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (countryId != null ? countryId.hashCode() : 0);
         result = 31 * result + (countries != null ? countries.hashCode() : 0);
         return result;
     }
@@ -84,6 +80,7 @@ public class ProductCompanyDto extends RepresentationModel<ProductCompanyDto> {
         return "ProductCompanyDto{" +
                 "productCompanyDtoId=" + productCompanyDtoId +
                 ", name='" + name + '\'' +
+                ", countries=" + countries +
                 '}';
     }
 }

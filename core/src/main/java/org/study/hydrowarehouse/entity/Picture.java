@@ -8,18 +8,18 @@ import java.util.Objects;
 @Table(name = "pictures")
 public class Picture implements Serializable {
 
-    private static final long serialVersionUID = 1618295118872891045L;
+    private static final long serialVersionUID = 5415408503539137383L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_pictures")
+    @Column(name = "picture_id")
     private Integer pictureId;
 
     @Column(name = "path")
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_products")
+    @JoinColumn(name = "product_id")
     private Product product;
 
     public Picture() {

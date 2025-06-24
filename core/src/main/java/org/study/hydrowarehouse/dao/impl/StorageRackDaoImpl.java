@@ -28,7 +28,7 @@ public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> impleme
         session.save(storageRack);
 
         session.flush();
-        return storageRack.getStorageRackId();
+        return storageRack.getRackId();
     }
 
     @Override

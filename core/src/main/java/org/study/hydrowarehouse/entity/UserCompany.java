@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_company")
+@Table(name = "user_companies")
 public class UserCompany implements Serializable {
 
-    private static final long serialVersionUID = -8612122621758523626L;
+    private static final long serialVersionUID = -8077864123660426289L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_user_company")
+    @Column(name = "user_company_id")
     private Integer userCompanyId;
 
     @Column(name = "name")
@@ -26,7 +26,7 @@ public class UserCompany implements Serializable {
     private List<User> users;
 
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "countries_id")
+    @JoinColumn(name = "country_id")
     private Country country;
 
     public UserCompany() {

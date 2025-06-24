@@ -47,10 +47,8 @@ class ProductDaoImplTest {
 
     @Test
     void create() {
-        Product product = new Product(35, 320, 350, 3.5, "path scheme",
-                52, "stock #3", "description", pictures);
-
-        product.setCountryProduct(new Country(1, "SW"));
+        Product product = new Product(35, 320, 350, 35,
+                5.2, 550, "stock #3", "description", pictures);
 
         product.setProductType(new ProductType(1, "name"));
         product.setProductCompany(new ProductCompany(1, "name"));
@@ -74,7 +72,6 @@ class ProductDaoImplTest {
     @Transactional
     void update() {
         Product product = new Product();
-        product.setStockKeepingUnit("OldProduct");
         product.setCount(100);
         product.setAdditionalInformation("Category1");
 
@@ -84,14 +81,12 @@ class ProductDaoImplTest {
 
         Integer id = product.getProductId();
 
-        product.setStockKeepingUnit("NewProduct");
         product.setCount(150);
         boolean result = productDao.update(product);
 
         assertTrue(result);
 
         Product updatedProduct = session.get(Product.class, id);
-        assertEquals("NewProduct", updatedProduct.getStockKeepingUnit());
         assertEquals(150, updatedProduct.getCount());
     }
 

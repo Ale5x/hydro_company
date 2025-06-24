@@ -10,11 +10,11 @@ import java.util.Set;
 @Entity
 public class ProductCompany implements Serializable {
 
-    private static final long serialVersionUID = -3206315018093822278L;
+    private static final long serialVersionUID = -4633476256409310737L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_product_companies")
+    @Column(name = "product_company_id")
     private Integer productCompanyId;
 
     @Column(name = "name")
@@ -26,8 +26,8 @@ public class ProductCompany implements Serializable {
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "countries_has_product_companies",
-            joinColumns = {@JoinColumn(name = "id_product_companies")},
-            inverseJoinColumns = {@JoinColumn(name = "id_countries")}
+            joinColumns = {@JoinColumn(name = "product_company_id")},
+            inverseJoinColumns = {@JoinColumn(name = "country_id")}
     )
     private Set<Country> companyCountries;
 

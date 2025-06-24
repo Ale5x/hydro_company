@@ -1,6 +1,5 @@
 package org.study.hydrowarehouse.entity;
 
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,30 +10,17 @@ import java.util.Objects;
 @Table(name = "countries")
 public class Country implements Serializable {
 
-    private static final long serialVersionUID = 780074541061735296L;
+    private static final long serialVersionUID = 236968937243173868L;
 
     @Id
-    @Column(name = "id_countries")
+    @Column(name = "country_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer countryId;
 
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
-    private List<UserCompany> userCompanyList;
-
-    @ManyToMany(cascade = {CascadeType.ALL}, mappedBy = "companyCountries")
-    private List<ProductCompany> productCompanies;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "countryProduct")
-    private List<Product> productList = new ArrayList<>();
-
     public Country() {
-    }
-
-    public Country(Integer countryId) {
-        this.countryId = countryId;
     }
 
     public Country(String name) {
@@ -44,12 +30,6 @@ public class Country implements Serializable {
     public Country(Integer countryId, String name) {
         this.countryId = countryId;
         this.name = name;
-    }
-
-    public Country(Integer countryId, String name, List<UserCompany> userCompanyList) {
-        this.countryId = countryId;
-        this.name = name;
-        this.userCompanyList = userCompanyList;
     }
 
     public Integer getCountryId() {
@@ -68,30 +48,6 @@ public class Country implements Serializable {
         this.name = name;
     }
 
-    public List<UserCompany> getUserCompanyList() {
-        return userCompanyList;
-    }
-
-    public void setUserCompanyList(List<UserCompany> userCompanyList) {
-        this.userCompanyList = userCompanyList;
-    }
-
-    public List<ProductCompany> getProductCompanies() {
-        return productCompanies;
-    }
-
-    public void setProductCompanies(List<ProductCompany> productCompanies) {
-        this.productCompanies = productCompanies;
-    }
-
-    public List<Product> getProductList() {
-        return productList;
-    }
-
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,21 +56,13 @@ public class Country implements Serializable {
         Country country = (Country) o;
 
         if (!Objects.equals(countryId, country.countryId)) return false;
-        if (!Objects.equals(name, country.name)) return false;
-        if (!Objects.equals(userCompanyList, country.userCompanyList))
-            return false;
-        if (!Objects.equals(productCompanies, country.productCompanies))
-            return false;
-        return Objects.equals(productList, country.productList);
+        return Objects.equals(name, country.name);
     }
 
     @Override
     public int hashCode() {
         int result = countryId != null ? countryId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (userCompanyList != null ? userCompanyList.hashCode() : 0);
-        result = 31 * result + (productCompanies != null ? productCompanies.hashCode() : 0);
-        result = 31 * result + (productList != null ? productList.hashCode() : 0);
         return result;
     }
 
@@ -123,9 +71,6 @@ public class Country implements Serializable {
         return "Country{" +
                 "countryId=" + countryId +
                 ", name='" + name + '\'' +
-                ", userCompanyList=" + userCompanyList +
-                ", productCompanies=" + productCompanies +
-                ", productList=" + productList +
                 '}';
     }
 }

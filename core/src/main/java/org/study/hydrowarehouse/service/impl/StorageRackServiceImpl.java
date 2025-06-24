@@ -76,9 +76,8 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
     @Override
     public StorageRackDto mapToObjectDto(StorageRack object) {
         StorageRackDto storageRackDto = new StorageRackDto();
-        storageRackDto.setStorageRackDtoId(object.getStorageRackId());
+        storageRackDto.setStorageRackDtoId(object.getRackId());
         storageRackDto.setName(object.getName());
-        storageRackDto.setShelfName(object.getShelf().getName());
 
         return storageRackDto;
     }

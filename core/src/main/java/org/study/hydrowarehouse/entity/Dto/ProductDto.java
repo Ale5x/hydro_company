@@ -10,7 +10,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
 
     private Integer productDtoId;
     private Integer count;
-    private String stockKeepingUnit;
     private Integer flowRate;
     private Integer pressure;
     private Integer pressureMax;
@@ -20,10 +19,9 @@ public class ProductDto extends RepresentationModel<ProductDto> {
     private ProductTypeDto productTypeDto;
     private String pathHydraulicScheme;
     private List<String> imagesPaths = new ArrayList<>();
-    private List<StorageRackDto> storageRackDtoList = new ArrayList<>();
+    private List<ProductSkuDto> productSkuDtos = new ArrayList<>();
     private ProductCompanyDto productCompanyDto;
     private ProductConnectionDto productConnectionDto;
-    private CountryDto countryDto;
 
     public Integer getProductDtoId() {
         return productDtoId;
@@ -39,14 +37,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
 
     public void setCount(Integer count) {
         this.count = count;
-    }
-
-    public String getStockKeepingUnit() {
-        return stockKeepingUnit;
-    }
-
-    public void setStockKeepingUnit(String stockKeepingUnit) {
-        this.stockKeepingUnit = stockKeepingUnit;
     }
 
     public Integer getFlowRate() {
@@ -105,14 +95,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         this.imagesPaths = imagesPaths;
     }
 
-    public List<StorageRackDto> getStorageRackDtoList() {
-        return storageRackDtoList;
-    }
-
-    public void setStorageRackDtoList(List<StorageRackDto> storageRackDtoList) {
-        this.storageRackDtoList = storageRackDtoList;
-    }
-
     public ProductCompanyDto getProductCompanyDto() {
         return productCompanyDto;
     }
@@ -129,20 +111,20 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         this.productConnectionDto = productConnectionDto;
     }
 
-    public CountryDto getCountryDto() {
-        return countryDto;
-    }
-
-    public void setCountryDto(CountryDto countryDto) {
-        this.countryDto = countryDto;
-    }
-
     public ProductTypeDto getProductTypeDto() {
         return productTypeDto;
     }
 
     public void setProductTypeDto(ProductTypeDto productTypeDto) {
         this.productTypeDto = productTypeDto;
+    }
+
+    public List<ProductSkuDto> getProductSkuDtos() {
+        return productSkuDtos;
+    }
+
+    public void setProductSkuDtos(List<ProductSkuDto> productSkuDtos) {
+        this.productSkuDtos = productSkuDtos;
     }
 
     @Override
@@ -155,8 +137,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
 
         if (!Objects.equals(productDtoId, that.productDtoId)) return false;
         if (!Objects.equals(count, that.count)) return false;
-        if (!Objects.equals(stockKeepingUnit, that.stockKeepingUnit))
-            return false;
         if (!Objects.equals(flowRate, that.flowRate)) return false;
         if (!Objects.equals(pressure, that.pressure)) return false;
         if (!Objects.equals(pressureMax, that.pressureMax)) return false;
@@ -168,13 +148,9 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         if (!Objects.equals(pathHydraulicScheme, that.pathHydraulicScheme))
             return false;
         if (!Objects.equals(imagesPaths, that.imagesPaths)) return false;
-        if (!Objects.equals(storageRackDtoList, that.storageRackDtoList))
-            return false;
         if (!Objects.equals(productCompanyDto, that.productCompanyDto))
             return false;
-        if (!Objects.equals(productConnectionDto, that.productConnectionDto))
-            return false;
-        return Objects.equals(countryDto, that.countryDto);
+        return Objects.equals(productConnectionDto, that.productConnectionDto);
     }
 
     @Override
@@ -182,7 +158,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         int result = super.hashCode();
         result = 31 * result + (productDtoId != null ? productDtoId.hashCode() : 0);
         result = 31 * result + (count != null ? count.hashCode() : 0);
-        result = 31 * result + (stockKeepingUnit != null ? stockKeepingUnit.hashCode() : 0);
         result = 31 * result + (flowRate != null ? flowRate.hashCode() : 0);
         result = 31 * result + (pressure != null ? pressure.hashCode() : 0);
         result = 31 * result + (pressureMax != null ? pressureMax.hashCode() : 0);
@@ -191,10 +166,8 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         result = 31 * result + (productTypeDto != null ? productTypeDto.hashCode() : 0);
         result = 31 * result + (pathHydraulicScheme != null ? pathHydraulicScheme.hashCode() : 0);
         result = 31 * result + (imagesPaths != null ? imagesPaths.hashCode() : 0);
-        result = 31 * result + (storageRackDtoList != null ? storageRackDtoList.hashCode() : 0);
         result = 31 * result + (productCompanyDto != null ? productCompanyDto.hashCode() : 0);
         result = 31 * result + (productConnectionDto != null ? productConnectionDto.hashCode() : 0);
-        result = 31 * result + (countryDto != null ? countryDto.hashCode() : 0);
         return result;
     }
 
@@ -203,7 +176,6 @@ public class ProductDto extends RepresentationModel<ProductDto> {
         return "ProductDto{" +
                 "productDtoId=" + productDtoId +
                 ", count=" + count +
-                ", stockKeepingUnit='" + stockKeepingUnit + '\'' +
                 ", flowRate=" + flowRate +
                 ", pressure=" + pressure +
                 ", pressureMax=" + pressureMax +
@@ -212,10 +184,9 @@ public class ProductDto extends RepresentationModel<ProductDto> {
                 ", productTypeDto=" + productTypeDto +
                 ", pathHydraulicScheme='" + pathHydraulicScheme + '\'' +
                 ", imagesPaths=" + imagesPaths +
-                ", storageRackDtoList=" + storageRackDtoList +
                 ", productCompanyDto=" + productCompanyDto +
                 ", productConnectionDto=" + productConnectionDto +
-                ", countryDto=" + countryDto +
+                ", skus=" + productSkuDtos +
                 '}';
     }
 }

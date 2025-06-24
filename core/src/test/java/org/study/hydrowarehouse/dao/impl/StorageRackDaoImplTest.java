@@ -12,7 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.configuration.DevelopmentConfig;
 import org.study.hydrowarehouse.dao.StorageRackDao;
-import org.study.hydrowarehouse.entity.Shelf;
 import org.study.hydrowarehouse.entity.StorageRack;
 
 import java.util.List;
@@ -37,9 +36,7 @@ class StorageRackDaoImplTest {
     private int storageRackId = 1;
     private String newStorageRackName = "new StorageRack";
 
-    private Shelf shelf = new Shelf("name");
-
-    private StorageRack storageRack = new StorageRack(1, newStorageRackName, shelf);
+    private StorageRack storageRack = new StorageRack(1, newStorageRackName);
 
     @BeforeEach
     void setUp() {
@@ -81,7 +78,7 @@ class StorageRackDaoImplTest {
         Session session = sessionFactory.getCurrentSession();
         session.save(rack);
         session.flush();
-        Integer id = rack.getStorageRackId();
+        Integer id = rack.getRackId();
 
         rack.setName("UPDATED-RACK");
         boolean result = storageRackDao.update(rack);

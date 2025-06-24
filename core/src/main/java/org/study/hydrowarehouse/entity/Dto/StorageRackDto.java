@@ -8,7 +8,6 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
 
     private Integer storageRackDtoId;
     private String name;
-    private String shelfName;
 
     public StorageRackDto(){}
 
@@ -36,14 +35,6 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
         this.name = name;
     }
 
-    public String getShelfName() {
-        return shelfName;
-    }
-
-    public void setShelfName(String shelfName) {
-        this.shelfName = shelfName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,8 +45,7 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
 
         if (!Objects.equals(storageRackDtoId, that.storageRackDtoId))
             return false;
-        if (!Objects.equals(name, that.name)) return false;
-        return Objects.equals(shelfName, that.shelfName);
+        return Objects.equals(name, that.name);
     }
 
     @Override
@@ -63,7 +53,6 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
         int result = super.hashCode();
         result = 31 * result + (storageRackDtoId != null ? storageRackDtoId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (shelfName != null ? shelfName.hashCode() : 0);
         return result;
     }
 
@@ -72,7 +61,6 @@ public class StorageRackDto extends RepresentationModel<StorageRackDto> {
         return "StorageRackDto{" +
                 "storageRackDtoId=" + storageRackDtoId +
                 ", name='" + name + '\'' +
-                ", shelfName='" + shelfName + '\'' +
                 '}';
     }
 }

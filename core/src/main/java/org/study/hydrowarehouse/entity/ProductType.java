@@ -9,11 +9,11 @@ import java.util.Objects;
 @Entity
 public class ProductType implements Serializable {
 
-    private static final long serialVersionUID = 3655198763736607930L;
+    private static final long serialVersionUID = 3047606515890435961L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_products_type")
+    @Column(name = "product_type_id")
     private Integer productTypeId;
 
     @Column(name = "name")

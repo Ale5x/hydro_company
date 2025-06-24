@@ -6,20 +6,20 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "products_connection")
+@Table(name = "products_connections")
 public class ProductConnection implements Serializable {
 
-    private static final long serialVersionUID = -4249187559410945137L;
+    private static final long serialVersionUID = 6914444849149373625L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_products_connection")
+    @Column(name = "product_connection_id")
     private Integer productConnectionId;
 
     @Column(name = "size")
     private String size;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productType")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productConnection")
     private List<Product> products;
 
     public ProductConnection() {

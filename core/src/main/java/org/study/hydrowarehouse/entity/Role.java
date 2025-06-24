@@ -9,11 +9,11 @@ import java.util.Objects;
 @Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Role implements Serializable {
 
-    private static final long serialVersionUID = 6860836939002433814L;
+    private static final long serialVersionUID = 8586938457852993437L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_roles")
+    @Column(name = "role_id")
     private Integer roleId;
 
     @Enumerated(EnumType.STRING)

@@ -24,7 +24,7 @@ import java.util.Optional;
 public class RoleDaoImpl extends CriteriaQueryHelper<Role> implements RoleDao {
 
     private static final String GET_ROLE_QUERY = "SELECT * FROM roles WHERE name=";
-    private static final String ROLE_ID = "id_roles";
+    private static final String ROLE_ID = "role_id";
     private static final String ROLE_NAME = "name";
     private static final String ROLE_ACUTE = "'";
     private static final String ROLE_SEMICOLON = ";";

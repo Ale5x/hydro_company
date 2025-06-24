@@ -248,12 +248,12 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
                 flowRate);
 
         List<ProductDto> productList = productService.findAllByFlowRate(
-                Pagination.getOffset(page, size),
                 Integer.parseInt(size),
+                Pagination.getOffset(page, size),
                 Integer.parseInt(flowRate));
         List<ProductDto> nextDataList = productService.findAllByFlowRate(
-                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size),
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(flowRate));
 
 

@@ -2,79 +2,65 @@ package org.study.hydrowarehouse.entity;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
 public class Product implements Serializable {
 
-    private static final long serialVersionUID = -7789179148102341314L;
+    private static final long serialVersionUID = 1987270399400466886L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_products")
+    @Column(name = "product_id")
     private Integer productId;
 
-    @Column(name = "count")
+//    @Formula("(SELECT COUNT(*) FROM product_sku ps WHERE ps.product_id = product_id)")
+    @Column(name = "count", nullable = false)
     private Integer count;
 
-    @Column(name = "sku")
-    private String stockKeepingUnit;
-
-    @Column(name = "flow_rate")
+    @Column(name = "flow_rate", nullable = false)
     private Integer flowRate;
 
-    @Column(name = "pressure")
+    @Column(name = "pressure", nullable = false)
     private Integer pressure;
 
-    @Column(name = "pressure_max")
+    @Column(name = "pressure_max", nullable = false)
     private Integer pressureMax;
 
-    @Column(name = "weight")
+    @Column(name = "weight", nullable = false)
     private Double weight;
 
-    @Column(name = "path_hydraulic_scheme")
+    @Column(name = "path_hydraulic_scheme", nullable = false, length = 255)
     private String pathHydraulicScheme;
 
-    @Column(name = "additional_inf")
+    @Column(name = "additional_inf", columnDefinition = "TEXT")
     private String additionalInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_products_type")
-    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_type_id", nullable = false)
     private ProductType productType;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", fetch = FetchType.LAZY, orphanRemoval = true)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Picture> picturePath;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_product_companies")
-    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_company_id", nullable = false)
     private ProductCompany productCompany;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_products_connection")
-    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_connection_id", nullable = false)
     private ProductConnection productConnection;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "storage_racks_products",
-            joinColumns = {@JoinColumn(name = "id_products")},
-            inverseJoinColumns = {@JoinColumn(name = "id_storage_racks")}
-    )
-    @Fetch(FetchMode.SUBSELECT)
-    private List<StorageRack> storageRackList;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_countries")
-    @Fetch(FetchMode.JOIN)
-    private Country countryProduct;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductSku> productSkus;
 
     public Product() {
     }
@@ -84,28 +70,25 @@ public class Product implements Serializable {
     }
 
     public Product(Integer productId, Integer count, Integer pressure, Integer pressureMax, Double weight,
-                   Integer flowRate, String stockKeepingUnit, String pathHydraulicScheme, String additionalInformation,
-                   List<Picture> picturePath) {
+                   Integer flowRate, String pathHydraulicScheme, String additionalInformation, List<Picture> picturePath) {
         this.productId = productId;
         this.flowRate = flowRate;
         this.count = count;
         this.pressure = pressure;
         this.pressureMax = pressureMax;
         this.weight = weight;
-        this.stockKeepingUnit = stockKeepingUnit;
         this.pathHydraulicScheme = pathHydraulicScheme;
         this.picturePath = picturePath;
         this.additionalInformation = additionalInformation;
     }
 
     public Product(Integer count, Integer pressure, Integer pressureMax, Double weight, String pathHydraulicScheme,
-                   Integer flowRate, String stockKeepingUnit, String additionalInformation, List<Picture> picturePath) {
+                   Integer flowRate, String additionalInformation, List<Picture> picturePath) {
         this.flowRate = flowRate;
         this.count = count;
         this.pressure = pressure;
         this.pressureMax = pressureMax;
         this.weight = weight;
-        this.stockKeepingUnit = stockKeepingUnit;
         this.pathHydraulicScheme = pathHydraulicScheme;
         this.additionalInformation = additionalInformation;
         this.picturePath = picturePath;
@@ -125,14 +108,6 @@ public class Product implements Serializable {
 
     public void setCount(Integer count) {
         this.count = count;
-    }
-
-    public String getStockKeepingUnit() {
-        return stockKeepingUnit;
-    }
-
-    public void setStockKeepingUnit(String stockKeepingUnit) {
-        this.stockKeepingUnit = stockKeepingUnit;
     }
 
     public Integer getFlowRate() {
@@ -215,22 +190,6 @@ public class Product implements Serializable {
         this.productConnection = productConnection;
     }
 
-    public List<StorageRack> getStorageRackList() {
-        return storageRackList;
-    }
-
-    public void setStorageRackList(List<StorageRack> storageRackList) {
-        this.storageRackList = storageRackList;
-    }
-
-    public Country getCountryProduct() {
-        return countryProduct;
-    }
-
-    public void setCountryProduct(Country countryProduct) {
-        this.countryProduct = countryProduct;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -240,8 +199,6 @@ public class Product implements Serializable {
 
         if (!Objects.equals(productId, product.productId)) return false;
         if (!Objects.equals(count, product.count)) return false;
-        if (!Objects.equals(stockKeepingUnit, product.stockKeepingUnit))
-            return false;
         if (!Objects.equals(flowRate, product.flowRate)) return false;
         if (!Objects.equals(pressure, product.pressure)) return false;
         if (!Objects.equals(pressureMax, product.pressureMax)) return false;
@@ -254,18 +211,13 @@ public class Product implements Serializable {
         if (!Objects.equals(picturePath, product.picturePath)) return false;
         if (!Objects.equals(productCompany, product.productCompany))
             return false;
-        if (!Objects.equals(productConnection, product.productConnection))
-            return false;
-        if (!Objects.equals(storageRackList, product.storageRackList))
-            return false;
-        return Objects.equals(countryProduct, product.countryProduct);
+        return Objects.equals(productConnection, product.productConnection);
     }
 
     @Override
     public int hashCode() {
         int result = productId != null ? productId.hashCode() : 0;
         result = 31 * result + (count != null ? count.hashCode() : 0);
-        result = 31 * result + (stockKeepingUnit != null ? stockKeepingUnit.hashCode() : 0);
         result = 31 * result + (flowRate != null ? flowRate.hashCode() : 0);
         result = 31 * result + (pressure != null ? pressure.hashCode() : 0);
         result = 31 * result + (pressureMax != null ? pressureMax.hashCode() : 0);
@@ -276,8 +228,6 @@ public class Product implements Serializable {
         result = 31 * result + (picturePath != null ? picturePath.hashCode() : 0);
         result = 31 * result + (productCompany != null ? productCompany.hashCode() : 0);
         result = 31 * result + (productConnection != null ? productConnection.hashCode() : 0);
-        result = 31 * result + (storageRackList != null ? storageRackList.hashCode() : 0);
-        result = 31 * result + (countryProduct != null ? countryProduct.hashCode() : 0);
         return result;
     }
 
@@ -286,7 +236,6 @@ public class Product implements Serializable {
         return "Product{" +
                 "productId=" + productId +
                 ", count=" + count +
-                ", stockKeepingUnit='" + stockKeepingUnit + '\'' +
                 ", flowRate=" + flowRate +
                 ", pressure=" + pressure +
                 ", pressureMax=" + pressureMax +
@@ -297,8 +246,6 @@ public class Product implements Serializable {
                 ", picturePath=" + picturePath +
                 ", productCompany=" + productCompany +
                 ", productConnection=" + productConnection +
-                ", storageRackList=" + storageRackList +
-                ", countryProduct=" + countryProduct +
                 '}';
     }
 }

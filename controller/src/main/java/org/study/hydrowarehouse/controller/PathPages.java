@@ -125,6 +125,23 @@ public class PathPages {
     public static final String PICTURE_ALL = PICTURE_BRANCH + "/all";
 
 
+    public static final String SKU_STATUS = GUEST_BRANCH + "/sku_status";
+    public static final String SKU_STATUS_CREATE = SKU_STATUS + "/create";
+    public static final String SKU_STATUS_UPDATE = SKU_STATUS + "/update";
+    public static final String SKU_STATUS_REMOVE = SKU_STATUS + "/remove";
+    public static final String SKU_STATUS_BY_ID = SKU_STATUS + "/id";
+    public static final String SKU_STATUS_BY_STATUS = SKU_STATUS + "/status";
+    public static final String SKU_STATUS_ALL = SKU_STATUS + "/all";
+
+    public static final String SKU_BRANCH = GUEST_BRANCH + "/product_sku";
+    public static final String SKU_CREATE = SKU_BRANCH + "/create";
+    public static final String SKU_UPDATE = SKU_BRANCH + "/update";
+    public static final String SKU_REMOVE = SKU_BRANCH + "/remove";
+    public static final String SKU_BY_ID = SKU_BRANCH + "/id";
+    public static final String SKU_BY_CODE = SKU_BRANCH + "/code";
+    public static final String SKU_ALL_BY_STATUS = SKU_BRANCH + "/by_status";
+    public static final String SKU_ALL_BY_PRODUCT = SKU_BRANCH + "/by_product";
+
     public static final String ALL_RESOURCES = "/**";
 
     public static final String API_ALL_RESOURCES = API + ALL_RESOURCES;

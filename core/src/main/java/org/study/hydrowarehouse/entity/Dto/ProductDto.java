@@ -23,6 +23,11 @@ public class ProductDto extends RepresentationModel<ProductDto> {
     private ProductCompanyDto productCompanyDto;
     private ProductConnectionDto productConnectionDto;
 
+    public ProductDto(){}
+
+    public ProductDto(Integer id) {
+        this.productDtoId = id;
+    }
     public Integer getProductDtoId() {
         return productDtoId;
     }

@@ -26,12 +26,15 @@ public class ServiceMediator {
     private final UserCompanyDao userCompanyDao;
     private final RoleDao roleDao;
     private final UserStatusDao userStatusDao;
+    private final ShelfDao shelfDao;
+    private final ProductSkuStatusDao skuStatus;
 
     @Autowired
     public ServiceMediator(ProductDao productDao, PictureDao pictureDao, CountryDao countryDao,
                            ProductTypeDao productTypeDao, ProductCompanyDao productCompanyDao,
                            ProductConnectionDao productConnectionDao, StorageRackDao storageRackDao,
-                           UserCompanyDao userCompanyDao, RoleDao roleDao, UserStatusDao userStatusDao) {
+                           UserCompanyDao userCompanyDao, RoleDao roleDao, UserStatusDao userStatusDao,
+                           ShelfDao shelfDao, ProductSkuStatusDao skuStatus) {
         this.productDao = productDao;
         this.pictureDao = pictureDao;
         this.countryDao = countryDao;
@@ -42,6 +45,8 @@ public class ServiceMediator {
         this.userCompanyDao = userCompanyDao;
         this.roleDao = roleDao;
         this.userStatusDao = userStatusDao;
+        this.shelfDao = shelfDao;
+        this.skuStatus = skuStatus;
     }
 
     /**
@@ -148,4 +153,36 @@ public class ServiceMediator {
         return roleDao.findRole(role);
     }
 
+    /**
+     * Retrieves a {@link Shelf} entity by its unique identifier.
+     *
+     * @param id the ID of the shelf to retrieve
+     * @return an {@link Optional} containing the found {@link Shelf},
+     *         or an empty Optional if no such entity exists
+     */
+    public Optional<Shelf> findShelfById(Integer id) {
+        return shelfDao.findById(id);
+    }
+
+    /**
+     * Finds a {@link ProductSkuStatus} entity by its status name.
+     *
+     * @param status the name of the status to search for.
+     * @return an {@link Optional} containing the found {@link ProductSkuStatus},
+     *         or an empty {@link Optional} if not found.
+     */
+    public Optional<ProductSkuStatus> findSkuStatusByStatus(String status) {
+        return skuStatus.findByStatus(status);
+    }
+
+    /**
+     * Retrieves a {@link ProductSkuStatus} entity by its unique identifier.
+     *
+     * @param id the ID of the status to retrieve
+     * @return an {@link Optional} containing the found {@link ProductSkuStatus},
+     *         or an empty Optional if no such entity exists
+     */
+    public Optional<ProductSkuStatus> findSkuStatusById(Integer id) {
+        return skuStatus.findById(id);
+    }
 }

@@ -11,6 +11,14 @@ public class ShelfDto extends RepresentationModel<ShelfDto> {
 
     private StorageRackDto storageRackDto;
 
+    public ShelfDto(){}
+
+    public ShelfDto(Integer id, String name, StorageRackDto storageRackDto) {
+        this.shelfDtoId = id;
+        this.name = name;
+        this.storageRackDto = storageRackDto;
+    }
+
     public Integer getShelfDtoId() {
         return shelfDtoId;
     }

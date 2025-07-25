@@ -15,6 +15,7 @@ public class ControllerConstants {
     public final static String PICTURE = "picture";
     public final static String FILE_PRODUCT_SCHEME = "product_scheme";
     public final static String MESSAGE = "message";
+    public final static String CODE = "code";
 
     public final static String DATE = "date";
 
@@ -25,6 +26,7 @@ public class ControllerConstants {
     public final static String ROLE = "role";
     public final static String PRODUCT_PRESSURE = "pressure";
     public final static String PRODUCT_FLOW_RATE = "flowRate";
+    public final static String PRODUCT_ID = "product_id";
     public final static String NAME = "name";
 
 

@@ -44,6 +44,8 @@ class ProductServiceImplTest {
     private ProductCompany productCompany = new ProductCompany(1, "company");
     private ProductConnection productConnection = new ProductConnection(1, "size");
 
+    private String status = "In stock";
+
     List<Product> productList = new ArrayList<>();
     private int productId = 1;
     private int limit = 0;
@@ -366,12 +368,12 @@ class ProductServiceImplTest {
 
     @Test
     void findAll() {
-        when(productDao.getProductsList(offset, limit)).thenReturn(productList);
+        when(productDao.getProductsList(offset, limit, status)).thenReturn(productList);
 
-        List<ProductDto> list = productService.findAll(limit, offset);
+        List<ProductDto> list = productService.findAll(limit, offset, status);
 
         assertNotNull(list);
-        verify(productDao, times(1)).getProductsList(limit, offset);
+        verify(productDao, times(1)).getProductsList(limit, offset, status);
     }
 
     @Test

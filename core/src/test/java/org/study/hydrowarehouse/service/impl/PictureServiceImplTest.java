@@ -88,7 +88,7 @@ class PictureServiceImplTest {
 
         Product product = new Product();
         product.setProductId(2);
-        product.setStockKeepingUnit("Product2");
+//        product.setStockKeepingUnit("Product2");
 
         when(pictureDao.findById(pictureDto.getPictureDtoId())).thenReturn(Optional.of(existingPicture));
 

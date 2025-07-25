@@ -38,6 +38,8 @@ class ProductDaoImplTest {
 
     private List<Picture> pictures = new ArrayList<>();
 
+    private String status = "In stock";
+
     @BeforeEach
     void init() {
         pictures.add(new Picture("path_product-1"));
@@ -54,7 +56,7 @@ class ProductDaoImplTest {
         product.setProductCompany(new ProductCompany(1, "name"));
         product.setProductConnection(new ProductConnection(1, "size"));
 
-        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset);
+        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset, status);
 
         assertFalse(productListBefore.isEmpty());
 
@@ -62,7 +64,7 @@ class ProductDaoImplTest {
 
         assertTrue(id > 0);
 
-        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset);
+        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset, status);
 
         assertFalse(productListAfter.isEmpty());
         assertTrue(productListAfter.size() > productListBefore.size());
@@ -92,13 +94,13 @@ class ProductDaoImplTest {
 
     @Test
     void remove() {
-        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset);
+        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset, status);
 
         assertFalse(productListBefore.isEmpty());
         boolean condition = productDao.remove(productId);
         assertTrue(condition);
 
-        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset);
+        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset, status);
         assertFalse(productListAfter.isEmpty());
         assertTrue(productListBefore.size() > productListAfter.size());
 
@@ -116,7 +118,7 @@ class ProductDaoImplTest {
 
     @Test
     void getProductsList() {
-        List<Product> productList = productDao.getProductsList(limit, offset);
+        List<Product> productList = productDao.getProductsList(limit, offset, status);
 
         assertFalse(productList.isEmpty());
         assertTrue(productList.size() == limit);

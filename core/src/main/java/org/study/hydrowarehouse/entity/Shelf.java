@@ -19,7 +19,7 @@ public class Shelf implements Serializable {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "storage_racks_id", nullable = false)
+    @JoinColumn(name = "rack_id", nullable = false)
     private StorageRack storageRack;
 
     public Shelf() {

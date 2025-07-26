@@ -14,10 +14,7 @@ import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,11 +37,23 @@ class ProductServiceImplTest {
 
     private ProductDto productDto = new ProductDto();
     private Product product = new Product();
+
+    private ProductSku productSku = new ProductSku();
+
+    private Country country = new Country(1, "ARM");
+
+    private Shelf shelf = new Shelf(1, "Shelf-5");
+    private StorageRack storageRack = new StorageRack(1, "storage rack #1");
     private ProductType productType = new ProductType(1, "type");
     private ProductCompany productCompany = new ProductCompany(1, "company");
     private ProductConnection productConnection = new ProductConnection(1, "size");
 
-    private String status = "In stock";
+    private String status = "Reserved";
+    private String defaultStatus = "In active";
+
+    private ProductSkuStatus skuStatus = new ProductSkuStatus(1, status);
+
+
 
     List<Product> productList = new ArrayList<>();
     private int productId = 1;
@@ -53,6 +62,10 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(productService, "defaultStatus", defaultStatus);
+
+        shelf.setStorageRack(storageRack);
+        productCompany.setCompanyCountries(Set.of(country));
 
         productDto.setCount(100);
         productDto.setFlowRate(50);
@@ -65,13 +78,28 @@ class ProductServiceImplTest {
         productDto.setProductCompanyDto(new ProductCompanyDto(1, "product company #1"));
         productDto.setProductConnectionDto(new ProductConnectionDto(1, "size type #3"));
         productDto.setImagesPaths(Arrays.asList("path1", "path 2"));
+        product.setCount(100);
+        product.setFlowRate(50);
+        product.setPressure(320);
+        product.setPressureMax(400);
+        product.setWeight(1.5);
+        product.setAdditionalInformation("ta-ta");
+        product.setPathHydraulicScheme("path");
 
+        productSku.setProductSkuId(11);
+        productSku.setCountry(country);
+        productSku.setCode("12345-F");
+        productSku.setShelf(shelf);
+        productSku.setStatus(skuStatus);
 
         product.setProductConnection(productConnection);
         product.setProductCompany(productCompany);
         product.setProductType(productType);
         product.setProductId(1);
         product.setPicturePath(List.of(new Picture("some path")));
+        product.setProductSkus(List.of(productSku));
+
+        System.out.println("Size -> " + product.getProductSkus());
 
         productList.add(product);
     }
@@ -377,45 +405,228 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void findAllByPressure() {
-        when(productDao.getProductsByPressure(offset, limit, 1)).thenReturn(productList);
+    void findAll_shouldUseDefaultStatus_whenStatusIsNull() throws CoreException {
+        int offset = 0;
+        int limit = 10;
 
-        List<ProductDto> list = productService.findAllByPressure(limit, offset, 1);
+        skuStatus.setStatus(defaultStatus);
+        List<Product> mockProducts = List.of(product);
+        when(productDao.getProductsList(limit, offset, defaultStatus)).thenReturn(mockProducts);
+
+        List<ProductDto> result = productService.findAll(offset, limit, null);
+
+        assertNotNull(result);
+        verify(productDao).getProductsList(limit, offset, defaultStatus);
+    }
+
+    @Test
+    void findAll_shouldUseDefaultStatus_whenStatusIsEmpty() throws CoreException {
+        int offset = 0;
+        int limit = 10;
+        skuStatus.setStatus(defaultStatus);
+
+        List<Product> mockProducts = List.of(product);
+        when(productDao.getProductsList(limit, offset, defaultStatus)).thenReturn(mockProducts);
+
+        List<ProductDto> result = productService.findAll(offset, limit, "   ");
+
+        assertNotNull(result);
+        verify(productDao).getProductsList(limit, offset, defaultStatus);
+    }
+
+    @Test
+    void findAllByPressure() {
+        when(productDao.getProductsByPressure(offset, limit, 1, status)).thenReturn(productList);
+
+        List<ProductDto> list = productService.findAllByPressure(limit, offset, 1, status);
 
         assertNotNull(list);
-        verify(productDao, times(1)).getProductsByPressure(limit, offset, 1);
+        verify(productDao, times(1)).getProductsByPressure(limit, offset, 1, status);
+    }
+
+    @Test
+    void findAllByPressure_shouldUseDefaultStatus_whenStatusIsNull() throws CoreException {
+        ReflectionTestUtils.setField(productService, "defaultStatus", "In active");
+
+        int offset = 0;
+        int limit = 10;
+        int pressure = 320;
+        String status = null;
+
+        List<Product> products = List.of(product);
+        when(productDao.getProductsByPressure(10, 0, 320, "In active")).thenReturn(products);
+        List<ProductDto> result = productService.findAllByPressure(offset, limit, pressure, status);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getProductDtoId()); // предположим, у product ID = 1
+
+        verify(productDao).getProductsByPressure(limit, offset, pressure, "In active");
+    }
+
+    @Test
+    void findAllByPressure_shouldUseDefaultStatus_whenStatusIsEmpty() throws CoreException {
+        ReflectionTestUtils.setField(productService, "defaultStatus", "In active");
+
+        int offset = 0;
+        int limit = 10;
+        int pressure = 320;
+        String status = "";
+
+        List<Product> products = List.of(product);
+        when(productDao.getProductsByPressure(limit, offset, pressure, "In active")).thenReturn(products);
+
+        List<ProductDto> result = productService.findAllByPressure(offset, limit, pressure, status);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getProductDtoId());
+
+        verify(productDao).getProductsByPressure(limit, offset, pressure, "In active");
     }
 
     @Test
     void findAllByFlowRate() {
-        when(productDao.getProductsByFlowRate(offset, limit, 150)).thenReturn(productList);
+        when(productDao.getProductsByFlowRate(offset, limit, 150, status)).thenReturn(productList);
 
-        List<ProductDto> list = productService.findAllByFlowRate(limit, offset, 150);
+        List<ProductDto> list = productService.findAllByFlowRate(limit, offset, 150, status);
 
         assertNotNull(list);
-        verify(productDao, times(1)).getProductsByFlowRate(limit, offset, 150);
+        verify(productDao, times(1)).getProductsByFlowRate(limit, offset, 150, status);
+    }
+
+    @Test
+    void findAllByFlowRate_shouldUseDefaultStatus_whenStatusIsNull() throws CoreException {
+        int offset = 0;
+        int limit = 10;
+        int flowRate = 150;
+
+        List<Product> products = List.of(new Product());
+        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(products);
+
+        List<ProductDto> result = productService.findAllByFlowRate(limit, offset, flowRate, null);
+
+        assertNotNull(result);
+        verify(productDao).getProductsByFlowRate(limit, offset, flowRate, defaultStatus);
+    }
+
+    @Test
+    void findAllByFlowRate_shouldUseDefaultStatus_whenStatusIsEmpty() throws CoreException {
+        int offset = 0;
+        int limit = 10;
+        int flowRate = 150;
+
+        List<Product> products = List.of(new Product());
+        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(products);
+
+        List<ProductDto> result = productService.findAllByFlowRate(limit, offset, flowRate, "");
+
+        assertNotNull(result);
+        verify(productDao).getProductsByFlowRate(limit, offset, flowRate, defaultStatus);
     }
 
     @Test
     void findAllByType() {
-        when(productDao.getProductsByTypeId(offset, limit, 1)).thenReturn(productList);
+        when(productDao.getProductsByTypeId(offset, limit, 1, status)).thenReturn(productList);
         ProductTypeDto type = new ProductTypeDto();
         type.setProductTypeId(1);
-        List<ProductDto> list = productService.findAllByType(limit, offset, type);
+        List<ProductDto> list = productService.findAllByType(limit, offset, type, status);
 
         assertNotNull(list);
-        verify(productDao, times(1)).getProductsByTypeId(limit, offset, 1);
+        verify(productDao, times(1)).getProductsByTypeId(limit, offset, 1, status);
+    }
+    @Test
+    void findAllByType_shouldUseDefaultStatus_whenStatusIsNull() {
+        int offset = 0;
+        int limit = 10;
+        ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
 
+        List<Product> productList = List.of(new Product());
+
+        when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus))
+                .thenReturn(productList);
+
+        List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(productDao).getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus);
+    }
+
+    @Test
+    void findAllByType_shouldUseDefaultStatus_whenStatusIsEmpty() {
+        int offset = 0;
+        int limit = 10;
+        ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
+
+        List<Product> productList = List.of(new Product());
+
+        when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus))
+                .thenReturn(productList);
+
+        List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, "");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(productDao).getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus);
+    }
+
+    @Test
+    void findAllByType_shouldUseGivenStatus() {
+        int offset = 0;
+        int limit = 10;
+        ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
+
+        List<Product> productList = List.of(new Product());
+
+        when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), status))
+                .thenReturn(productList);
+
+        List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, status);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(productDao).getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), status);
     }
 
     @Test
     void findAllByCompany() {
-        when(productDao.getProductsByCompanyId(offset, limit, 1)).thenReturn(productList);
+        when(productDao.getProductsByCompanyId(offset, limit, 1, status)).thenReturn(productList);
         ProductCompanyDto company = new ProductCompanyDto();
         company.setProductCompanyDtoId(1);
-        List<ProductDto> list = productService.findAllByCompany(limit, offset, company);
+        List<ProductDto> list = productService.findAllByCompany(limit, offset, company, status);
 
         assertNotNull(list);
-        verify(productDao, times(1)).getProductsByCompanyId(limit, offset, 1);
+        verify(productDao, times(1)).getProductsByCompanyId(limit, offset, 1, status);
+    }
+
+    @Test
+    void findAllByCompany_shouldUseDefaultStatus_whenStatusIsNull() throws CoreException {
+        int offset = 0;
+        int limit = 10;
+        ProductCompanyDto company = new ProductCompanyDto(1, "Some Company");
+
+        when(productDao.getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus))
+                .thenReturn(productList);
+
+        List<ProductDto> result = productService.findAllByCompany(offset, limit, company, null);
+
+        assertNotNull(result);
+        verify(productDao).getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus);
+    }
+
+    @Test
+    void findAllByCompany_shouldUseDefaultStatus_whenStatusIsEmpty() throws CoreException {
+        int offset = 0;
+        int limit = 10;
+        ProductCompanyDto company = new ProductCompanyDto(1, "Some Company");
+
+        when(productDao.getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus))
+                .thenReturn(productList);
+
+        List<ProductDto> result = productService.findAllByCompany(offset, limit, company, "");
+
+        assertNotNull(result);
+        verify(productDao).getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus);
     }
 }

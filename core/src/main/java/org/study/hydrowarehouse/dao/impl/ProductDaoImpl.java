@@ -7,9 +7,7 @@ import org.study.hydrowarehouse.dao.CriteriaQueryHelper;
 import org.study.hydrowarehouse.dao.ProductDao;
 import org.study.hydrowarehouse.entity.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,25 +15,41 @@ import java.util.Optional;
 @Transactional(rollbackFor = Exception.class)
 public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements ProductDao {
 
+    private final static String PRODUCT_SKUS = "productSkus";
+
+    private final static String STATUS = "status";
+
     private final static String PRODUCT_ID = "productId";
-    private final static String PRODUCT_TYPE_ID = "id_products_type";
+
+    private final static String PRODUCT_TYPE_ID = "productTypeId";
+
     private final static String COMPANY_ID = "productCompanyId";
+
     private final static String PRODUCT_PRESSURE = "pressure";
+
     private final static String PRODUCT_FLOW_RATE = "flowRate";
-    private final static String STORAGE_RACK_NAME = "name";
+
+    private final static String STORAGE_RACK_NAME = "storageRackName";
+
     private final static String DELETE_PRODUCT_QUERY = String.format("DELETE Product WHERE id =: %s", PRODUCT_ID);
-    private final static String GET_PRODUCTS_BY_TYPE_ID_QUERY = "SELECT p FROM Product p WHERE p.productType.productTypeId = " +
-            ":productTypeId GROUP BY p.productId";
-    private final static String GET_PRODUCTS_BY_PRESSURE_QUERY = "SELECT p FROM Product p WHERE p.pressure <= :" +
-            "pressure GROUP BY p.productId";
-    private final static String GET_PRODUCTS_BY_FLOW_RATE_QUERY = "SELECT p FROM Product p WHERE " +
-            "p.flowRate <= :flowRate GROUP BY p.productId";
-    private final static String GET_PRODUCTS_BY_COMPANY_ID_QUERY = "SELECT p FROM Product p WHERE " +
-            "p.productCompany.productCompanyId = :companyId GROUP BY p.productId";
-//    private final static String GET_PRODUCTS_BY_STORAGE_RACK_QUERY = "SELECT p FROM Product p LEFT JOIN p.productType pt" +
-//            " LEFT JOIN p.productCompany pc LEFT JOIN p.productConnection pCon LEFT JOIN p.countryProduct c" +
-//            " LEFT JOIN p.picturePath pic LEFT JOIN p.storageRackList sr" +
-//            " WHERE sr.name =: " + STORAGE_RACK_NAME + " order by p.productId";
+
+    private final static String GET_PRODUCTS_BY_TYPE_ID_QUERY = "SELECT DISTINCT p FROM Product p " +
+                    "JOIN p.productSkus ps JOIN ps.status s WHERE p.productType.productTypeId = :productTypeId " +
+                    "AND s.status = :status ORDER BY p.productId";
+
+    private final static String GET_PRODUCTS_BY_PRESSURE_QUERY = "SELECT DISTINCT p FROM Product p JOIN p.productSkus ps " +
+            "JOIN ps.status s WHERE p.pressure <= :pressure AND s.status = :status ORDER BY p.productId";
+
+    private final static String GET_PRODUCTS_BY_FLOW_RATE_QUERY = "SELECT DISTINCT p FROM Product p JOIN p.productSkus ps " +
+            "JOIN ps.status s WHERE p.flowRate <= :flowRate AND s.status = :status ORDER BY p.productId";
+
+    private final static String GET_PRODUCTS_BY_COMPANY_ID_QUERY = "SELECT DISTINCT p FROM Product p " +
+            "JOIN p.productSkus ps JOIN ps.status s WHERE p.productCompany.productCompanyId = :productCompanyId " +
+            "AND s.status = :status ORDER BY p.productId";
+
+    private final static String GET_PRODUCTS_BY_STORAGE_RACK_NAME_QUERY = "SELECT DISTINCT p FROM Product p " +
+                    "JOIN p.productSkus ps JOIN ps.status s JOIN ps.shelf sh JOIN sh.storageRack sr " +
+                    "WHERE sr.name = :storageRackName AND s.status = :status ORDER BY p.productId";
 
     @Override
     public int create(Product product) {
@@ -74,67 +88,81 @@ public class ProductDaoImpl extends CriteriaQueryHelper<Product> implements Prod
     }
 
     @Override
-    public List<Product> getProductsList(int limit, int offset) {
+    public List<Product> getProductsList(int limit, int offset, String status) {
         Session session = getCurrentSession();
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Product> criteriaQuery = getCriteriaQuery(criteriaBuilder, Product.class);
         Root<Product> productRoot = getRoot(criteriaQuery, Product.class);
 
-        criteriaQuery.select(productRoot).orderBy(criteriaBuilder.asc(productRoot.get(PRODUCT_ID)));
+        Join<Product, ProductSku> skuJoin = productRoot.join(PRODUCT_SKUS);
+
+        Join<ProductSku, ProductSkuStatus> statusJoin = skuJoin.join(STATUS);
+
+        Predicate statusPredicate = criteriaBuilder.equal(statusJoin.get(STATUS), status);
+        criteriaQuery.select(productRoot)
+                .distinct(true)
+                .where(statusPredicate)
+                .orderBy(criteriaBuilder.asc(productRoot.get(PRODUCT_ID)));
+
         return session.createQuery(criteriaQuery)
-                      .setMaxResults(limit)
-                      .setFirstResult(offset)
-                      .getResultList();
+                .setMaxResults(limit)
+                .setFirstResult(offset)
+                .getResultList();
     }
 
     @Override
-    public List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate) {
+    public List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate, String status) {
         Session session = getCurrentSession();
         return session.createQuery(GET_PRODUCTS_BY_FLOW_RATE_QUERY)
                 .setParameter(PRODUCT_FLOW_RATE, flowRate)
+                .setParameter(STATUS, status)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
     }
 
     @Override
-    public List<Product> getProductsByPressure(int limit, int offset, Integer pressure) {
+    public List<Product> getProductsByPressure(int limit, int offset, Integer pressure, String status) {
         Session session = getCurrentSession();
 
         return session.createQuery(GET_PRODUCTS_BY_PRESSURE_QUERY)
                 .setParameter(PRODUCT_PRESSURE, pressure)
+                .setParameter(STATUS, status)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
     }
 
     @Override
-    public List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId) {
+    public List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId, String status) {
         Session session = getCurrentSession();
 
         return session.createQuery(GET_PRODUCTS_BY_TYPE_ID_QUERY)
                 .setParameter(PRODUCT_TYPE_ID, productTypeId)
+                .setParameter(STATUS, status)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
     }
 
     @Override
-    public List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId) {
+    public List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId, String status) {
         Session session = getCurrentSession();
         return session.createQuery(GET_PRODUCTS_BY_COMPANY_ID_QUERY)
                 .setParameter(COMPANY_ID, productCompanyId)
+                .setParameter(STATUS, status)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
     }
 
     @Override
-    public List<Product> getProductsByStorageRackName(int limit, int offset, String storageRackName){
+    public List<Product> getProductsByStorageRackName(int limit, int offset, String storageRackName, String status){
         Session session = getCurrentSession();
 
-        return session.createQuery("GET_PRODUCTS_BY_STORAGE_RACK_QUERY")
+        return session.createQuery(GET_PRODUCTS_BY_STORAGE_RACK_NAME_QUERY)
                 .setParameter(STORAGE_RACK_NAME, storageRackName)
+                .setParameter(STATUS, status)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();

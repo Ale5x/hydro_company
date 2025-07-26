@@ -52,69 +52,83 @@ public interface ProductDao {
     Optional<Product> getProductById(Integer id);
 
     /**
-     * The method will return list of the products.
+     * Returns a list of products with pagination and optional status filtering.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
+     * @param limit  the maximum number of products to return.
+     * @param offset the starting position of the first product to retrieve.
+     * @param status the status of the products to filter by (e.g. "ACTIVE", "INACTIVE");
+     *               if null or empty, all statuses are included.
      *
-     * @return the specified list of the products.
+     * @return the list of products matching the criteria.
      */
-    List<Product> getProductsList(int limit, int offset);
+    List<Product> getProductsList(int limit, int offset, String status);
 
     /**
-     * The method will return list of the products by the pressure.
+     * Retrieves a list of products filtered by pressure and product SKU status, with pagination.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
-     * @param pressure is the value of the elements of the products that correspond
-     * to a given pressure value.
+     * @param limit    the maximum number of products to return.
+     * @param offset   the index of the first product to retrieve.
+     * @param pressure the pressure value to filter products by.
+     * @param status   the status of associated product SKUs to filter by;
+     *                 only products having at least one SKU with the given status will be included.
      *
-     * @return the specified list of the products with the same search pressure.
+     * @return a list of products matching the specified pressure and status criteria.
      */
-    List<Product> getProductsByPressure(int limit, int offset, Integer pressure);
+    List<Product> getProductsByPressure(int limit, int offset, Integer pressure, String status);
 
     /**
-     * The method will return list of the products by the flow rate.
+     * Retrieves a list of products filtered by flow rate and product SKU status, with pagination.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
-     * @param flowRate is the value of the elements of the products that correspond
-     * to a given flowRate value.
+     * @param limit     the maximum number of products to return.
+     * @param offset    the index of the first product to retrieve.
+     * @param flowRate  the flow rate value to filter products by.
+     * @param status    the status of associated product SKUs to filter by;
+     *                  only products having at least one SKU with the given status will be included.
+     *                  If {@code null} or empty, products are not filtered by status.
      *
-     * @return the specified list of the products with the same search flow rate.
+     * @return a list of products matching the specified flow rate and status criteria.
      */
-    List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate);
+    List<Product> getProductsByFlowRate(int limit, int offset, Integer flowRate, String status);
 
     /**
-     * The method will return list of the products by the pressure.
+     * Retrieves a list of products filtered by product type ID and product SKU status, with pagination.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
-     * @param productTypeId is the productType's id that match the similar value of the type.
+     * @param limit          the maximum number of products to return.
+     * @param offset         the index of the first product to retrieve.
+     * @param productTypeId  the ID of the product type to filter by.
+     * @param status         the status of associated product SKUs to filter by;
+     *                       only products having at least one SKU with the given status will be included.
+     *                       If {@code null} or empty, products are not filtered by status.
      *
-     * @return the specified list of the products with the same search type.
+     * @return a list of products matching the specified product type and status criteria.
      */
-    List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId);
+    List<Product> getProductsByTypeId(int limit, int offset, Integer productTypeId, String status);
 
     /**
-     * The method will return list of the products by the product company.
+     * Retrieves a list of products filtered by product company ID and product SKU status, with pagination.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
-     * @param productCompanyId is the productCompany's id that match the similar value of the company.
+     * @param limit             the maximum number of products to return.
+     * @param offset            the index of the first product to retrieve.
+     * @param productCompanyId  the ID of the product company to filter products by.
+     * @param status            the status of associated product SKUs to filter by;
+     *                          only products having at least one SKU with the given status will be included.
+     *                          If {@code null} or empty, products are not filtered by status.
      *
-     * @return the specified list of the products with the same company.
+     * @return a list of products matching the specified company and status criteria.
      */
-    List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId);
+    List<Product> getProductsByCompanyId(int limit, int offset, Integer productCompanyId, String status);
 
     /**
-     * The method will return list of the products by the product company.
+     * Retrieves a list of products filtered by storage rack name and product SKU status, with pagination.
      *
-     * @param limit the number of rows to get at one time.
-     * @param offset the value of the element from which the countdown starts.
-     * @param storageRackName is the storageRack's name that match the similar value of the storageRack's name.
+     * @param limit             the maximum number of products to return.
+     * @param offset            the index of the first product to retrieve.
+     * @param storageRackName   the name of the storage rack to filter products by.
+     * @param status            the status of associated product SKUs to filter by;
+     *                          only products having at least one SKU with the given status will be included.
+     *                          If {@code null} or empty, products are not filtered by status.
      *
-     * @return the specified list of the products with the same storageRack.
+     * @return a list of products matching the specified storage rack name and status criteria.
      */
-    List<Product> getProductsByStorageRackName(int limit, int offset, String storageRackName);
+    List<Product> getProductsByStorageRackName(int limit, int offset, String storageRackName, String status);
 }

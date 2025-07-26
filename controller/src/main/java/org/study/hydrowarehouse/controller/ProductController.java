@@ -166,55 +166,75 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
      * The method returns all products data by the page and the size.
      * @param page is the current page.
      * @param size is the count items on this page.
-     * @return The object of the CollectionModel includes list of the products.
+     * @param status   the status of associated product SKUs to filter by;
+     *                 only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified status criteria, along with pagination links.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllProducts (@RequestParam(ControllerConstants.PAGE) String page,
-                                                        @RequestParam(ControllerConstants.SIZE) String size) {
+                                                        @RequestParam(ControllerConstants.SIZE) String size,
+                                                        @RequestParam(ControllerConstants.STATUS) String status) {
+
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size,
+                ControllerConstants.STATUS, status);
 
         List<ProductDto> nextProductList = productService.findAll(
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
-                Integer.parseInt(size));
+                Integer.parseInt(size),
+                status);
 
-        List<ProductDto> productList = productService.findAll(Pagination.getOffset(page, size), Integer.parseInt(size));
-        Link previousLink = HateoasLinkHelper.createPreviousLink(ProductController.class,
+        List<ProductDto> productList = productService.findAll(Pagination.getOffset(page, size), Integer.parseInt(size), status);
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                ProductController.class,
+                PathPages.PRODUCT_ALL_BY_PRESSURE,
+                searchCriteria);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                ProductController.class,
                 PathPages.PRODUCT_ALL,
-                page,
-                size);
-        Link nextLink = HateoasLinkHelper.createNextLink(ProductController.class,
-                PathPages.PRODUCT_ALL,
-                page,
-                size);
+                searchCriteria);
 
         return createPaginatedModel(productList, nextProductList, previousLink, nextLink);
     }
 
     /**
-     * The method returns all products data by the pressure and the page and the size.
-     * @param page is the current page.
-     * @param size is the count items on this page.
-     * @param pressure is some the product's pressure.
-     * @return The object of the CollectionModel includes list of the products by some pressure.
+     * Retrieves a paginated collection of {@link ProductDto} filtered by a specific pressure value
+     * and product SKU status.
+     *
+     * @param page     the current page number (as a String).
+     * @param size     the number of items per page (as a String).
+     * @param pressure the pressure value used to filter the products (as a String).
+     * @param status   the status of associated product SKUs to filter by;
+     *                 only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified pressure and status criteria, along with pagination links.
+     *
+     * @throws IllegalArgumentException if the pressure parameter is not a valid number.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL_BY_PRESSURE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByPressure (@RequestParam(ControllerConstants.PAGE) String page,
                                                           @RequestParam(ControllerConstants.SIZE) String size,
-                                                          @RequestParam(ControllerConstants.PRODUCT_PRESSURE) String pressure) {
+                                                          @RequestParam(ControllerConstants.PRODUCT_PRESSURE) String pressure,
+                                                          @RequestParam(ControllerConstants.STATUS) String status) {
         ValidatorParam.isNumber(pressure);
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,
-                ControllerConstants.PRODUCT_PRESSURE,
-                pressure);
+                ControllerConstants.PRODUCT_PRESSURE, pressure,
+                ControllerConstants.STATUS, status);
 
         List<ProductDto> productList = productService.findAllByPressure(
                 Pagination.getOffset(page, size),
                 Integer.parseInt(size),
-                Integer.parseInt(pressure));
+                Integer.parseInt(pressure),
+                status);
         List<ProductDto> nextDataList = productService.findAllByPressure(
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size),
-                Integer.parseInt(pressure));
+                Integer.parseInt(pressure),
+                status);
 
         Link previousLink = HateoasLinkHelper.createPreviousLink(
                 ProductController.class,
@@ -230,31 +250,41 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     }
 
     /**
-     * The method returns all products data by the flowRate and the page and the size.
-     * @param page is the current page.
-     * @param size is the count items on this page.
-     * @param flowRate is some the product's flowRate.
-     * @return The object of the CollectionModel includes list of the products by some flowRate.
+     * Retrieves a paginated collection of {@link ProductDto} filtered by a specific flowRate value
+     * and product SKU status.
+     *
+     * @param page     the current page number (as a String).
+     * @param size     the number of items per page (as a String).
+     * @param flowRate the flowRate value used to filter the products (as a String).
+     * @param status   the status of associated product SKUs to filter by;
+     *                 only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified flowRate and status criteria, along with pagination links.
+     *
+     * @throws IllegalArgumentException if the flowRate parameter is not a valid number.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL_BY_FLOW_RATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByFlowRate (@RequestParam(ControllerConstants.PAGE) String page,
                                                           @RequestParam(ControllerConstants.SIZE) String size,
-                                                          @RequestParam(ControllerConstants.PRODUCT_FLOW_RATE)String flowRate) {
+                                                          @RequestParam(ControllerConstants.PRODUCT_FLOW_RATE)String flowRate,
+                                                          @RequestParam(ControllerConstants.STATUS) String status) {
         ValidatorParam.isNumber(flowRate);
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,
-                ControllerConstants.PRODUCT_FLOW_RATE,
-                flowRate);
+                ControllerConstants.PRODUCT_FLOW_RATE, flowRate,
+                ControllerConstants.STATUS, status);
 
         List<ProductDto> productList = productService.findAllByFlowRate(
                 Integer.parseInt(size),
                 Pagination.getOffset(page, size),
-                Integer.parseInt(flowRate));
+                Integer.parseInt(flowRate),
+                status);
         List<ProductDto> nextDataList = productService.findAllByFlowRate(
                 Integer.parseInt(size),
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
-                Integer.parseInt(flowRate));
+                Integer.parseInt(flowRate),
+                status);
 
 
         Link previousLink = HateoasLinkHelper.createPreviousLink(
@@ -271,30 +301,40 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     }
 
     /**
-     * The method returns all products data by the product type and the page and the size.
-     * @param page is the current page.
-     * @param size is the count items on this page.
-     * @param id is the id object of the productType.
-     * @return The object of the CollectionModel includes list of the products by some product type.
+     * Retrieves a paginated collection of {@link ProductDto} filtered by a specific product type
+     * and product SKU status.
+     *
+     * @param page   the current page number (as a String).
+     * @param size   the number of items per page (as a String).
+     * @param id     the unique identifier of the product type (as a String).
+     * @param status the status of associated product SKUs to filter by;
+     *               only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified product type and status criteria, along with pagination links.
+     *
+     * @throws IllegalArgumentException if the id parameter is not a valid number.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL_BY_TYPE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByType (@RequestParam(ControllerConstants.PAGE) String page,
                                                       @RequestParam(ControllerConstants.SIZE) String size,
-                                                      @RequestParam(ControllerConstants.ID) String id) {
+                                                      @RequestParam(ControllerConstants.ID) String id,
+                                                      @RequestParam(ControllerConstants.STATUS) String status) {
         ValidatorParam.isNumber(id);
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,
-                ControllerConstants.ID,
-                id);
+                ControllerConstants.ID, id,
+                ControllerConstants.STATUS, status);
         List<ProductDto> productList = productService.findAllByType(
                 Pagination.getOffset(page, size),
                 Integer.parseInt(size),
-                new ProductTypeDto(Integer.parseInt(id)));
+                new ProductTypeDto(Integer.parseInt(id)),
+                status);
         List<ProductDto> nextDataList = productService.findAllByType(
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size),
-                new ProductTypeDto(Integer.parseInt(id)));
+                new ProductTypeDto(Integer.parseInt(id)),
+                status);
 
         Link previousLink = HateoasLinkHelper.createPreviousLink(
                 ProductController.class,
@@ -310,31 +350,41 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     }
 
     /**
-     * The method returns all products data by the companies and the page and the size.
-     * @param page is the current page.
-     * @param size is the count items on this page.
-     * @param id is the id of the productCompany.
-     * @return The object of the CollectionModel includes list of the products by some product company.
+     * Retrieves a paginated collection of {@link ProductDto} filtered by a specific product company
+     * and product SKU status.
+     *
+     * @param page   the current page number (as a String).
+     * @param size   the number of items per page (as a String).
+     * @param id     the unique identifier of the product company (as a String).
+     * @param status the status of associated product SKUs to filter by;
+     *               only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified product company and status criteria, along with pagination links.
+     *
+     * @throws IllegalArgumentException if the id parameter is not a valid number.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL_BY_COMPANY, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByCompany (@RequestParam(ControllerConstants.PAGE) String page,
                                                          @RequestParam(ControllerConstants.SIZE) String size,
-                                                         @RequestParam(ControllerConstants.ID) String id) {
+                                                         @RequestParam(ControllerConstants.ID) String id,
+                                                         @RequestParam(ControllerConstants.STATUS) String status) {
         ValidatorParam.isNumber(id);
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,
-                ControllerConstants.ID,
-                id);
+                ControllerConstants.ID, id,
+                ControllerConstants.STATUS, status);
 
         List<ProductDto> productList = productService.findAllByCompany(
                 Pagination.getOffset(page, size),
                 Integer.parseInt(size),
-                new ProductCompanyDto(Integer.parseInt(id)));
+                new ProductCompanyDto(Integer.parseInt(id)),
+                status);
         List<ProductDto> nextDataList = productService.findAllByCompany(
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size),
-                new ProductCompanyDto(Integer.parseInt(id)));
+                new ProductCompanyDto(Integer.parseInt(id)),
+                status);
 
         Link previousLink = HateoasLinkHelper.createPreviousLink(
                 ProductController.class,
@@ -350,30 +400,38 @@ public class ProductController implements HypermediaListAssembler<ProductDto> {
     }
 
     /**
-     * The method returns all products data by the storage rack and the page and the size.
-     * @param page is the current page.
-     * @param size is the count items on this page.
-     * @param name is the name of the storageRack.
-     * @return The object of the CollectionModel includes list of the products by some storage rack.
+     * Retrieves a paginated collection of {@link ProductDto} filtered by a specific storage rack name
+     * and product SKU status.
+     *
+     * @param page   the current page number (as a String).
+     * @param size   the number of items per page (as a String).
+     * @param name   the unique name of the storage rack (as a String).
+     * @param status the status of associated product SKUs to filter by;
+     *               only products having at least one SKU with the given status will be included.
+     * @return a {@link CollectionModel} containing the paginated list of {@link ProductDto} objects
+     *         matching the specified storage rack and status criteria, along with pagination links.
      */
     @GetMapping(value = PathPages.PRODUCT_ALL_BY_STORAGE_RACK, produces = MediaType.APPLICATION_JSON_VALUE)
     public CollectionModel<ProductDto> findAllByStorageRack (@RequestParam(ControllerConstants.PAGE) String page,
                                                          @RequestParam(ControllerConstants.SIZE) String size,
-                                                         @RequestParam(ControllerConstants.NAME) String name) {
+                                                         @RequestParam(ControllerConstants.NAME) String name,
+                                                             @RequestParam(ControllerConstants.STATUS) String status) {
         Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
                 page,
                 size,
-                ControllerConstants.NAME,
-                name);
+                ControllerConstants.NAME, name,
+                ControllerConstants.STATUS, status);
 
         List<ProductDto> productList = productService.findAllByStorageRack(
                 Pagination.getOffset(page, size),
                 Integer.parseInt(size),
-                new StorageRackDto(name));
+                new StorageRackDto(name),
+                status);
         List<ProductDto> nextDataList = productService.findAllByStorageRack(
                 Pagination.getOffset(Pagination.getNumberNextPage(page), size),
                 Integer.parseInt(size),
-                new StorageRackDto(name));
+                new StorageRackDto(name),
+                status);
 
         Link previousLink = HateoasLinkHelper.createPreviousLink(
                 ProductController.class,

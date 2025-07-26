@@ -65,18 +65,19 @@ CREATE TABLE product_companies (
 );
 
 -- products
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   product_id INT AUTO_INCREMENT PRIMARY KEY,
   flow_rate INT NOT NULL,
   pressure INT NOT NULL,
   weight DOUBLE NOT NULL,
   path_hydraulic_scheme VARCHAR(255) NOT NULL,
   pressure_max INT NOT NULL,
-  additional_inf CLOB,
+  additional_inf TEXT,
   product_type_id INT NOT NULL,
   count INT NOT NULL,
   product_connection_id INT NOT NULL,
   product_company_id INT NOT NULL,
+
   FOREIGN KEY (product_type_id) REFERENCES products_type(product_type_id) ON DELETE RESTRICT,
   FOREIGN KEY (product_connection_id) REFERENCES products_connections(product_connection_id) ON DELETE RESTRICT,
   FOREIGN KEY (product_company_id) REFERENCES product_companies(product_company_id) ON DELETE RESTRICT
@@ -100,8 +101,8 @@ CREATE TABLE storage_racks (
 CREATE TABLE shelves (
   shelf_id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(10) NOT NULL,
-  storage_racks_id INT NOT NULL,
-  FOREIGN KEY (storage_racks_id) REFERENCES storage_racks(rack_id) ON DELETE RESTRICT
+  rack_id INT NOT NULL,
+  FOREIGN KEY (rack_id) REFERENCES storage_racks(rack_id) ON DELETE RESTRICT
 );
 
 -- countries_has_product_companies

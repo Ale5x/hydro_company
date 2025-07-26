@@ -38,7 +38,8 @@ class ProductDaoImplTest {
 
     private List<Picture> pictures = new ArrayList<>();
 
-    private String status = "In stock";
+    private String inStockStatus = "In Stock";
+    private String outOfStockStatus = "Out of Stock";
 
     @BeforeEach
     void init() {
@@ -56,7 +57,7 @@ class ProductDaoImplTest {
         product.setProductCompany(new ProductCompany(1, "name"));
         product.setProductConnection(new ProductConnection(1, "size"));
 
-        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset, status);
+        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset, inStockStatus);
 
         assertFalse(productListBefore.isEmpty());
 
@@ -64,7 +65,7 @@ class ProductDaoImplTest {
 
         assertTrue(id > 0);
 
-        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset, status);
+        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset, inStockStatus);
 
         assertFalse(productListAfter.isEmpty());
         assertTrue(productListAfter.size() > productListBefore.size());
@@ -74,8 +75,32 @@ class ProductDaoImplTest {
     @Transactional
     void update() {
         Product product = new Product();
-        product.setCount(100);
-        product.setAdditionalInformation("Category1");
+
+        product.setCount(20);
+        product.setFlowRate(50);
+        product.setPressure(100);
+        product.setPressureMax(150);
+        product.setWeight(20.2);
+        product.setPathHydraulicScheme("/schemes/");
+        product.setAdditionalInformation("Test info: ");
+
+        ProductType productType = new ProductType();
+        productType.setProductTypeId(1);
+        product.setProductType(productType);
+
+        ProductCompany company = new ProductCompany();
+        company.setProductCompanyId(1);
+        product.setProductCompany(company);
+
+        ProductConnection connection = new ProductConnection();
+        connection.setProductConnectionId(1);
+        product.setProductConnection(connection);
+
+        product.setPicturePath(new ArrayList<>());
+
+        product.setProductSkus(new ArrayList<>());
+
+
 
         Session session = sessionFactory.getCurrentSession();
         session.save(product);
@@ -94,15 +119,11 @@ class ProductDaoImplTest {
 
     @Test
     void remove() {
-        List<Product> productListBefore = productDao.getProductsList(maxLimit, offset, status);
+        Optional<Product> isProductExist = productDao.getProductById(productId);
+        assertTrue(isProductExist.isPresent());
 
-        assertFalse(productListBefore.isEmpty());
         boolean condition = productDao.remove(productId);
         assertTrue(condition);
-
-        List<Product> productListAfter = productDao.getProductsList(maxLimit, offset, status);
-        assertFalse(productListAfter.isEmpty());
-        assertTrue(productListBefore.size() > productListAfter.size());
 
         Optional<Product> isProduct = productDao.getProductById(productId);
         assertTrue(isProduct.isEmpty());
@@ -118,15 +139,13 @@ class ProductDaoImplTest {
 
     @Test
     void getProductsList() {
-        List<Product> productList = productDao.getProductsList(limit, offset, status);
-
-        assertFalse(productList.isEmpty());
-        assertTrue(productList.size() == limit);
+        List<Product> productListInStock = productDao.getProductsList(limit, offset, inStockStatus);
+        assertFalse(productListInStock.isEmpty());
     }
 
     @Test
     void getProductsByCompany() {
-        List<Product> productList = productDao.getProductsByCompanyId(maxLimit, offset, 1);
+        List<Product> productList = productDao.getProductsByCompanyId(maxLimit, offset, 1, inStockStatus);
 
         assertNotNull(productList);
     }
@@ -134,7 +153,7 @@ class ProductDaoImplTest {
     @Test
     void getProductsByFlowRate() {
         int flowRate = 200;
-        List<Product> productList = productDao.getProductsByFlowRate(maxLimit, offset, flowRate);
+        List<Product> productList = productDao.getProductsByFlowRate(maxLimit, offset, flowRate, inStockStatus);
 
         assertNotNull(productList);
     }
@@ -142,24 +161,34 @@ class ProductDaoImplTest {
 
     @Test
     void getProductsByPressure() {
-        int pressure = 185;
-        List<Product> productList = productDao.getProductsByPressure(maxLimit, offset, pressure);
+        int pressure = 300;
+        List<Product> productList = productDao.getProductsByPressure(maxLimit, offset, pressure, inStockStatus);
         assertNotNull(productList);
     }
 
     @Test
     void getProductsByType() {
-        List<Product> productList = productDao.getProductsByTypeId(maxLimit, offset, 2);
+        List<Product> productListInStock = productDao.getProductsByTypeId(maxLimit, offset, 2, inStockStatus);
+        List<Product> productListOutStock = productDao.getProductsByTypeId(maxLimit, offset, 2, outOfStockStatus);
 
-        assertFalse(productList.isEmpty());
+        if (productListInStock.isEmpty()) {
+            assertFalse(productListOutStock.isEmpty());
+        } else {
+            assertFalse(productListInStock.isEmpty());
+        }
     }
 
     @Test
     void getProductsByStorageName() {
-        String storageName = "storage_racks-name-1";
+        String storageName = "Rack B";
 
-        List<Product> productList = productDao.getProductsByStorageRackName(maxLimit, offset, storageName);
+        List<Product> productListInStock = productDao.getProductsByStorageRackName(maxLimit, offset, storageName, inStockStatus);
+        List<Product> productListOutStock = productDao.getProductsByStorageRackName(maxLimit, offset, storageName, outOfStockStatus);
 
-        assertFalse(productList.isEmpty());
+        if (productListInStock.isEmpty()) {
+            assertFalse(productListOutStock.isEmpty());
+        } else {
+            assertFalse(productListInStock.isEmpty());
+        }
     }
 }

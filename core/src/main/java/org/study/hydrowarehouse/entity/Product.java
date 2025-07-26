@@ -1,15 +1,9 @@
 package org.study.hydrowarehouse.entity;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Formula;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
@@ -190,6 +184,14 @@ public class Product implements Serializable {
         this.productConnection = productConnection;
     }
 
+    public List<ProductSku> getProductSkus() {
+        return productSkus;
+    }
+
+    public void setProductSkus(List<ProductSku> productSkus) {
+        this.productSkus = productSkus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -211,7 +213,9 @@ public class Product implements Serializable {
         if (!Objects.equals(picturePath, product.picturePath)) return false;
         if (!Objects.equals(productCompany, product.productCompany))
             return false;
-        return Objects.equals(productConnection, product.productConnection);
+        if (!Objects.equals(productConnection, product.productConnection))
+            return false;
+        return Objects.equals(productSkus, product.productSkus);
     }
 
     @Override
@@ -228,6 +232,7 @@ public class Product implements Serializable {
         result = 31 * result + (picturePath != null ? picturePath.hashCode() : 0);
         result = 31 * result + (productCompany != null ? productCompany.hashCode() : 0);
         result = 31 * result + (productConnection != null ? productConnection.hashCode() : 0);
+        result = 31 * result + (productSkus != null ? productSkus.hashCode() : 0);
         return result;
     }
 
@@ -246,6 +251,7 @@ public class Product implements Serializable {
                 ", picturePath=" + picturePath +
                 ", productCompany=" + productCompany +
                 ", productConnection=" + productConnection +
+                ", productSkus=" + productSkus +
                 '}';
     }
 }

@@ -60,64 +60,91 @@ public interface ProductService {
     Optional<Product> findProductById(int id) throws CoreException;
 
     /**
-     * Retrieves a list of all productsDto.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @return a list of all productsDto as {@link ProductDto} objects.
+     * Retrieves a list of {@link ProductDto} objects with optional filtering by product SKU status.
+     *
+     * @param offset the index of the first productDto to retrieve.
+     * @param limit  the maximum number of productDto to include in the result.
+     * @param criteriaStatus the status of the related product SKUs to filter by;
+     *               only products having at least one SKU with the given status will be included.
+     *               If {@code null} or empty, all products are returned regardless of SKU status.
+     *
+     * @return a list of {@link ProductDto} objects matching the specified criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAll(int offset, int limit) throws CoreException;
+    List<ProductDto> findAll(int offset, int limit, String criteriaStatus) throws CoreException;
 
     /**
-     * Retrieves a paginated list of productsDto filtered by a specific pressure value.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @param pressure the pressure value used to filter the products.
-     * @return a list of {@link ProductDto} objects representing the productsDto that match the specified pressure value.
+     * Retrieves a paginated list of {@link ProductDto} filtered by a specific pressure value
+     * and product SKU status.
+     *
+     * @param limit     the maximum number of products to include in the list.
+     * @param offset    the starting position of the product list.
+     * @param pressure  the pressure value used to filter the products.
+     * @param criteriaStatus    the status of associated product SKUs to filter by;
+     *                  only products having at least one SKU with the given status will be included.
+     * @return a list of {@link ProductDto} objects representing products that match
+     *         the specified pressure and status criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByPressure(int offset, int limit, int pressure) throws CoreException;
+    List<ProductDto> findAllByPressure(int offset, int limit, int pressure, String criteriaStatus) throws CoreException;
 
     /**
-     * Retrieves a paginated list of productsDto filtered by a specific flowRate value.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @param flowRate the flowRate value used to filter the products.
-     * @return a list of {@link ProductDto} objects representing the productsDto that match the specified flowRate value.
+     * Retrieves a paginated list of {@link ProductDto} filtered by a specific flowRate value
+     * and product SKU status.
+     *
+     * @param limit     the maximum number of products to include in the list.
+     * @param offset    the starting position of the product list.
+     * @param flowRate  the flowRate value used to filter the products.
+     * @param criteriaStatus    the status of associated product SKUs to filter by;
+     *                  only products having at least one SKU with the given status will be included.
+     * @return a list of {@link ProductDto} objects representing products that match
+     *         the specified flowRate and status criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByFlowRate(int offset, int limit, int flowRate) throws CoreException;
+    List<ProductDto> findAllByFlowRate(int offset, int limit, int flowRate, String criteriaStatus) throws CoreException;
 
     /**
-     * Retrieves a paginated list of products filtered by a specific productDto type by its unique identifier.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @param type a {@link ProductTypeDto} object containing the data of the product type.
-     * @return a list of {@link ProductDto} objects representing the productsDto that match the specified product type by
-     * its unique identifier.
+     * Retrieves a paginated list of {@link ProductDto} filtered by a specific product type
+     * and product SKU status.
+     *
+     * @param limit   the maximum number of products to include in the list.
+     * @param offset  the starting position of the product list.
+     * @param type    a {@link ProductTypeDto} object representing the product type to filter by.
+     * @param criteriaStatus  the status of associated product SKUs to filter by;
+     *                only products having at least one SKU with the given status will be included.
+     * @return a list of {@link ProductDto} objects representing products that match
+     *         the specified product type and status criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByType(int offset, int limit, ProductTypeDto type) throws CoreException;
+    List<ProductDto> findAllByType(int offset, int limit, ProductTypeDto type, String criteriaStatus) throws CoreException;
 
     /**
-     * Retrieves a paginated list of productsDto filtered by a specific product company by its unique identifier.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @param company a {@link ProductCompanyDto} object containing the data of the product company.
-     * @return a list of {@link ProductDto} objects representing the productsDto that match the specified product
-     * company by its unique identifier.
+     * Retrieves a paginated list of {@link ProductDto} filtered by a specific product company
+     * and product SKU status.
+     *
+     * @param limit    the maximum number of products to include in the list.
+     * @param offset   the starting position of the product list.
+     * @param company  a {@link ProductCompanyDto} object representing the product company to filter by.
+     * @param criteriaStatus   the status of associated product SKUs to filter by;
+     *                 only products having at least one SKU with the given status will be included.
+     * @return a list of {@link ProductDto} objects representing products that match
+     *         the specified product company and status criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByCompany(int offset, int limit, ProductCompanyDto company) throws CoreException;
+    List<ProductDto> findAllByCompany(int offset, int limit, ProductCompanyDto company, String criteriaStatus) throws CoreException;
 
     /**
-     * Retrieves a paginated list of productsDto filtered by a specific storage rack by its unique name.
-     * @param limit the maximum number of productsDto to include in the list.
-     * @param offset the starting position of the productDto list.
-     * @param storageRack a {@link StorageRackDto} object containing the data of the storage rack.
-     * @return a list of {@link ProductDto} objects representing the productsDto that match the specified storage rack by
-     * its unique name.
+     * Retrieves a paginated list of {@link ProductDto} filtered by a specific storage rack
+     * and product SKU status.
+     *
+     * @param limit        the maximum number of products to include in the list.
+     * @param offset       the starting position of the product list.
+     * @param storageRack  a {@link StorageRackDto} object representing the storage rack to filter by.
+     * @param criteriaStatus       the status of associated product SKUs to filter by;
+     *                     only products having at least one SKU with the given status will be included.
+     * @return a list of {@link ProductDto} objects representing products that match
+     *         the specified storage rack and status criteria.
      * @throws CoreException if an error occurs during the retrieval process.
      */
-    List<ProductDto> findAllByStorageRack(int offset, int limit, StorageRackDto storageRack) throws CoreException;
+    List<ProductDto> findAllByStorageRack(int offset, int limit, StorageRackDto storageRack, String criteriaStatus) throws CoreException;
 }

@@ -25,6 +25,8 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
 
     private final UserDao userDao;
 
+    private static final String USER_NOT_FOUND = "User not found: ";
+
     @Autowired
     public AuthUserDetailsServiceImpl(UserDao userDao) {
         this.userDao = userDao;
@@ -42,7 +44,7 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userDao.getUserByEmail(username);
         if(user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found: " + username);
+            throw new UsernameNotFoundException(USER_NOT_FOUND + username);
         }
         return new org.springframework.security.core.userdetails.User(
                 user.orElseThrow().getEmail(),

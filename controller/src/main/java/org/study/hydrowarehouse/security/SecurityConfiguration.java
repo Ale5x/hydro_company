@@ -64,10 +64,14 @@ public class SecurityConfiguration {
                         ERole.MANAGER.name(),
                         ERole.CEO.name()
                 )
-                .requestMatchers(PathPages.API_ALL_RESOURCES)
+                .requestMatchers(PathPages.ADMIN_ALL_RESOURCES)
                 .hasAnyAuthority(
                         ERole.ADMIN.name(),
                         ERole.MANAGER.name(),
+                        ERole.CEO.name()
+                )
+                .requestMatchers(PathPages.CEO_ALL_RESOURCES)
+                .hasAnyAuthority(
                         ERole.CEO.name()
                 )
                 .anyRequest().authenticated()

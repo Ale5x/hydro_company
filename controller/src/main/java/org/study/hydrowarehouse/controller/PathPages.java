@@ -14,6 +14,7 @@ public class PathPages {
     public static final String AUTH = API + "/auth";
 
     public static final String ADMIN_BRANCH = API + "/admin";
+    public static final String CEO_BRANCH = API + "/ceo";
     public static final String GUEST_BRANCH = API + "/guest";
     public static final String USER_BRANCH = API + "/user";
     public static final String AUTH_AUTHENTICATION = AUTH + "/authentication";
@@ -125,15 +126,17 @@ public class PathPages {
     public static final String PICTURE_ALL = PICTURE_BRANCH + "/all";
 
 
-    public static final String SKU_STATUS = GUEST_BRANCH + "/sku_status";
-    public static final String SKU_STATUS_CREATE = SKU_STATUS + "/create";
-    public static final String SKU_STATUS_UPDATE = SKU_STATUS + "/update";
-    public static final String SKU_STATUS_REMOVE = SKU_STATUS + "/remove";
-    public static final String SKU_STATUS_BY_ID = SKU_STATUS + "/id";
-    public static final String SKU_STATUS_BY_STATUS = SKU_STATUS + "/status";
-    public static final String SKU_STATUS_ALL = SKU_STATUS + "/all";
+    public static final String SKU_STATUS = "/sku_status";
+    public static final String SKU_STATUS_ADMIN_BRANCH = ADMIN_BRANCH + SKU_STATUS;
+    public static final String SKU_STATUS_CEO_BRANCH = CEO_BRANCH + SKU_STATUS;
+    public static final String SKU_STATUS_CREATE = SKU_STATUS_CEO_BRANCH + "/create";
+    public static final String SKU_STATUS_UPDATE = SKU_STATUS_CEO_BRANCH + "/update";
+    public static final String SKU_STATUS_REMOVE = SKU_STATUS_CEO_BRANCH + "/remove";
+    public static final String SKU_STATUS_BY_ID = SKU_STATUS_ADMIN_BRANCH + "/id";
+    public static final String SKU_STATUS_BY_STATUS = SKU_STATUS_ADMIN_BRANCH + "/status";
+    public static final String SKU_STATUS_ALL = SKU_STATUS_ADMIN_BRANCH + "/all";
 
-    public static final String SKU_BRANCH = GUEST_BRANCH + "/product_sku";
+    public static final String SKU_BRANCH = ADMIN_BRANCH + "/product_sku";
     public static final String SKU_CREATE = SKU_BRANCH + "/create";
     public static final String SKU_UPDATE = SKU_BRANCH + "/update";
     public static final String SKU_REMOVE = SKU_BRANCH + "/remove";
@@ -148,6 +151,7 @@ public class PathPages {
     public static final String AUTH_ALL_RESOURCES = AUTH + ALL_RESOURCES;
     public static final String USER_ALL_RESOURCES = USER_BRANCH + ALL_RESOURCES;
     public static final String ADMIN_ALL_RESOURCES = ADMIN_BRANCH + ALL_RESOURCES;
+    public static final String CEO_ALL_RESOURCES = CEO_BRANCH + ALL_RESOURCES;
     public static final String GUEST_ALL_RESOURCES = GUEST_BRANCH + ALL_RESOURCES;
 //    public static final String COMPANY_ALL_RESOURCES = COMPANY + ALL_RESOURCES;
 }

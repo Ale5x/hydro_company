@@ -57,7 +57,7 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
     protected Set<Country> getCountriesFromDto(ProductCompanyDto productCompanyDto) {
         Set<Country> countrySet = new HashSet<>();
         for(CountryDto countryDto : productCompanyDto.getCountries()) {
-            Country country = serviceMediator.countryById(countryDto.getCountryId())
+            Country country = serviceMediator.findCountryById(countryDto.getCountryId())
                     .orElseThrow(() -> {
                         //logger
                         throw new CoreException(String.format(

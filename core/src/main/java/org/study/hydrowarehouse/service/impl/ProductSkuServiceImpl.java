@@ -309,7 +309,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
                                         ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
                                         ExceptionMessages.COUNTRY_TYPE));
         }
-        return serviceMediator.countryById(dto.getCountryId())
+        return serviceMediator.findCountryById(dto.getCountryId())
                 .orElseThrow(() -> {
                     //logger
                     throw new CoreException(String.format(

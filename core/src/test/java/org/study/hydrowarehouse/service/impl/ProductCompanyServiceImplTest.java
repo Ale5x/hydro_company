@@ -88,7 +88,7 @@ class ProductCompanyServiceImplTest {
         country.setName("USA");
 
         when(productCompanyDao.getById(1)).thenReturn(Optional.of(existingCompany));
-        when(serviceMediator.countryById(1)).thenReturn(Optional.of(country));
+        when(serviceMediator.findCountryById(1)).thenReturn(Optional.of(country));
         when(productCompanyDao.update(any(ProductCompany.class))).thenReturn(true);
 
         boolean result = productCompanyService.update(dto);
@@ -128,7 +128,7 @@ class ProductCompanyServiceImplTest {
         existingCompany.setName("Old Name");
 
         when(productCompanyDao.getById(1)).thenReturn(Optional.of(existingCompany));
-        when(serviceMediator.countryById(2)).thenReturn(Optional.empty());
+        when(serviceMediator.findCountryById(2)).thenReturn(Optional.empty());
 
         CoreException ex = assertThrows(CoreException.class, () -> productCompanyService.update(dto));
 

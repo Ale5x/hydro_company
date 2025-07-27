@@ -80,7 +80,7 @@ public class ServiceMediator {
      * @return an {@link Optional} containing the country if found, or an empty {@link Optional} if not
      * @throws IllegalArgumentException if the provided ID is invalid (e.g., negative or zero)
      */
-    public Optional<Country> countryById(int id) {
+    public Optional<Country> findCountryById(int id) {
         return countryDao.countryById(id);
     }
 

@@ -68,7 +68,7 @@ class ProductSkuServiceImplTest {
 
     @Test
     void save_ShouldReturnTrue_WhenSaveSuccessful() throws CoreException {
-        when(serviceMediator.countryById(2)).thenReturn(Optional.of(country));
+        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
         when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
         when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
         when(serviceMediator.findSkuStatusByStatus("In Stock")).thenReturn(Optional.of(status));
@@ -80,7 +80,7 @@ class ProductSkuServiceImplTest {
 
     @Test
     void save_ShouldThrowCoreException_WhenStatusNotFound() {
-        when(serviceMediator.countryById(2)).thenReturn(Optional.of(country));
+        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
         when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
         when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
         when(serviceMediator.findSkuStatusByStatus("In Stock")).thenReturn(Optional.empty());
@@ -96,7 +96,7 @@ class ProductSkuServiceImplTest {
         existingSku.setCode("OLD");
 
         when(skuDao.findById(1)).thenReturn(Optional.of(existingSku));
-        when(serviceMediator.countryById(2)).thenReturn(Optional.of(country));
+        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
         when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
         when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
         when(serviceMediator.findSkuStatusById(status.getProductSkuStatusId())).thenReturn(Optional.of(status));
@@ -146,7 +146,7 @@ class ProductSkuServiceImplTest {
     void update_ShouldThrowCoreException_WhenStatusNotFound() {
         when(skuDao.findById(1)).thenReturn(Optional.of(productSku));
         skuDto.setStatus(new ProductSkuStatusDto(5, "new status"));
-        when(serviceMediator.countryById(anyInt())).thenReturn(Optional.of(country));
+        when(serviceMediator.findCountryById(anyInt())).thenReturn(Optional.of(country));
         when(serviceMediator.findProductById(anyInt())).thenReturn(Optional.of(product));
         when(serviceMediator.findShelfById(anyInt())).thenReturn(Optional.of(shelf));
 

@@ -252,7 +252,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
             userCompany = new UserCompany();
             userCompany.setName(userCompanyDto.getName());
             userCompany.setAddress(userCompanyDto.getAddress());
-            userCompany.setCountry(serviceMediator.countryById(userCompanyDto.getCountryDto().getCountryId()).orElseThrow(() -> {
+            userCompany.setCountry(serviceMediator.findCountryById(userCompanyDto.getCountryDto().getCountryId()).orElseThrow(() -> {
                 //logger
                 throw new CoreException(String.format(
                                             ExceptionMessages.COUNTRY_NOT_FOUND_MESSAGE,

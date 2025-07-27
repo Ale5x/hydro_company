@@ -134,7 +134,7 @@ class ProductServiceImplTest {
         existing.setProductType(new ProductType(12, "OldType"));
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
-        when(serviceMediator.countryById(2)).thenReturn(Optional.of(new Country(2, "NewCountry")));
+        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(new Country(2, "NewCountry")));
         when(serviceMediator.findProductCompanyById(3)).thenReturn(Optional.of(new ProductCompany(3, "NewCompany")));
         when(serviceMediator.findProductConnectionById(4)).thenReturn(Optional.of(new ProductConnection(4, "1/2''")));
         when(serviceMediator.findProductTypeById(5)).thenReturn(Optional.of(new ProductType(5, "NewType")));
@@ -182,7 +182,7 @@ class ProductServiceImplTest {
         verify(serviceMediator, never()).findProductCompanyById(anyInt());
         verify(serviceMediator, never()).findProductConnectionById(anyInt());
         verify(serviceMediator, never()).findProductTypeById(anyInt());
-        verify(serviceMediator, never()).countryById(anyInt());
+        verify(serviceMediator, never()).findCountryById(anyInt());
 
     }
 
@@ -278,7 +278,7 @@ class ProductServiceImplTest {
         existing.setProductId(1);
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
-        when(serviceMediator.countryById(99)).thenReturn(Optional.empty());
+        when(serviceMediator.findCountryById(99)).thenReturn(Optional.empty());
 
         CoreException ex = assertThrows(CoreException.class, () -> productService.update(dto));
 

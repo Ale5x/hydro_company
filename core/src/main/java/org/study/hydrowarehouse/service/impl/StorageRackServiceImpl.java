@@ -7,6 +7,7 @@ import org.study.hydrowarehouse.dao.StorageRackDao;
 import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.StorageRackService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -18,8 +19,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, StorageRack> implements StorageRackService {
-
-    private final static String STORAGE_RACK_NOT_FOUND_BY_ID_MESSAGE = "Storage rack not found. [id =%s]";
     private final StorageRackDao storageRackDao;
 
     @Autowired
@@ -40,8 +39,9 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
         StorageRack existingStRack = storageRackDao.getStorageRackById(storageRackDto.getStorageRackDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(STORAGE_RACK_NOT_FOUND_BY_ID_MESSAGE,
-                            storageRackDto.getStorageRackDtoId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.STORAGE_RACK_NOT_FOUND_BY_ID_MESSAGE,
+                                                storageRackDto.getStorageRackDtoId()));
                 });
         existingStRack.setName(StringUtils.isBlankOrNullText(storageRackDto.getName())
                 ? existingStRack.getName() : storageRackDto.getName());

@@ -9,6 +9,7 @@ import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.Shelf;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ShelfService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -20,8 +21,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements ShelfService {
-
-    private final static String SHELF_BY_ID_NOT_FOUND_MESSAGE = "Shelf not found. [id = %s, name = %s]";
 
     private final ShelfDao shelfDao;
 
@@ -61,8 +60,10 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
         Shelf existingShelf = shelfDao.findById(shelfDto.getShelfDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(SHELF_BY_ID_NOT_FOUND_MESSAGE,
-                            shelfDto.getShelfDtoId(), shelfDto.getName()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.SHELF_BY_ID_NOT_FOUND_MESSAGE,
+                                                shelfDto.getShelfDtoId(),
+                                                shelfDto.getName()));
                 });
         existingShelf.setStorageRack(mapToStorageRack(shelfDto.getStorageRackDto()));
         existingShelf.setName(StringUtils.isBlankOrNullText(shelfDto.getName())
@@ -101,7 +102,11 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
         if (shelf.isPresent()) {
             return shelfDao.remove(id);
         } else {
-            throw new CoreException(SHELF_BY_ID_NOT_FOUND_MESSAGE);
+            //logger
+            throw new CoreException(String.format(
+                                ExceptionMessages.SHELF_BY_ID_NOT_FOUND_MESSAGE,
+                                id,
+                                ""));
         }
     }
 

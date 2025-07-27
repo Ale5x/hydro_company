@@ -9,6 +9,7 @@ import org.study.hydrowarehouse.entity.Dto.PictureDto;
 import org.study.hydrowarehouse.entity.Picture;
 import org.study.hydrowarehouse.entity.Product;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.PictureService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -23,10 +24,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implements PictureService {
-
-    private final static String PICTURE_NOT_FOUND_BY_ID_MESSAGE = "Picture not found. [id = %s]";
-    private final static String PICTURE_NOT_REMOVE_MESSAGE = "Picture don't remove. [id = %s]";
-    private final static String PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE = "Product not found for the picture. [id = %s]";
 
     @Value("${file.limit-pictures}")
     private int maxPhotoLimit;
@@ -49,7 +46,9 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
         picture.setProduct(serviceMediator.findProductById(pictureDto.getProductId())
                 .orElseThrow(() -> new CoreException(
-                        String.format(PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE, pictureDto.getProductId()))));
+                        String.format(
+                                ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE,
+                                pictureDto.getProductId()))));
 
         picture.setPath(pictureDto.getPath());
         validatePhotoCountLimit(picture.getProduct().getProductId());
@@ -61,7 +60,9 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
         Picture existingPicture = pictureDao.findById(pictureDto.getPictureDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(PICTURE_NOT_FOUND_BY_ID_MESSAGE, pictureDto.getPictureDtoId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PICTURE_NOT_FOUND_BY_ID_MESSAGE,
+                                                pictureDto.getPictureDtoId()));
         });
         if (!StringUtils.isBlankOrNullText(pictureDto.getPath())
                 && !pictureDto.getPath().equals(existingPicture.getPath())) {
@@ -73,7 +74,9 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
                 .orElseThrow(() -> {
                     //logger
                     throw new CoreException(
-                            String.format(PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE, pictureDto.getProductId()));
+                            String.format(
+                                    ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE,
+                                    pictureDto.getProductId()));
                 });
         existingPicture.setProduct(existingPicture.getProduct().getProductId().equals(product.getProductId())
                 ? existingPicture.getProduct() : product);
@@ -83,13 +86,18 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
     @Override
     public boolean remove(int id) throws CoreException {
         Picture picture = pictureDao.findById(id)
-                .orElseThrow(() -> new CoreException(String.format(PICTURE_NOT_FOUND_BY_ID_MESSAGE, id)));
+                .orElseThrow(() -> new CoreException(
+                        String.format(
+                                ExceptionMessages.PICTURE_NOT_FOUND_BY_ID_MESSAGE,
+                                id)));
 
         boolean isRemoved = pictureDao.remove(id);
         if (isRemoved) {
             return imageStorage.removeFile(picture.getPath());
         } else {
-            throw new CoreException(String.format(PICTURE_NOT_REMOVE_MESSAGE, id));
+            throw new CoreException(String.format(
+                    ExceptionMessages.PICTURE_NOT_REMOVE_MESSAGE,
+                    id));
         }
     }
 

@@ -7,6 +7,7 @@ import org.study.hydrowarehouse.dao.ProductSkuDao;
 import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductSkuService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -38,23 +39,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSku> implements ProductSkuService {
-
-    private final static String PRODUCT_TYPE = "Product";
-    private final static String SHELF_TYPE = "Shelf";
-    private final static String COUNTRY_TYPE = "Country";
-    private final static String PRODUCT_SKU_TYPE = "Product SKU";
-    private final static String PRODUCT_SKU_STATUS_TYPE = "Product SKU status";
-    private final static String COUNTRY_BY_ID_NOT_FOUND_MESSAGE = "Country not found. [id = %s]";
-
-    private final static String PRODUCT_BY_ID_NOT_FOUND_MESSAGE = "Product not found. [id = %s]";
-    private final static String PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE = "Product SKU not found. [id = %s]";
-    private final static String INVALID_SKU_STATUS_MESSAGE = "Invalid SKU status: [SKU status = %s].";
-    private final static String ID_IS_NULL_MESSAGE = "Id is null. [Type = %s].";
-    private final static String OBJECT_IS_NULL_MESSAGE = "Object is null. [Type = %s].";
-
-    private final static String SHELF_BY_ID_NOT_FOUND_MESSAGE = "Shelf not found. [id = %s, name = %s]";
-    private final static String SKU_STATUS_BY_NAME_NOT_FOUND_MESSAGE = "SKU status not found. [name = %s]";
-
     private final static String IN_STOCK = "In Stock";
 
     private final ProductSkuDao skuDao;
@@ -75,7 +59,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
         productSku.setShelf(resolveShelf(skuDto.getShelfDto()));
         productSku.setStatus(serviceMediator.findSkuStatusByStatus(IN_STOCK).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(SKU_STATUS_BY_NAME_NOT_FOUND_MESSAGE, IN_STOCK));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.SKU_STATUS_BY_NAME_NOT_FOUND_MESSAGE,
+                                        IN_STOCK));
         }));
         return skuDao.save(productSku) > 0;
     }
@@ -85,12 +71,16 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
         Integer skuDtoId = skuDto.getProductSkuDtoId();
         if (StringUtils.isNullNumericObject(skuDtoId)) {
             // logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_SKU_TYPE));
+            throw new CoreException(String.format(
+                    ExceptionMessages.ID_IS_NULL_MESSAGE,
+                    ExceptionMessages.PRODUCT_SKU_TYPE));
         }
         ProductSku existingSku = skuDao.findById(skuDtoId)
                 .orElseThrow(() -> {
                    // logger.warn("ProductSku not found, ID = {}", skuDto.getProductSkuId());
-                    throw new CoreException(String.format(PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE, skuDtoId));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE,
+                                                skuDtoId));
                 });
 
         if (skuDto.getCode() != null && !skuDto.getCode().isBlank()) {
@@ -113,8 +103,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
             ProductSkuStatus status = serviceMediator.findSkuStatusById(skuDto.getStatus().getProductSkuStatusDtoId())
                     .orElseThrow(() -> {
                         //logger.warn("ProductSkuStatus not found: {}", skuDto.getStatus());
-                        throw new CoreException(String.format(PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE,
-                                skuDto.getStatus().getProductSkuStatusDtoId()));
+                        throw new CoreException(String.format(
+                                                    ExceptionMessages.PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE,
+                                                    skuDto.getStatus().getProductSkuStatusDtoId()));
                     });
             existingSku.setStatus(status);
         }
@@ -126,19 +117,27 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     public boolean updateStatus(ProductSkuDto skuDto, String status) throws CoreException {
         if (StringUtils.isNullNumericObject(skuDto.getProductSkuDtoId())) {
             //logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_SKU_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.ID_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_SKU_TYPE));
         }
         if (StringUtils.isNullNumericObject(status)) {
             //logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_SKU_STATUS_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.ID_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_SKU_STATUS_TYPE));
         }
         ProductSku productSku = skuDao.findById(skuDto.getProductSkuDtoId()).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE, skuDto.getProductSkuDtoId()));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.PRODUCT_SKU_BY_ID_NOT_FOUND_MESSAGE,
+                                        skuDto.getProductSkuDtoId()));
         });
         ProductSkuStatus newStatus = serviceMediator.findSkuStatusByStatus(status).orElseThrow(() -> {
             // logger
-            throw new CoreException(String.format(SKU_STATUS_BY_NAME_NOT_FOUND_MESSAGE, status));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.SKU_STATUS_BY_NAME_NOT_FOUND_MESSAGE,
+                                        status));
         });
         productSku.setStatus(newStatus);
         return skuDao.update(productSku);
@@ -148,7 +147,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     public boolean remove(Integer id) throws CoreException {
         if (StringUtils.isNullNumericObject(id)) {
             //logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_SKU_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.ID_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_SKU_TYPE));
         }
         return skuDao.remove(id);
     }
@@ -157,7 +158,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     public Optional<ProductSkuDto> findById(Integer id) throws CoreException {
         if (StringUtils.isNullNumericObject(id)) {
             //logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_SKU_TYPE));
+            throw new CoreException(String.format(
+                                    ExceptionMessages.ID_IS_NULL_MESSAGE,
+                                    ExceptionMessages.PRODUCT_SKU_TYPE));
         }
         Optional<ProductSku> productSku = skuDao.findById(id);
         if (productSku.isEmpty()) {
@@ -174,7 +177,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     @Override
     public List<ProductSkuDto> findAllByStatus(int limit, int offset, String status) throws CoreException {
         ProductSkuStatus productSkuStatus = serviceMediator.findSkuStatusByStatus(status)
-                .orElseThrow(() -> new CoreException(String.format(INVALID_SKU_STATUS_MESSAGE, status)));
+                .orElseThrow(() -> new CoreException(String.format(
+                                                        ExceptionMessages.INVALID_SKU_STATUS_MESSAGE,
+                                                        status)));
         return mapToListObjectsDto(skuDao.findAllByStatus(limit, offset, productSkuStatus));
     }
 
@@ -183,7 +188,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
         Integer productId = productDto.getProductDtoId();
         if (StringUtils.isNullNumericObject(productId)) {
             //logger
-            throw new CoreException(String.format(ID_IS_NULL_MESSAGE, PRODUCT_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.ID_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_TYPE));
         }
         return mapToListObjectsDto(skuDao.findAllByProduct(limit, offset, new Product(productId)));
     }
@@ -200,7 +207,9 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     @Override
     public ProductSkuDto mapToObjectDto(ProductSku object) throws CoreException {
         if (object == null) {
-            throw new CoreException(String.format(OBJECT_IS_NULL_MESSAGE, PRODUCT_SKU_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_SKU_TYPE));
         }
 
         ProductSkuDto skuDto = new ProductSkuDto();
@@ -296,14 +305,16 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     private Country resolveCountry(CountryDto dto) {
         if (StringUtils.isNullNumericObject(dto.getCountryId())) {
             //logger
-            throw new CoreException(String.format(OBJECT_IS_NULL_MESSAGE, COUNTRY_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
+                                        ExceptionMessages.COUNTRY_TYPE));
         }
         return serviceMediator.countryById(dto.getCountryId())
                 .orElseThrow(() -> {
                     //logger
                     throw new CoreException(String.format(
-                            COUNTRY_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getCountryId()));
+                                                ExceptionMessages.COUNTRY_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getCountryId()));
                 });
     }
 
@@ -317,14 +328,16 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     private Product resolveProduct(ProductDto dto) {
         if (StringUtils.isNullNumericObject(dto.getProductDtoId())) {
             //logger
-            throw new CoreException(String.format(OBJECT_IS_NULL_MESSAGE, PRODUCT_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
+                                        ExceptionMessages.PRODUCT_TYPE));
         }
         return serviceMediator.findProductById(dto.getProductDtoId())
                 .orElseThrow(() -> {
                     //logger
                     throw new CoreException(String.format(
-                            PRODUCT_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getProductDtoId()));
+                                                ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getProductDtoId()));
                 });
     }
 
@@ -338,15 +351,17 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     private Shelf resolveShelf(ShelfDto dto) {
         if (StringUtils.isNullNumericObject(dto.getShelfDtoId())) {
             //logger
-            throw new CoreException(String.format(OBJECT_IS_NULL_MESSAGE, SHELF_TYPE));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
+                                        ExceptionMessages.SHELF_TYPE));
         }
         return serviceMediator.findShelfById(dto.getShelfDtoId())
                 .orElseThrow(() -> {
                     //logger
                     throw new CoreException(String.format(
-                            SHELF_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getShelfDtoId(),
-                            dto.getName()));
+                                                ExceptionMessages.SHELF_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getShelfDtoId(),
+                                                dto.getName()));
                 });
     }
 }

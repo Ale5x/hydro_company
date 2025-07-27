@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implements CountryService {
 
-    private static final String COUNTRY_NOT_FOUND_ERROR = "Country not found.";
     private final CountryDao countryDao;
 
     @Autowired

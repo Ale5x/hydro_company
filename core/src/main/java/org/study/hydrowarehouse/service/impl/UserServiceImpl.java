@@ -9,6 +9,7 @@ import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.*;
 import org.study.hydrowarehouse.utill.StringUtils;
 
@@ -29,11 +30,6 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
 
     private static final String ISO_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String USER_STATUS_ACTIVE = "ACTIVE";
-    private static final String USER_NOT_FOUND_BY_ID_MESSAGE = "User not found. [id = %s]";
-    private static final String USER_STATUS_NOT_FOUND_MESSAGE = "User Status not found. [status = %s]";
-    private static final String USER_ROLE_NOT_EXIST_MESSAGE = "User Role doesn't exist. [role = %s]";
-    private static final String USER_COMPANY_NOT_FOUND_MESSAGE = "User company not found. [id = %s, name = %s, address = %s]";
-    private static final String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
 
     private final UserDao userDao;
 
@@ -67,7 +63,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
 
         user.setPathPhoto(userDto.getPathPhoto());
         user.setStatus(serviceMediator.findByStatus(USER_STATUS_ACTIVE.toUpperCase()).orElseThrow(
-                () -> new CoreException(String.format(USER_STATUS_NOT_FOUND_MESSAGE, USER_STATUS_ACTIVE))));
+                () -> new CoreException(String.format(
+                                            ExceptionMessages.USER_STATUS_NOT_FOUND_MESSAGE,
+                                            USER_STATUS_ACTIVE))));
 
         user.setRegistration( getLocalDate());
 
@@ -82,7 +80,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         User existingUser = userDao.getUserById(userDto.getUserDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userDto.getUserDtoId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.USER_NOT_FOUND_BY_ID_MESSAGE,
+                                                userDto.getUserDtoId()));
                 });
         existingUser.setFirstName(StringUtils.isBlankOrNullText(userDto.getFirstName())
                 ? existingUser.getFirstName() : userDto.getFirstName());
@@ -133,11 +133,15 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     public boolean changeStatus(Integer userId, String newStatus) throws CoreException {
         User user = userDao.getUserById(userId).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userId));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_NOT_FOUND_BY_ID_MESSAGE,
+                                        userId));
         });
         UserStatus status = serviceMediator.findByStatus(newStatus).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(USER_STATUS_NOT_FOUND_MESSAGE, newStatus));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_STATUS_NOT_FOUND_MESSAGE,
+                                        newStatus));
         });
         user.setStatus(status);
         userDao.update(user);
@@ -148,11 +152,15 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     public boolean changeRole(Integer userId, String newRole) throws CoreException {
         User user = userDao.getUserById(userId).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(USER_NOT_FOUND_BY_ID_MESSAGE, userId));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_NOT_FOUND_BY_ID_MESSAGE,
+                                        userId));
         });
         Role role = serviceMediator.findRole(parseRole(newRole)).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, newRole));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_ROLE_NOT_EXIST_MESSAGE,
+                                        newRole));
         });
         user.setRole(role);
         userDao.update(user);
@@ -169,7 +177,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         try {
             return ERole.valueOf(role.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, role));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_ROLE_NOT_EXIST_MESSAGE,
+                                        role));
         }
     }
 
@@ -216,7 +226,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
      */
     private Role addRoleToNewUser() {
         return roleService.findRole(ERole.USER).orElseThrow(
-                () -> new CoreException(USER_ROLE_NOT_EXIST_MESSAGE));
+                () -> new CoreException(String.format(
+                                            ExceptionMessages.USER_ROLE_NOT_EXIST_MESSAGE,
+                                            ERole.USER)));
     }
 
     /**
@@ -230,7 +242,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         if (companyId != null) {
             return serviceMediator.findUserCompanyById(companyId).orElseThrow(() -> {
                 //logger
-                throw new CoreException(String.format(USER_COMPANY_NOT_FOUND_MESSAGE, companyId,
+                throw new CoreException(String.format(
+                        ExceptionMessages.USER_COMPANY_NOT_FOUND_MESSAGE,
+                        companyId,
                         userCompanyDto.getName(),
                         userCompanyDto.getAddress()));
             });
@@ -240,9 +254,10 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
             userCompany.setAddress(userCompanyDto.getAddress());
             userCompany.setCountry(serviceMediator.countryById(userCompanyDto.getCountryDto().getCountryId()).orElseThrow(() -> {
                 //logger
-                throw new CoreException(String.format(COUNTRY_NOT_FOUND_MESSAGE,
-                        userCompanyDto.getCountryDto().getCountryId(),
-                        userCompanyDto.getCountryDto().getName()));
+                throw new CoreException(String.format(
+                                            ExceptionMessages.COUNTRY_NOT_FOUND_MESSAGE,
+                                            userCompanyDto.getCountryDto().getCountryId(),
+                                            userCompanyDto.getCountryDto().getName()));
             }));
         }
         return userCompany;
@@ -277,7 +292,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
             userDto.setRole(mapRoles(object.getRole()));
         } else {
             //logging
-            throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, object.getRole()));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.USER_ROLE_NOT_EXIST_MESSAGE,
+                                        object.getRole()));
         }
         return userDto;
     }
@@ -314,7 +331,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
                return role.get();
             } else {
                 // logging
-                throw new CoreException(String.format(USER_ROLE_NOT_EXIST_MESSAGE, roleName));
+                throw new CoreException(String.format(
+                                            ExceptionMessages.USER_ROLE_NOT_EXIST_MESSAGE,
+                                            roleName));
             }
         }
         return new Role(ERole.USER);

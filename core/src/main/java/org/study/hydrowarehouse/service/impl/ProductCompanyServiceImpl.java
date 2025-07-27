@@ -9,6 +9,7 @@ import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.entity.Dto.ProductCompanyDto;
 import org.study.hydrowarehouse.entity.ProductCompany;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductCompanyService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -20,10 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, ProductCompany> implements ProductCompanyService {
-
-    private final static String PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "ProductCompany not found. [id = %s]";
-    private final static String COUNTRY_FOR_PRODUCT_COMPANY_NOT_FOUND_MESSAGE =
-            "Country not found for product company. [id = %s, name = %s]";
 
     private final ProductCompanyDao productCompanyDao;
     private final ServiceMediator serviceMediator;
@@ -47,8 +44,9 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
         ProductCompany existingCompany = productCompanyDao.getById(productCompanyDto.getProductCompanyDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
-                            productCompanyDto.getProductCompanyDtoId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
+                                                productCompanyDto.getProductCompanyDtoId()));
                 });
         existingCompany.setName(StringUtils.isBlankOrNullText(productCompanyDto.getName())
                 ? existingCompany.getName() : productCompanyDto.getName());
@@ -62,9 +60,10 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
             Country country = serviceMediator.countryById(countryDto.getCountryId())
                     .orElseThrow(() -> {
                         //logger
-                        throw new CoreException(String.format(COUNTRY_FOR_PRODUCT_COMPANY_NOT_FOUND_MESSAGE,
-                                countryDto.getCountryId(),
-                                countryDto.getName()));
+                        throw new CoreException(String.format(
+                                                    ExceptionMessages.COUNTRY_FOR_PRODUCT_COMPANY_NOT_FOUND_MESSAGE,
+                                                    countryDto.getCountryId(),
+                                                    countryDto.getName()));
                     });
             countrySet.add(country);
         }

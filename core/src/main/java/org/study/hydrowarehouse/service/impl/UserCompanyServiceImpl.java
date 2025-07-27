@@ -9,6 +9,7 @@ import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.entity.UserCompany;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.CountryService;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.UserCompanyService;
@@ -25,9 +26,6 @@ import java.util.*;
 @Service
 @Transactional
 public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCompany> implements UserCompanyService {
-
-    private final static String USER_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "User company not found. [id = %s]";
-    private final static String COUNTRY_NOT_FOUND_MESSAGE = "Country not found. [id = %s, name = %s]";
     private final UserCompanyDao userCompanyDao;
 
     private final CountryService countryService;
@@ -52,8 +50,9 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
         UserCompany existingUserCompany =userCompanyDao.companyById(userCompanyDto.getCompanyDtoId())
                 .orElseThrow(() -> {
                     //logger
-                    return new CoreException(
-                            String.format(USER_COMPANY_BY_ID_NOT_FOUND_MESSAGE, userCompanyDto.getCompanyDtoId()));
+                    return new CoreException(String.format(
+                                                ExceptionMessages.USER_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
+                                                userCompanyDto.getCompanyDtoId()));
                 });
 
         existingUserCompany.setName(StringUtils.isBlankOrNullText(userCompanyDto.getName())
@@ -118,7 +117,8 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
                 .orElseThrow(() -> {
                     // Logger
                     throw new CoreException(
-                            String.format(COUNTRY_NOT_FOUND_MESSAGE,
+                            String.format(
+                                    ExceptionMessages.COUNTRY_NOT_FOUND_MESSAGE,
                                     countryDto.getCountryId(),
                                     countryDto.getName())
                     );

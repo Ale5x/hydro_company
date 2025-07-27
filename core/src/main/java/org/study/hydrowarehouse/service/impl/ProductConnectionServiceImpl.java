@@ -7,6 +7,7 @@ import org.study.hydrowarehouse.dao.ProductConnectionDao;
 import org.study.hydrowarehouse.entity.Dto.ProductConnectionDto;
 import org.study.hydrowarehouse.entity.ProductConnection;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductConnectionService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -18,8 +19,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ProductConnectionServiceImpl extends EntityMapper<ProductConnectionDto, ProductConnection> implements ProductConnectionService {
-
-    private final static String PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE = "Product Connection not found. [id = %s.]";
 
     private final ProductConnectionDao productConnectionDao;
 
@@ -41,8 +40,9 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
                 .getProductConnectionById(productConnectionDto.getProductConnectionId())
                 .orElseThrow(() -> {
                     // logger
-                    throw new CoreException(String.format(PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
-                            productConnectionDto.getProductConnectionId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
+                                                productConnectionDto.getProductConnectionId()));
                 });
         existingConnection.setSize(StringUtils.isBlankOrNullText(productConnectionDto.getSize())
                 ? existingConnection.getSize() : productConnectionDto.getSize());

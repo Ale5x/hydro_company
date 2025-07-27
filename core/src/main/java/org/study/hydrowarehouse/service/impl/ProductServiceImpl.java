@@ -8,6 +8,7 @@ import org.study.hydrowarehouse.dao.ProductDao;
 import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.ProductService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -23,13 +24,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     @Value("${product-sku-status}")
     private String defaultStatus;
-    private final static String PRODUCT_BY_ID_NOT_FOUND_MESSAGE = "Product not found. [id = %s]";
-    private final static String PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE = "Product Type not found. [id = %s]";
-    private final static String PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE = "Product Connection not found. [id = %s]";
-    private final static String PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE = "Product Company not found. [id = %s]";
-    private final static String STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE = "Storage rack not found. [id = %s]";
-    private final static String COUNTRY_BY_ID_NOT_FOUND_MESSAGE = "Country not found. [id = %s]";
-    private final static String FILED_REMOVING_FILES_ERROR = "Failed to remove some product's files: ";
 
     private final ProductDao productDao;
 
@@ -69,7 +63,9 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     public boolean update(ProductDto productDto) throws CoreException {
         Product existingProduct = productDao.getProductById(productDto.getProductDtoId()).orElseThrow(() -> {
             //logger
-            throw new CoreException(String.format(PRODUCT_BY_ID_NOT_FOUND_MESSAGE, productDto.getProductDtoId()));
+            throw new CoreException(String.format(
+                                        ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_MESSAGE,
+                                        productDto.getProductDtoId()));
         });
 
         existingProduct.setFlowRate(StringUtils.isNullNumericObject(productDto.getFlowRate())
@@ -116,7 +112,12 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     @Override
     public boolean remove(int id) throws CoreException {
         Product product = productDao.getProductById(id).orElseThrow(
-                () -> new CoreException(PRODUCT_BY_ID_NOT_FOUND_MESSAGE));
+                () -> {
+                    //logger
+                    throw new CoreException(String.format(
+                            ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_MESSAGE,
+                            id));
+                });
 
         if (productDao.remove(product.getProductId())) {
             removeAllProductFiles(product);
@@ -142,7 +143,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                 .toList();
         if (!failedPaths.isEmpty()) {
             //logging
-            throw new CoreException(FILED_REMOVING_FILES_ERROR + failedPaths);
+            throw new CoreException(ExceptionMessages.FILED_REMOVING_FILES_ERROR + failedPaths);
         }
     }
 
@@ -287,8 +288,9 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
             StorageRack storageRack = serviceMediator.findStorageRackById(storageRackDto.getStorageRackDtoId())
                     .orElseThrow(() -> {
                         //logger
-                        throw new CoreException(String.format(STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE,
-                                storageRackDto.getStorageRackDtoId()));
+                        throw new CoreException(String.format(
+                                                    ExceptionMessages.STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE,
+                                                    storageRackDto.getStorageRackDtoId()));
                     });
             storageList.add(storageRack);
         }
@@ -347,8 +349,8 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         return serviceMediator.findProductCompanyById(dto.getProductCompanyDtoId())
                 .orElseThrow(() -> {
                     throw new CoreException(String.format(
-                            PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getProductCompanyDtoId()));
+                                                ExceptionMessages.PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getProductCompanyDtoId()));
                 });
     }
 
@@ -372,8 +374,9 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                         dto.getProductTypeId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getProductTypeId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getProductTypeId()));
                 });
     }
 
@@ -474,8 +477,9 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
                         dto.getProductConnectionId())
                 .orElseThrow(() -> {
                     //logger
-                    throw new CoreException(String.format(PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
-                            dto.getProductConnectionId()));
+                    throw new CoreException(String.format(
+                                                ExceptionMessages.PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
+                                                dto.getProductConnectionId()));
                 });
     }
 

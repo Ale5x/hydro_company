@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @ControllerAdvice
 public class AppExceptionHandler {
-
-    private static final String CODE_500_MESSAGE = "Server doesn't work...";
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error occurred. Please try again later.";
+    private static final String UNEXPECTED_ERROR_MESSAGE = "An unexpected error occurred. Please contact support.";
 
     /**
      * This method catches CoreException from the core and sends the response with the report and the status.
@@ -26,7 +26,7 @@ public class AppExceptionHandler {
     @ExceptionHandler(value = CoreException.class)
     public ResponseEntity<Object> internalError(CoreException coreEx) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ReportException reportEx = new ReportException(status);
+        ReportException reportEx = new ReportException(status, INTERNAL_SERVER_ERROR_MESSAGE);
         return new ResponseEntity<>(reportEx, status);
     }
 
@@ -50,7 +50,7 @@ public class AppExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Object> internalError(Exception ex) {
-        ReportException reportEx = new ReportException(HttpStatus.INTERNAL_SERVER_ERROR, CODE_500_MESSAGE);
+        ReportException reportEx = new ReportException(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED_ERROR_MESSAGE);
         return new ResponseEntity<>(reportEx, reportEx.getStatus());
     }
 }

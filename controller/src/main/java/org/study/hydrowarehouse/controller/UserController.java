@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
+import org.study.hydrowarehouse.exception.AppRequestException;
 import org.study.hydrowarehouse.exception.ReportException;
 import org.study.hydrowarehouse.hateoas.HateoasLinkHelper;
 import org.study.hydrowarehouse.hateoas.HypermediaListAssembler;
@@ -134,7 +135,7 @@ public class UserController implements HypermediaListAssembler<UserDto> {
         return userService.findUserByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
-                    throw new ReportException(HttpStatus.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
+                    throw new AppRequestException(USER_NOT_FOUND_MESSAGE, HttpStatus.NOT_FOUND);
                 });
     }
 

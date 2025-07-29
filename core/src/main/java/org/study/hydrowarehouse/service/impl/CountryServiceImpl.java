@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.CountryDao;
 import org.study.hydrowarehouse.entity.Country;
 import org.study.hydrowarehouse.entity.Dto.CountryDto;
+import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.CountryService;
 import org.study.hydrowarehouse.service.EntityMapper;
 
@@ -52,6 +53,14 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
     @Override
     public Optional<Country> findCountryById(int id) {
         return countryDao.countryById(id);
+    }
+
+    @Override
+    public List<CountryDto> findByProduct(int productId) throws CoreException {
+        return mapToListObjectsDto(new ArrayList<>(countryDao.countriesByProduct(productId)))
+                .stream()
+                .sorted(Comparator.comparing(CountryDto::getName))
+                .collect(Collectors.toList());
     }
 
     @Override

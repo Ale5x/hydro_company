@@ -25,14 +25,11 @@ public class CountyDaoImplTest {
 
     private String countryName = "B";
     private int countryId = 1;
+    private int productId = 1;
 
     @Test
     void getCountries() {
         Set<Country> countries = countryDao.countries();
-        System.out.println(" Count countries --->> "  + countries.size());
-        for(Country country : countries) {
-            System.out.println("ID --> " + country.getCountryId() + " | name --> " + country.getName());
-        }
         assertTrue(countries.size() > 0);
         assertFalse(countries.isEmpty());
 
@@ -41,10 +38,6 @@ public class CountyDaoImplTest {
     @Test
     void getByName() {
         Set<Country> countrySetByName = countryDao.countriesByName(countryName);
-        System.out.println(" Count countries --->> "  + countrySetByName.size());
-        for(Country country : countrySetByName) {
-            System.out.println("ID --> " + country.getCountryId() + " | name --> " + country.getName());
-        }
         assertTrue(countrySetByName.size() > 0);
         assertFalse(countrySetByName.isEmpty());
     }
@@ -52,8 +45,14 @@ public class CountyDaoImplTest {
     @Test
     void getById() {
         Optional<Country> countryById = countryDao.countryById(countryId);
-        System.out.println(" Count countries --->> "  + countryById.get().getCountryId() + " | name -> " + countryById.get().getName());
 
         assertTrue(countryById.isPresent());
+    }
+
+    @Test
+    void countriesByProduct () {
+        Set<Country> countrySetByProduct = countryDao.countriesByProduct(productId);
+        assertTrue(countrySetByProduct.size() > 0);
+        assertFalse(countrySetByProduct.isEmpty());
     }
 }

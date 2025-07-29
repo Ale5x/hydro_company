@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.CountryDao;
 import org.study.hydrowarehouse.dao.CriteriaQueryHelper;
 import org.study.hydrowarehouse.entity.Country;
+import org.study.hydrowarehouse.exception.CoreException;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -19,6 +20,11 @@ public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements Coun
 
     private final static String COUNTRY_NAME = "name";
     private final static String COUNTRY_ID = "countryId";
+    private final static String PRODUCT_ID = "productId";
+
+    private final static String COUNTRIES_BY_PRODUCT_ID_QUERY = "SELECT DISTINCT c FROM ProductSku ps " +
+            "JOIN ps.country c " +
+            "WHERE ps.product.productId = :productId";
 
     @Override
     public Set<Country> countries() {
@@ -58,5 +64,13 @@ public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements Coun
         criteriaQuery.select(countryRoot)
                 .where(criteriaBuilder.or(predicates));
         return new HashSet<>(session.createQuery(criteriaQuery).getResultList());
+    }
+
+    @Override
+    public Set<Country> countriesByProduct(Integer productId){
+        Session session = getCurrentSession();
+        return new HashSet<>(session.createQuery(COUNTRIES_BY_PRODUCT_ID_QUERY, Country.class)
+                .setParameter(PRODUCT_ID, productId)
+                .getResultList());
     }
 }

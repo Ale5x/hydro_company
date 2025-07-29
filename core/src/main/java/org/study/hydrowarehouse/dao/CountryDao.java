@@ -2,6 +2,7 @@ package org.study.hydrowarehouse.dao;
 
 
 import org.study.hydrowarehouse.entity.Country;
+import org.study.hydrowarehouse.exception.CoreException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -37,4 +38,13 @@ public interface CountryDao {
      * @return the specified list of countries by the name or the same name.
      */
     Set<Country> countriesByName(String name);
+
+    /**
+     * Retrieves a set of countries associated with the specified product.
+     *
+     * @param productId the unique identifier of the product; must not be {@code null}
+     * @return a set of {@link Country} entities linked to the given product;
+     *         an empty set if no countries are found
+     */
+    Set<Country> countriesByProduct(Integer productId);
 }

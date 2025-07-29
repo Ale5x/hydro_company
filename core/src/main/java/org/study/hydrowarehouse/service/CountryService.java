@@ -45,4 +45,14 @@ public interface CountryService {
      * @throws CoreException if an error occurs during the retrieval process.
      */
     Optional<Country> findCountryById(int id);
+
+    /**
+     * Retrieves a list of countries associated with the specified product ID.
+     *
+     * @param productId the unique identifier of the product
+     * @return a list of {@link CountryDto} objects linked to the given product;
+     *         an empty list if no countries are found
+     * @throws CoreException if an error occurs during data retrieval
+     */
+    List<CountryDto> findByProduct(int productId) throws CoreException;
 }

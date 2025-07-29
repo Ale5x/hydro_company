@@ -71,4 +71,10 @@ public class CountryController {
     public CollectionModel<CountryDto> findCountriesByName(@RequestParam(ControllerConstants.NAME) String name) {
         return CollectionModel.of(countryService.findByName(name));
     }
+
+    @GetMapping(value = PathPages.COUNTRY_BY_PRODUCT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<CountryDto> findCountriesByProduct(@RequestParam(ControllerConstants.ID) String id) {
+        ValidatorParam.isNumber(id);
+        return CollectionModel.of(countryService.findByProduct(Integer.parseInt(id)));
+    }
 }

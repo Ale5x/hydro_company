@@ -106,6 +106,7 @@ public class PathPages {
     public static final String COUNTRY_ALL = COUNTRY + "/all";
     public static final String COUNTRY_ID = COUNTRY + "/id";
     public static final String COUNTRY_NAME = COUNTRY + "/name";
+    public static final String COUNTRY_BY_PRODUCT = COUNTRY + "/by_product";
 
     public static final String USER = "/user";
     public static final String USER_CURRENT = API + USER + "/me";

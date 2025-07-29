@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CountryServiceTest {
@@ -33,6 +34,8 @@ public class CountryServiceTest {
     private List<CountryDto> countryDtoSearchCriteriaList = new ArrayList<>();
     private List<CountryDto> expectedCountryDtoSearchCriteriaList = new ArrayList<>();
     private  List<CountryDto> expectedListCounties;
+    private Set<Country> countries = new HashSet<>();
+
 
     @BeforeEach
     void init() {
@@ -84,6 +87,10 @@ public class CountryServiceTest {
                 .stream()
                 .sorted(Comparator.comparing(CountryDto::getName))
                 .collect(Collectors.toList());
+
+        countries.add(new Country(1, "Germany"));
+        countries.add(new Country(2, "France"));
+        countries.add(new Country(3, "Italy"));
     }
 
     @Test
@@ -172,5 +179,28 @@ public class CountryServiceTest {
         assertFalse(countryDtoSearchCriteriaList.get(testOne).equals(actualListCountries.get(testOne)));
         assertFalse(countryDtoSearchCriteriaList.get(testTwo).equals(actualListCountries.get(testTwo)));
         assertFalse(countryDtoSearchCriteriaList.get(testThree).equals(actualListCountries.get(testThree)));
+    }
+
+    @Test
+    void testFindByProduct_ReturnsSortedCountryDtos()  {
+        int productId = 123;
+
+        when(countryDao.countriesByProduct(productId)).thenReturn(countries);
+        List<CountryDto> result = countryService.findByProduct(productId);
+
+        assertNotNull(result);
+        assertTrue( result.size() > 0);
+    }
+
+    @Test
+    void testFindByProduct_EmptyList(){
+        int productId = 999;
+
+        when(countryDao.countriesByProduct(productId)).thenReturn(Collections.emptySet());
+
+        List<CountryDto> result = countryService.findByProduct(productId);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

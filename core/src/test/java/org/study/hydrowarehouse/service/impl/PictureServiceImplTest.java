@@ -12,6 +12,7 @@ import org.study.hydrowarehouse.entity.Dto.PictureDto;
 import org.study.hydrowarehouse.entity.Picture;
 import org.study.hydrowarehouse.entity.Product;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.exception.ExceptionMessages;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
@@ -39,9 +40,14 @@ class PictureServiceImplTest {
 
     private PictureDto pictureDto = new PictureDto();
     private Picture picture = new Picture();
+    private Product productWithMaxPictures = new Product();
+    private Product productWithMinPictures = new Product();
     private List<PictureDto> pictureDtoList = new ArrayList<>();
-    private List<Picture> pictureList = new ArrayList<>();
+    private List<Picture> maxPictureList = new ArrayList<>();
+    private List<Picture> minPictureList = new ArrayList<>();
 
+    private int maxPhotoLimit = 10;
+    private int minPhotoLimit = 5;
     private int limit = 10;
     private int offset = 0;
     private int someId = 1;
@@ -58,21 +64,57 @@ class PictureServiceImplTest {
 
         picture.setProduct(new Product(someId));
 
-        pictureList.add(picture);
+        maxPictureList.add(picture);
 
         ReflectionTestUtils.setField(pictureService, "maxPhotoLimit", 10);
+
+        productWithMaxPictures.setProductId(someId);
+        for (int i = 0; i <= maxPhotoLimit; i++) {
+            Picture pic = new Picture();
+            pic.setPictureId(i);
+            pic.setPath("Path -> " + i);
+            pic.setProduct(productWithMaxPictures);
+
+            maxPictureList.add(pic);
+        }
+        productWithMaxPictures.setPicturePath(maxPictureList);
+
+        productWithMinPictures.setProductId(someId);
+        for (int i = 0; i <= minPhotoLimit; i++) {
+            Picture pic = new Picture();
+            pic.setPictureId(i);
+            pic.setPath("Path -> " + i);
+            pic.setProduct(productWithMinPictures);
+
+            minPictureList.add(pic);
+        }
+        productWithMinPictures.setPicturePath(minPictureList);
+
 
     }
 
     @Test
     void create() {
-        when(serviceMediator.findProductById(someId)).thenReturn(Optional.of(new Product(someId)));
-        when(pictureService.findAllPicturesByProductId(someId)).thenReturn(pictureList);
+        when(serviceMediator.findProductById(someId)).thenReturn(Optional.of(productWithMinPictures));
         when(pictureDao.create(any(Picture.class))).thenReturn(3);
 
         boolean condition = pictureService.create(pictureDto);
         assertTrue(condition);
         verify(pictureDao, times(1)).create(any(Picture.class));
+    }
+
+    @Test
+    void create_shouldThrowException_whenMaxPhotoLimitReached() {
+           when(serviceMediator.findProductById(someId)).thenReturn(Optional.of(productWithMaxPictures));
+        CoreException ex = assertThrows(CoreException.class,
+                () -> pictureService.create(pictureDto));
+
+        assertTrue(ex.getMessage().contains(
+                String.format(ExceptionMessages.PICTURE_LIMIT_EXCEEDED_MESSAGE, someId)
+        ));
+
+        verify(serviceMediator).findProductById(someId);
+        verifyNoInteractions(pictureDao);
     }
 
     @Test
@@ -88,7 +130,6 @@ class PictureServiceImplTest {
 
         Product product = new Product();
         product.setProductId(2);
-//        product.setStockKeepingUnit("Product2");
 
         when(pictureDao.findById(pictureDto.getPictureDtoId())).thenReturn(Optional.of(existingPicture));
 
@@ -212,7 +253,7 @@ class PictureServiceImplTest {
 
     @Test
     void findPicturesByProductId() {
-        when(pictureDao.getPicturesByProductId(someId)).thenReturn(pictureList);
+        when(pictureDao.getPicturesByProductId(someId)).thenReturn(maxPictureList);
 
         List<PictureDto> list = pictureService.findPicturesByProductId(someId);
 
@@ -232,7 +273,7 @@ class PictureServiceImplTest {
 
     @Test
     void findAll() {
-        when(pictureDao.getPictures(limit, offset)).thenReturn(pictureList);
+        when(pictureDao.getPictures(limit, offset)).thenReturn(maxPictureList);
 
         List<PictureDto> list = pictureService.findAll(offset, limit);
 

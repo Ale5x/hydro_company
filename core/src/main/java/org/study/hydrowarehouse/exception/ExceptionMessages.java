@@ -31,6 +31,7 @@ public final class ExceptionMessages {
     public static final String USER_STATUS_NOT_FOUND_MESSAGE = "User Status not found. [status = %s]";
     public static final String USER_ROLE_NOT_EXIST_MESSAGE = "User Role doesn't exist. [role = %s]";
     public static final String USER_COMPANY_NOT_FOUND_MESSAGE = "User company not found. [id = %s, name = %s, address = %s]";
+    public static final String PICTURE_LIMIT_EXCEEDED_MESSAGE = "The maximum number of pictures for this product is [id = %s]. Cannot add more.";
 
     public final static String PRODUCT_TYPE = "Product";
     public final static String PRODUCT_SKU_TYPE = "Product SKU";

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 @Transactional
 public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implements PictureService {
@@ -42,16 +41,20 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     @Override
     public boolean create(PictureDto pictureDto) throws CoreException {
-        Picture picture = new Picture();
-
-        picture.setProduct(serviceMediator.findProductById(pictureDto.getProductId())
+        Product product = serviceMediator.findProductById(pictureDto.getProductId())
                 .orElseThrow(() -> new CoreException(
-                        String.format(
-                                ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE,
-                                pictureDto.getProductId()))));
+                        String.format(ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_FOR_PICTURES_MESSAGE,
+                                pictureDto.getProductId())));
 
+        if (product.getPicturePath().size() >= maxPhotoLimit) {
+            throw new CoreException(
+                    String.format(ExceptionMessages.PICTURE_LIMIT_EXCEEDED_MESSAGE, product.getProductId()));
+        }
+
+        Picture picture = new Picture();
+        picture.setProduct(product);
         picture.setPath(pictureDto.getPath());
-        validatePhotoCountLimit(picture.getProduct().getProductId());
+
         return pictureDao.create(picture) > 0;
     }
 

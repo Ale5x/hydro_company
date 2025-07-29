@@ -82,6 +82,18 @@ public interface UserService {
     List<UserDto> findAllByCountry(int countryId, int offset, int limit) throws CoreException;
 
     /**
+     * Retrieves a paginated list of users associated with the specified company.
+     *
+     * @param companyId the unique identifier of the company
+     * @param offset    the starting position of the first result (for pagination)
+     * @param limit     the maximum number of results to return (for pagination)
+     * @return a list of {@link UserDto} objects representing users from the specified company;
+     *         an empty list if no users are found
+     * @throws CoreException if an error occurs while retrieving the data
+     */
+    List<UserDto> findAllByCompany(int companyId, int offset, int limit) throws CoreException;
+
+    /**
      * The method returns specified UserDto by id.
      *
      * @param id the User's id.

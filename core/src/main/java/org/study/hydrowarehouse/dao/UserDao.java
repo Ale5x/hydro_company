@@ -96,4 +96,15 @@ public interface UserDao {
      *         an empty list if no users are found
      */
     List<User> findByCountry(int countryId, int limit, int offset);
+
+    /**
+     * Retrieves a paginated list of users associated with the specified company.
+     *
+     * @param companyId the unique identifier of the company
+     * @param limit     the maximum number of results to return (for pagination)
+     * @param offset    the starting position of the first result (for pagination)
+     * @return a list of {@link User} entities belonging to the specified company;
+     *         an empty list if no users are found
+     */
+    List<User> findByCompany(int companyId, int limit, int offset);
 }

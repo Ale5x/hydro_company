@@ -359,6 +359,34 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findAllByCompany_shouldReturnUserDtoList() throws CoreException {
+        int companyId = 1;
+        int offset = 0;
+        int limit = 10;
+
+        Mockito.when(userDao.findByCompany(companyId, limit, offset)).thenReturn(userList);
+
+        List<UserDto> result = userService.findAllByCompany(companyId, offset, limit);
+
+        assertNotNull(result);
+        assertTrue( result.size() > 0);
+    }
+
+    @Test
+    void findAllByCompany_shouldReturnEmptyUserDtoList() throws CoreException {
+        int companyId = 1;
+        int offset = 0;
+        int limit = 10;
+
+        Mockito.when(userDao.findByCompany(companyId, limit, offset)).thenReturn(null);
+
+        List<UserDto> result = userService.findAllByCompany(companyId, offset, limit);
+
+        assertNull(result);
+        assertTrue( result.isEmpty());
+    }
+
+    @Test
     void findAllByStatus_shouldThrowCoreExceptionWhenDaoFails() {
         int offset = 0;
         int limit = 5;

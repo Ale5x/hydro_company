@@ -116,6 +116,7 @@ public class PathPages {
     public static final String USER_UPDATE_ROLE = ADMIN_BRANCH + USER + "/update_role";
     public static final String USER_FIND_BY_STATUS = ADMIN_BRANCH + USER + "/get_all_by_status";
     public static final String USER_FIND_BY_COUNTRY = ADMIN_BRANCH + USER + "/get_all_by_country";
+    public static final String USER_FIND_BY_COMPANY = ADMIN_BRANCH + USER + "/get_all_by_company";
     public static final String USER_FIND_BY_ROLE = ADMIN_BRANCH + USER + "/get_all_by_role";
     public static final String USER_ID = ADMIN_BRANCH + USER + "/id";
 

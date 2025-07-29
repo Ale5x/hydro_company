@@ -258,6 +258,51 @@ public class UserController implements HypermediaListAssembler<UserDto> {
     }
 
     /**
+     * Retrieves a paginated list of users belonging to the specified company.
+     * <p>
+     * The result is wrapped in a {@link CollectionModel} and includes HATEOAS
+     * navigation links to the previous and next pages, if applicable.
+     * </p>
+     *
+     * @param page      the current page number (1-based index)
+     * @param size      the number of records to return per page
+     * @param companyId the unique identifier of the company; must be a numeric value
+     * @return a {@link CollectionModel} containing the list of {@link UserDto} objects
+     *         for the requested page and company, along with pagination links
+     * @throws AppRequestException if {@code companyId} is not a valid integer
+     */
+    @GetMapping(value = PathPages.USER_FIND_BY_COMPANY, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<UserDto> getUsersByCompany(@RequestParam(ControllerConstants.PAGE) String page,
+                                                      @RequestParam(ControllerConstants.SIZE) String size,
+                                                      @RequestParam(ControllerConstants.ID) String companyId) {
+        ValidatorParam.isNumber(companyId);
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size,
+                ControllerConstants.ID, companyId);
+
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_COMPANY,
+                searchCriteria);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_COMPANY,
+                searchCriteria);
+
+        List<UserDto> userList = userService.findAllByCompany(
+                Integer.parseInt(companyId),
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<UserDto> nextDataList = userService.findAllByCompany(
+                Integer.parseInt(companyId),
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
+
+        return createPaginatedModel(userList, nextDataList, previousLink, nextLink);
+    }
+
+    /**
      * Retrieves a paginated list of users filtered by their role.
      * <p>
      * The method supports pagination using page and size parameters, and adds HATEOAS links

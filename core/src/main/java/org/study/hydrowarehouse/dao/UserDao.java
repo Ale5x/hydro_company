@@ -85,4 +85,15 @@ public interface UserDao {
      * @return a list of users matching the specified status within the given pagination constraints; empty list if no users found
      */
     List<User> findByStatus(String status, int limit, int offset);
+
+    /**
+     * Retrieves a list of users associated with the specified country.
+     *
+     * @param countryId the unique identifier of the country
+     * @param limit     the maximum number of results to return (for pagination)
+     * @param offset    the starting position of the first result (for pagination)
+     * @return a list of {@link User} entities from the specified country;
+     *         an empty list if no users are found
+     */
+    List<User> findByCountry(int countryId, int limit, int offset);
 }

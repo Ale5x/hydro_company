@@ -284,6 +284,7 @@ class UserServiceImplTest {
     }
 
 
+
     @Test
     void shouldThrowExceptionWhenRoleNotFound() {
         UserDto dto = new UserDto();
@@ -327,6 +328,34 @@ class UserServiceImplTest {
         assertEquals(1, result.size());
         assertEquals("john", result.get(0).getFirstName());
         assertEquals("ACTIVE", result.get(0).getStatus());
+    }
+
+    @Test
+    void findAllByCountry_shouldReturnUserDtoList() throws CoreException {
+        int countryId = 1;
+        int offset = 0;
+        int limit = 10;
+
+        Mockito.when(userDao.findByCountry(countryId, limit, offset)).thenReturn(userList);
+
+        List<UserDto> result = userService.findAllByCountry(countryId, offset, limit);
+
+        assertNotNull(result);
+        assertTrue( result.size() > 0);
+    }
+
+    @Test
+    void findAllByCountry_shouldReturnEmptyUserDtoList() throws CoreException {
+        int countryId = 1;
+        int offset = 0;
+        int limit = 10;
+
+        Mockito.when(userDao.findByCountry(countryId, limit, offset)).thenReturn(null);
+
+        List<UserDto> result = userService.findAllByCountry(countryId, offset, limit);
+
+        assertNull(result);
+        assertTrue( result.isEmpty());
     }
 
     @Test

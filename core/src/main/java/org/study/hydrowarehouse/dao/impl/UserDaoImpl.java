@@ -28,8 +28,11 @@ import java.util.Optional;
 public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
 
     private static final String USER_ID = "userId";
+    private static final String COUNTRY_ID = "countryId";
     private static final String USER_EMAIL = "email";
     private static final String FIND_USERS_BY_ROLE_QUERY = "FROM User u WHERE u.role.name = :roleName";
+    private static final String FIND_USERS_BY_COUNTRY_QUERY = "SELECT u FROM User u JOIN u.userCompany uc " +
+            "JOIN uc.country c WHERE c.countryId = :countryId ORDER BY u.userId ASC";
 
     @Override
     public int save(User user) {
@@ -101,6 +104,17 @@ public class UserDaoImpl extends CriteriaQueryHelper<User> implements UserDao {
         return session.createQuery(criteriaQuery)
                 .setMaxResults(limit)
                 .setFirstResult(offset)
+                .getResultList();
+    }
+
+    @Override
+    public List<User> findByCountry(int countryId, int limit, int offset) {
+        Session session = getCurrentSession();
+
+        return session.createQuery(FIND_USERS_BY_COUNTRY_QUERY, User.class)
+                .setParameter(COUNTRY_ID, countryId)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 

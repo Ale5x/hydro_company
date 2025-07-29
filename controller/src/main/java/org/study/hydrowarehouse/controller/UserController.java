@@ -213,6 +213,51 @@ public class UserController implements HypermediaListAssembler<UserDto> {
     }
 
     /**
+     * Retrieves a paginated list of users belonging to the specified country.
+     * <p>
+     * The result is wrapped in a {@link CollectionModel} and includes HATEOAS
+     * navigation links to the previous and next pages, if applicable.
+     * </p>
+     *
+     * @param page      the current page number (1-based index)
+     * @param size      the number of records to return per page
+     * @param countryId the unique identifier of the country; must be a numeric value
+     * @return a {@link CollectionModel} containing the list of {@link UserDto} objects
+     *         for the requested page and country, along with pagination links
+     * @throws AppRequestException if {@code countryId} is not a valid integer
+     */
+    @GetMapping(value = PathPages.USER_FIND_BY_COUNTRY, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CollectionModel<UserDto> getUsersByCountry(@RequestParam(ControllerConstants.PAGE) String page,
+                                                     @RequestParam(ControllerConstants.SIZE) String size,
+                                                     @RequestParam(ControllerConstants.ID) String countryId) {
+        ValidatorParam.isNumber(countryId);
+        Map<String, String> searchCriteria = HateoasLinkHelper.buildSearchCriteria(
+                page,
+                size,
+                ControllerConstants.ID, countryId);
+
+        Link previousLink = HateoasLinkHelper.createPreviousLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_COUNTRY,
+                searchCriteria);
+        Link nextLink = HateoasLinkHelper.createNextLink(
+                UserController.class,
+                PathPages.USER_FIND_BY_COUNTRY,
+                searchCriteria);
+
+        List<UserDto> userList = userService.findAllByCountry(
+                Integer.parseInt(countryId),
+                Pagination.getOffset(page, size),
+                Integer.parseInt(size));
+        List<UserDto> nextDataList = userService.findAllByCountry(
+                Integer.parseInt(countryId),
+                Pagination.getOffset(Pagination.getNumberNextPage(page), size),
+                Integer.parseInt(size));
+
+        return createPaginatedModel(userList, nextDataList, previousLink, nextLink);
+    }
+
+    /**
      * Retrieves a paginated list of users filtered by their role.
      * <p>
      * The method supports pagination using page and size parameters, and adds HATEOAS links

@@ -111,6 +111,11 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     }
 
     @Override
+    public List<UserDto> findAllByCountry(int countryId, int offset, int limit) throws CoreException {
+        return mapToListObjectsDto(userDao.findByCountry(countryId, limit, offset));
+    }
+
+    @Override
     public Optional<UserDto> findUserById(int id) throws CoreException {
         Optional<User> user = userDao.getUserById(id);
         if (user.isEmpty()) {

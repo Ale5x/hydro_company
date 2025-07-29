@@ -70,6 +70,18 @@ public interface UserService {
     List<UserDto> findAllByRole(String role, int offset, int limit) throws CoreException;
 
     /**
+     * Retrieves a paginated list of users associated with the specified country.
+     *
+     * @param countryId the unique identifier of the country
+     * @param offset    the starting position of the first result (for pagination)
+     * @param limit     the maximum number of results to return (for pagination)
+     * @return a list of {@link UserDto} objects representing users from the specified country;
+     *         an empty list if no users are found
+     * @throws CoreException if an error occurs while retrieving the data
+     */
+    List<UserDto> findAllByCountry(int countryId, int offset, int limit) throws CoreException;
+
+    /**
      * The method returns specified UserDto by id.
      *
      * @param id the User's id.

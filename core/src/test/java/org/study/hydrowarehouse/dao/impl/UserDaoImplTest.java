@@ -109,6 +109,12 @@ class UserDaoImplTest {
     }
 
     @Test
+    void findByCountry () {
+        List<User> users = userDao.findByCountry(1, limit, offset);
+        assertFalse(users.isEmpty());
+    }
+
+    @Test
     void findByRole() {
         List<User> users = userDao.findAllByRole(ERole.ADMIN, limit, offset);
         assertFalse(users.isEmpty());

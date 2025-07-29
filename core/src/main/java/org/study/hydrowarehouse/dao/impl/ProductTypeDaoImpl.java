@@ -69,7 +69,13 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
         CriteriaQuery<ProductType> criteriaQuery = getCriteriaQuery(criteriaBuilder, ProductType.class);
         Root<ProductType> productTypeRoot = getRoot(criteriaQuery, ProductType.class);
 
-        criteriaQuery.select(productTypeRoot).where(criteriaBuilder.equal(productTypeRoot.get(PRODUCT_TYPE_NAME), name));
+        criteriaQuery.select(productTypeRoot)
+                .where(criteriaBuilder.like(
+                        criteriaBuilder.lower(productTypeRoot.get(PRODUCT_TYPE_NAME)),
+                        createSearchCriteria(name).toLowerCase()
+                ));
+
+        System.out.println(createSearchCriteria(name));
         return session.createQuery(criteriaQuery).getResultList();
     }
 

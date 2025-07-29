@@ -99,6 +99,20 @@ class ProductTypeDaoImplTest {
     }
 
     @Test
+    void getProductTypeByPartName() {
+        Optional<ProductType> productTypeOptional = productTypeDao.getProductTypeById(productTypeId);
+        assertTrue(productTypeOptional.isPresent());
+
+        String fullName = productTypeOptional.get().getName();
+        assertFalse(fullName.isBlank());
+
+        String partName = fullName.substring(0, Math.min(3, fullName.length()));
+
+        List<ProductType> prTypeByName = productTypeDao.getProductTypeByName(partName);
+        assertFalse(prTypeByName.isEmpty());
+    }
+
+    @Test
     void update() {
         ProductType newProductType = new ProductType("new Product");
         List<ProductType> productTypesListBefore = productTypeDao.getProductTypes();

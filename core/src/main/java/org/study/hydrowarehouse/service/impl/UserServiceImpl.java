@@ -275,6 +275,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
 
     @Override
     public List<UserDto> mapToListObjectsDto(List<User> objectsList) {
+        if (objectsList == null) return null;
         List<UserDto> userDtoList = new ArrayList<>();
         for (User user : objectsList) {
             userDtoList.add(mapToObjectDto(user));
@@ -284,6 +285,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
 
     @Override
     public UserDto mapToObjectDto(User object) {
+        if (object == null) return null;
         UserDto userDto = new UserDto();
 
         userDto.setUserDtoId(object.getUserId());
@@ -360,6 +362,7 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
  * @throws CoreException if the role specified in the DTO does not exist in the system
  */
     protected Role mapUserRole(UserDto dto) throws CoreException {
+        if (dto == null) return null;
         return extractUserRole(dto);
     }
 }

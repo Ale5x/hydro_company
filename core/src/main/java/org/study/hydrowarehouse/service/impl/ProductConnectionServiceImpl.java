@@ -67,6 +67,7 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
 
     @Override
     public List<ProductConnectionDto> mapToListObjectsDto(List<ProductConnection> objectsList) {
+        if (objectsList == null) return null;
         List<ProductConnectionDto> productConnectionDtoList = new ArrayList<>();
         for (ProductConnection prCon : objectsList) {
 
@@ -77,6 +78,7 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
 
     @Override
     public ProductConnectionDto mapToObjectDto(ProductConnection object) {
+        if (object == null) return null;
         ProductConnectionDto productConnectionDto = new ProductConnectionDto();
 
         productConnectionDto.setProductConnectionId(object.getProductConnectionId());

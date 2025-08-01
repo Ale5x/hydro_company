@@ -84,6 +84,8 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     @Override
     public List<ProductTypeDto> mapToListObjectsDto(List<ProductType> objectsList) {
+        if (objectsList == null) return null;
+
         List<ProductTypeDto> productTypeDtoList = new ArrayList<>();
         for (ProductType productType : objectsList) {
 
@@ -94,6 +96,7 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     @Override
     public ProductTypeDto mapToObjectDto(ProductType object) {
+        if (object == null) return null;
         ProductTypeDto productTypeDto = new ProductTypeDto();
 
         productTypeDto.setProductTypeId(object.getProductTypeId());

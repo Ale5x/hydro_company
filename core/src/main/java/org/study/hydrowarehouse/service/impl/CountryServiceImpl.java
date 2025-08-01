@@ -65,6 +65,7 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
 
     @Override
     public List<CountryDto> mapToListObjectsDto(List<Country> objectsDtoList) {
+        if (objectsDtoList == null) return null;
         List<CountryDto> countryDtoList = new ArrayList<>();
         for(Country country : objectsDtoList) {
             CountryDto countryDto = new CountryDto();
@@ -77,6 +78,7 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
 
     @Override
     public CountryDto mapToObjectDto(Country object) {
+        if(object == null) return null;
         CountryDto countryDto = new CountryDto();
         countryDto.setCountryId(object.getCountryId());
         countryDto.setName(object.getName());

@@ -52,6 +52,7 @@ public class UserStatusServiceImpl extends EntityMapper<UserStatusDto, UserStatu
 
     @Override
     public List<UserStatusDto> mapToListObjectsDto(List<UserStatus> objectsList) {
+        if (objectsList == null) return null;
         List<UserStatusDto> userStatusDtoList = new ArrayList<>();
 
         for (UserStatus userStatus : objectsList) {
@@ -63,6 +64,7 @@ public class UserStatusServiceImpl extends EntityMapper<UserStatusDto, UserStatu
 
     @Override
     public UserStatusDto mapToObjectDto(UserStatus object) {
+        if (object == null) return null;
         UserStatusDto userStatusDto = new UserStatusDto();
         userStatusDto.setUserStatusIdDto(object.getUserStatusId());
         userStatusDto.setStatus(object.getStatus());

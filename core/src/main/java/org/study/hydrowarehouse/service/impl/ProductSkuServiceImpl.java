@@ -197,6 +197,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
 
     @Override
     public List<ProductSkuDto> mapToListObjectsDto(List<ProductSku> objectsList) throws CoreException {
+        if (objectsList == null) return null;
         List<ProductSkuDto> skuDtoList = new ArrayList<>();
         for (ProductSku productSku : objectsList) {
             skuDtoList.add(mapToObjectDto(productSku));
@@ -206,11 +207,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
 
     @Override
     public ProductSkuDto mapToObjectDto(ProductSku object) throws CoreException {
-        if (object == null) {
-            throw new CoreException(String.format(
-                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
-                                        ExceptionMessages.PRODUCT_SKU_TYPE));
-        }
+        if (object == null) return null;
 
         ProductSkuDto skuDto = new ProductSkuDto();
         skuDto.setProductSkuDtoId(object.getProductSkuId());
@@ -303,12 +300,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
      * @throws CoreException if the ID is null or the Country is not found
      */
     private Country resolveCountry(CountryDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getCountryId())) {
-            //logger
-            throw new CoreException(String.format(
-                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
-                                        ExceptionMessages.COUNTRY_TYPE));
-        }
+        if (dto == null) return null;
         return serviceMediator.findCountryById(dto.getCountryId())
                 .orElseThrow(() -> {
                     //logger
@@ -326,12 +318,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
      * @throws CoreException if the ID is null or the Product is not found
      */
     private Product resolveProduct(ProductDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getProductDtoId())) {
-            //logger
-            throw new CoreException(String.format(
-                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
-                                        ExceptionMessages.PRODUCT_TYPE));
-        }
+        if (dto == null) return null;
         return serviceMediator.findProductById(dto.getProductDtoId())
                 .orElseThrow(() -> {
                     //logger
@@ -349,12 +336,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
      * @throws CoreException if the ID is null or the Shelf is not found
      */
     private Shelf resolveShelf(ShelfDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getShelfDtoId())) {
-            //logger
-            throw new CoreException(String.format(
-                                        ExceptionMessages.OBJECT_IS_NULL_MESSAGE,
-                                        ExceptionMessages.SHELF_TYPE));
-        }
+        if (dto == null) return null;
         return serviceMediator.findShelfById(dto.getShelfDtoId())
                 .orElseThrow(() -> {
                     //logger

@@ -65,6 +65,7 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
 
     @Override
     public List<StorageRackDto> mapToListObjectsDto(List<StorageRack> objectsList) {
+        if (objectsList == null) return null;
         List<StorageRackDto> stRackDtoList = new ArrayList<>();
         for (StorageRack storageRack: objectsList) {
 
@@ -75,6 +76,7 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
 
     @Override
     public StorageRackDto mapToObjectDto(StorageRack object) {
+        if (object == null) return null;
         StorageRackDto storageRackDto = new StorageRackDto();
         storageRackDto.setStorageRackDtoId(object.getRackId());
         storageRackDto.setName(object.getName());

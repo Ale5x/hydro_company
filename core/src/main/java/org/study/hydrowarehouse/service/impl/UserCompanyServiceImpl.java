@@ -90,6 +90,7 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
 
     @Override
     public List<UserCompanyDto> mapToListObjectsDto(List<UserCompany> objectsList) throws CoreException {
+        if (objectsList == null) return null;
         List<UserCompanyDto> userCompanyDtoList = new ArrayList<>();
         for (UserCompany userCompany : objectsList) {
             userCompanyDtoList.add(mapToObjectDto(userCompany));
@@ -99,6 +100,7 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
 
     @Override
     public UserCompanyDto mapToObjectDto(UserCompany object) throws CoreException {
+        if (object == null) return null;
         UserCompanyDto userCompanyDto = new UserCompanyDto();
 
         userCompanyDto.setCompanyDtoId(object.getUserCompanyId());
@@ -113,6 +115,7 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
     }
 
     protected Country findCountryForCompany(CountryDto countryDto) {
+        if (countryDto == null) return null;
         return countryService.findCountryById(countryDto.getCountryId())
                 .orElseThrow(() -> {
                     // Logger

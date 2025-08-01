@@ -126,6 +126,7 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     @Override
     public List<PictureDto> mapToListObjectsDto(List<Picture> objectsDtoList) {
+        if (objectsDtoList == null) return null;
         List<PictureDto> pictureDtoList = new ArrayList<>();
         for (Picture picture : objectsDtoList) {
             pictureDtoList.add(mapToObjectDto(picture));
@@ -135,6 +136,7 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     @Override
     public PictureDto mapToObjectDto(Picture object) {
+        if (object == null) return null;
         PictureDto pictureDto = new PictureDto();
 
         pictureDto.setPictureDtoId(object.getPictureId());

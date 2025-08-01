@@ -210,6 +210,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     @Override
     public ProductDto mapToObjectDto(Product object) {
+        if (object == null) return null;
         ProductDto dto = new ProductDto();
 
         resolveBasicFields(dto, object);
@@ -268,6 +269,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
      * @param entity the source Product entity
      */
     private void resolveBasicFields(ProductDto dto, Product entity) {
+        if (entity == null) return;
         dto.setProductDtoId(entity.getProductId());
         dto.setCount(entity.getCount());
         dto.setFlowRate(entity.getFlowRate());
@@ -283,6 +285,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
      * @return the list of storage racks objects.
      */
     private List<StorageRack> convertFromStorageRackDtoList(List<StorageRackDto> storageDtoList) {
+        if (storageDtoList == null) return null;
         List<StorageRack> storageList = new ArrayList<>();
         for (StorageRackDto storageRackDto : storageDtoList) {
             StorageRack storageRack = serviceMediator.findStorageRackById(storageRackDto.getStorageRackDtoId())
@@ -303,6 +306,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
      * @return the list of strings includes pictures paths.
      */
     private List<String> convertToPicturesDtoList(List<Picture> pictures) {
+        if (pictures == null) return null;
         List<String> picturePathsList = new ArrayList<>();
         if (pictures != null) {
             for (Picture picture : pictures) {

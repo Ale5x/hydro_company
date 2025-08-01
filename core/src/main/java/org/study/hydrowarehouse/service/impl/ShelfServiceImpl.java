@@ -117,6 +117,7 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
 
     @Override
     public List<ShelfDto> mapToListObjectsDto(List<Shelf> objectsList)  throws CoreException {
+        if (objectsList == null) return null;
         List<ShelfDto> shelfDtoList = new ArrayList<>();
         for (Shelf shelf : objectsList) {
             shelfDtoList.add(mapToObjectDto(shelf));
@@ -126,6 +127,7 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
 
     @Override
     public ShelfDto mapToObjectDto(Shelf object)  throws CoreException {
+        if (object == null) return null;
         ShelfDto shelfDto = new ShelfDto();
 
         shelfDto.setShelfDtoId(object.getShelfId());
@@ -147,6 +149,7 @@ public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements S
      * @throws CoreException if the shelf or its related storage rack is {@code null}
      */
     private StorageRackDto mapToStorageRackDto(Shelf shelf) throws CoreException {
+        if (shelf == null) return null;
         StorageRackDto rackDto = new StorageRackDto();
         rackDto.setStorageRackDtoId(shelf.getStorageRack().getRackId());
         rackDto.setName(shelf.getStorageRack().getName());

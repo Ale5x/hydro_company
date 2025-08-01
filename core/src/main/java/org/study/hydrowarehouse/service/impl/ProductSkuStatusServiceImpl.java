@@ -105,6 +105,7 @@ public class ProductSkuStatusServiceImpl extends EntityMapper<ProductSkuStatusDt
 
     @Override
     public List<ProductSkuStatusDto> mapToListObjectsDto(List<ProductSkuStatus> objectsList) throws CoreException {
+        if (objectsList == null) return null;
         List<ProductSkuStatusDto> skuStatusDtoList = new ArrayList<>();
         for (ProductSkuStatus skuStatus : objectsList) {
             skuStatusDtoList.add(mapToObjectDto(skuStatus));
@@ -114,6 +115,7 @@ public class ProductSkuStatusServiceImpl extends EntityMapper<ProductSkuStatusDt
 
     @Override
     public ProductSkuStatusDto mapToObjectDto(ProductSkuStatus object) throws CoreException {
+        if (object == null) return null;
         ProductSkuStatusDto skuDto = new ProductSkuStatusDto();
 
         skuDto.setProductSkuStatusDtoId(object.getProductSkuStatusId());

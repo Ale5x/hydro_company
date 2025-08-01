@@ -91,6 +91,7 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
     @Override
     public List<ProductCompanyDto> mapToListObjectsDto(List<ProductCompany> objectsList) {
+        if (objectsList == null) return null;
         List<ProductCompanyDto> prodCompanyDtoList = new ArrayList<>();
         for (ProductCompany company : objectsList) {
 
@@ -101,6 +102,7 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
     @Override
     public ProductCompanyDto mapToObjectDto(ProductCompany object) {
+        if (object == null) return null;
         ProductCompanyDto productCompanyDto = new ProductCompanyDto();
 
         productCompanyDto.setProductCompanyDtoId(object.getProductCompanyId());
@@ -136,6 +138,8 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
      * @throws NullPointerException if the input {@code country} is {@code null}
      */
     private CountryDto mapToCountryDto(Country country) {
+        if (country == null) return null;
+
         CountryDto dto = new CountryDto();
         dto.setCountryId(country.getCountryId());
         dto.setName(country.getName());

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.UserDao;
 import org.study.hydrowarehouse.entity.*;
+import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
 import org.study.hydrowarehouse.exception.CoreException;
@@ -209,6 +210,8 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
         userCompanyDto.setName(userCompany.getName());
         userCompanyDto.setAddress(userCompany.getAddress());
 
+        userCompanyDto.setCountryDto(resolveCountryDto(userCompany.getCountry()));
+
         return userCompanyDto;
     }
 
@@ -364,5 +367,13 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     protected Role mapUserRole(UserDto dto) throws CoreException {
         if (dto == null) return null;
         return extractUserRole(dto);
+    }
+
+    private CountryDto resolveCountryDto (Country object) {
+        if(object == null) return null;
+        CountryDto countryDto = new CountryDto();
+        countryDto.setCountryId(object.getCountryId());
+        countryDto.setName(object.getName());
+        return countryDto;
     }
 }

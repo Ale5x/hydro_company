@@ -106,6 +106,8 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
         userCompanyDto.setCompanyDtoId(object.getUserCompanyId());
         userCompanyDto.setName(object.getName());
         userCompanyDto.setAddress(object.getAddress());
+
+        userCompanyDto.setCountryDto(resolveCountryDto(object.getCountry()));
         return userCompanyDto;
     }
 
@@ -126,5 +128,13 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
                                     countryDto.getName())
                     );
                 });
+    }
+
+    private CountryDto resolveCountryDto (Country object) {
+        if(object == null) return null;
+        CountryDto countryDto = new CountryDto();
+        countryDto.setCountryId(object.getCountryId());
+        countryDto.setName(object.getName());
+        return countryDto;
     }
 }

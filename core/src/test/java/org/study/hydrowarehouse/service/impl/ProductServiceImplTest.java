@@ -99,8 +99,6 @@ class ProductServiceImplTest {
         product.setPicturePath(List.of(new Picture("some path")));
         product.setProductSkus(List.of(productSku));
 
-        System.out.println("Size -> " + product.getProductSkus());
-
         productList.add(product);
     }
 

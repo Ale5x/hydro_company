@@ -220,7 +220,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         dto.setPathHydraulicScheme(object.getPathHydraulicScheme());
         dto.setImagesPaths(convertToPicturesDtoList(object.getPicturePath()));
         dto.setProductSkuDtos(resolveProductSkuDto(object.getProductSkus()));
-
         return dto;
     }
 
@@ -402,7 +401,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
             skuDto.setProductSkuDtoId(sku.getProductSkuId());
             skuDto.setCode(sku.getCode());
-            skuDto.setShelfDto(resolveShelfDto(sku.getShelf()));
+//            skuDto.setShelfDto(resolveShelfDto(sku.getShelf()));
             skuDto.setCountryDto(resolveCountryDto(sku.getCountry()));
             skuDto.setStatus(resolveProductSkuStatusDto(sku.getStatus()));
 
@@ -439,7 +438,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         ShelfDto shelfDto = new ShelfDto();
         shelfDto.setShelfDtoId(shelf.getShelfId());
         shelfDto.setName(shelf.getName());
-
         shelfDto.setStorageRackDto(resolveStorageRackDto(shelf.getStorageRack()));
         return shelfDto;
     }

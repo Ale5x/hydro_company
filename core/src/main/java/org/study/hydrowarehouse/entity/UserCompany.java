@@ -5,6 +5,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * Represents a company to which users belong.
+ * <p>
+ * Mapped to the {@code user_companies} table in the database, this entity stores company details such as name and
+ * address, maintains a one-to-many relationship with {@link User} entities representing its employees, and associates
+ * with {@link Country} to specify the company's location.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "user_companies")
 public class UserCompany implements Serializable {

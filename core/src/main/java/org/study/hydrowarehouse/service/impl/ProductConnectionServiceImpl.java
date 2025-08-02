@@ -16,6 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link ProductConnection} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting product
+ * connections. Extends {@link EntityMapper} to handle mapping between {@link ProductConnectionDto} and
+ * {@link ProductConnection} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see ProductConnectionService
+ * @see ProductConnection
+ * @see ProductConnectionDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class ProductConnectionServiceImpl extends EntityMapper<ProductConnectionDto, ProductConnection> implements ProductConnectionService {

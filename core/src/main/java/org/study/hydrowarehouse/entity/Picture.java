@@ -4,6 +4,15 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents an image associated with a specific product.
+ * <p>
+ * Mapped to the {@code pictures} table in the database, this entity stores the file path to the image and maintains
+ * a many-to-one relationship with {@link Product}, allowing multiple pictures to be linked to the same product.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "pictures")
 public class Picture implements Serializable {

@@ -18,9 +18,11 @@ import org.study.hydrowarehouse.auth.AuthUserDetailsServiceImpl;
 import java.io.IOException;
 
 /**
-    * The filter class {@link JwtAuthenticationFilter} is responsible for authenticating the user by his token.
-    *
-    * @author Aliaksandr Pishchala
+ * The filter class {@link JwtAuthenticationFilter} is responsible for authenticating the user by his token.
+ *
+ * @see OncePerRequestFilter
+ *
+ * @author Aliaksandr Pishchala
  */
 @Component
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {

@@ -18,6 +18,8 @@ import java.util.Optional;
  * The class {@link AuthUserDetailsServiceImpl} provides the necessary information to construct
  * an Authentication object from the application's DAO objects
  *
+ * @see org.springframework.security.core.userdetails.UserDetailsService
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

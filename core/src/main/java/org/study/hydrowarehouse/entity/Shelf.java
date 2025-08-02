@@ -4,6 +4,16 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents a shelf within a storage rack.
+ * <p>
+ * Mapped to the {@code shelves} table in the database, this entity stores shelf-specific information such as its
+ * identifier and name, and maintains a many-to-one relationship with {@link StorageRack}, indicating the rack where
+ * the shelf is located.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "shelves")
 public class Shelf implements Serializable {

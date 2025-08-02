@@ -16,9 +16,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link StorageRack} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting storage racks
+ * in the warehouse. Extends {@link EntityMapper} to handle mapping between {@link StorageRackDto} and
+ * {@link StorageRack} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see StorageRackService
+ * @see StorageRack
+ * @see StorageRackDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, StorageRack> implements StorageRackService {
+
     private final StorageRackDao storageRackDao;
 
     @Autowired

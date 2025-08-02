@@ -1,5 +1,13 @@
 package org.study.hydrowarehouse.utill;
 
+/**
+ * Utility class for String-related helper methods.
+ * <p>
+ * Provides static methods for common string checks such as  null or blank detection and numeric object null checks.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class StringUtils {
 
     /**

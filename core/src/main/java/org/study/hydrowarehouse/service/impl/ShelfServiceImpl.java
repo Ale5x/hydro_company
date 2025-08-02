@@ -18,6 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link Shelf} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting shelves within
+ * storage racks. Extends {@link EntityMapper} to handle mapping between {@link ShelfDto} and {@link Shelf} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see ShelfService
+ * @see Shelf
+ * @see ShelfDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class ShelfServiceImpl extends EntityMapper<ShelfDto, Shelf> implements ShelfService {

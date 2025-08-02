@@ -5,6 +5,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a type or category of products.
+ * <p>
+ * Mapped to the {@code products_type} table in the database, this entity stores the classification of products and
+ * maintains a one-to-many relationship with {@link Product} to group products by their type.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Table(name = "products_type")
 @Entity
 public class ProductType implements Serializable {

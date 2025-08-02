@@ -13,6 +13,20 @@ import org.study.hydrowarehouse.service.EntityMapper;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing {@link Country} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting countries.
+ * Extends {@link EntityMapper} to handle mapping between {@link CountryDto} and {@link Country} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see CountryService
+ * @see Country
+ * @see CountryDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implements CountryService {

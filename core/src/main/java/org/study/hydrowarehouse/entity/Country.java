@@ -6,6 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a country entry in the system.
+ * <p>
+ * Mapped to the {@code countries} table in the database, this entity stores the basic information about a country and
+ * can be referenced by other entities such as {@link UserCompany} and {@link ProductSku} to indicate
+ * their associated country.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "countries")
 public class Country implements Serializable {

@@ -21,6 +21,11 @@ import java.util.*;
  * The class {@link UserCompanyServiceImpl} implements methods of the CompanyService interface.
  * The class is annotated as a service, which qualifies it to be automatically created by component-scanning.
  *
+ * @see EntityMapper
+ * @see UserCompanyService
+ * @see UserCompany
+ * @see UserCompanyDto
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

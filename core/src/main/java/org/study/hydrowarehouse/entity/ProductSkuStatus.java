@@ -4,6 +4,16 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents the status of a specific product SKU.
+ * <p>
+ * Mapped to the {@code product_sku_status} table in the database, this entity defines the possible states a
+ * {@link ProductSku} can be in, such as available, reserved, or sold. It is used to track the current condition
+ * or availability of each SKU in the warehouse.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "product_sku_status")
 public class ProductSkuStatus implements Serializable {

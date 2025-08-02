@@ -5,6 +5,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a product available in the warehouse system.
+ * <p>
+ * Mapped to the {@code products} table in the database, this entity contains technical specifications, additional
+ * information, and relationships to other entities such as {@link ProductType}, {@link ProductCompany}, and
+ * {@link ProductConnection}. It also maintains associations with {@link Picture} for product images and
+ * {@link ProductSku} for stock keeping units, which track inventory details like storage location and country.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "products")
 public class Product implements Serializable {

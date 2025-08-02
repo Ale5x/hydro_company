@@ -16,6 +16,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link ProductType} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting product types.
+ * Extends {@link EntityMapper} to handle mapping between {@link ProductTypeDto} and {@link ProductType} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see ProductTypeService
+ * @see ProductType
+ * @see ProductTypeDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, ProductType> implements ProductTypeService {

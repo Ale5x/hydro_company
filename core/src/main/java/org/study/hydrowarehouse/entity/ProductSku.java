@@ -4,6 +4,16 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents a Stock Keeping Unit (SKU) for a specific product.
+ * <p>
+ * Mapped to the {@code product_sku} table in the database, this entity contains SKU-specific details such as its code,
+ * associated {@link Product}, origin {@link Country}, current {@link ProductSkuStatus}, and storage location
+ * {@link Shelf}. It serves as the primary unit for tracking individual product instances in the warehouse.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "product_sku")
 public class ProductSku implements Serializable {

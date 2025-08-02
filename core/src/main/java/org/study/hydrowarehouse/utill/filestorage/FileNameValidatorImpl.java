@@ -8,6 +8,8 @@ import java.util.List;
 /**
  * Implementation of the {@link FileNameValidator} interface.
  *
+ * @see FileNameValidator
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

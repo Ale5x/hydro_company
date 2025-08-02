@@ -17,18 +17,18 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of the {@link ProductSkuStatusService} interface that handles
- * business logic related to {@link ProductSkuStatus} entities and their DTOs.
+ * Implementation of the {@link ProductSkuStatusService} interface that handles business logic related to
+ * {@link ProductSkuStatus} entities and their DTOs.
  * <p>
- * Uses {@link ProductSkuStatusDao} for persistence operations and
- * {@link EntityMapper} for entity-to-DTO mapping.
+ * Uses {@link ProductSkuStatusDao} for persistence operations and {@link EntityMapper} for entity-to-DTO mapping.
  * </p>
  *
- * @author Aliaksandr Pishchala
  * @see EntityMapper
  * @see org.study.hydrowarehouse.service.ProductSkuStatusService
  * @see ProductSkuStatus
  * @see org.study.hydrowarehouse.entity.Dto.ProductSkuDto
+ *
+ * @author Aliaksandr Pishchala
  */
 @Service
 @Transactional

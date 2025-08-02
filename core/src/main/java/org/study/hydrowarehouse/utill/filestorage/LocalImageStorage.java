@@ -19,6 +19,8 @@ import java.util.List;
  * locally on the disk. It is responsible for saving, validating, and managing file names for images that need to be
  * stored on the local file system.
  *
+ * @see ImageStorage
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

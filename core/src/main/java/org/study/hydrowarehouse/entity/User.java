@@ -8,6 +8,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Represents a user of the system.
+ * <p>
+ * Mapped to the {@code users} table in the database, this entity stores personal information such as name, email,
+ * password, and registration date. It maintains relationships with {@link Role} for access control,
+ * {@link UserCompany} to indicate the company affiliation, and {@link UserStatus} to track the current status of
+ * the user account.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "users")
 public class User implements Serializable {

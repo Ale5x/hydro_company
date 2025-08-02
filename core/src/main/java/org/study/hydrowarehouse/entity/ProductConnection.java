@@ -5,6 +5,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents the connection specification for a product.
+ * <p>
+ * Mapped to the {@code products_connections} table in the database, this entity stores connection size information
+ * and is linked to multiple {@link Product} entities that share the same connection specification.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "products_connections")
 public class ProductConnection implements Serializable {

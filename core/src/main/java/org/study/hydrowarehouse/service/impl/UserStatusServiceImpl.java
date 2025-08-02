@@ -14,6 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link UserStatus} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting user statuses.
+ * Extends {@link EntityMapper} to handle mapping between {@link UserStatusDto} and {@link UserStatus} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see UserStatusService
+ * @see UserStatus
+ * @see UserStatusDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class UserStatusServiceImpl extends EntityMapper<UserStatusDto, UserStatus> implements UserStatusService {

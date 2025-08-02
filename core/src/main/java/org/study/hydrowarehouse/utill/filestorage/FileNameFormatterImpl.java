@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 /**
  * Implementation of the {@link FileNameFormatter} interface.
  *
+ * @see FileNameFormatter
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

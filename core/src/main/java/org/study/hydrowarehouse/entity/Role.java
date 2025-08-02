@@ -5,6 +5,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a user role within the system.
+ * <p>
+ * Mapped to the {@code roles} table in the database, this entity defines different roles (e.g., ADMIN, USER) that can
+ * be assigned to {@link User} entities to manage permissions and access control.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Role implements Serializable {

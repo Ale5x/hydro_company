@@ -10,6 +10,7 @@ import java.util.Optional;
  * Service interface for managing user statuses.
  * <p>
  * Provides business-level operations related to {@link UserStatusDto}.
+ * <p>
  *
  * @author Aliaksandr Pishchala
  */

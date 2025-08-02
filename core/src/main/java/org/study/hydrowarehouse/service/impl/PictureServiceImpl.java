@@ -20,6 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link Picture} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting pictures
+ * associated with products. Extends {@link EntityMapper} to handle mapping between {@link PictureDto} and
+ * {@link Picture} entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see PictureService
+ * @see Picture
+ * @see PictureDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implements PictureService {

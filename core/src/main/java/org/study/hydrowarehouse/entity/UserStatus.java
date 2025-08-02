@@ -4,6 +4,15 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents the status of a user account.
+ * <p>
+ * Mapped to the {@code user_statuses} table in the database, this entity defines various states a user account can
+ * have, such as active, inactive, or suspended, which are used to control user access and behavior within the system.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "user_statuses")
 public class UserStatus implements Serializable {

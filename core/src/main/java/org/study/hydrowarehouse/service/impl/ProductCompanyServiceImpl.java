@@ -18,6 +18,21 @@ import org.study.hydrowarehouse.utill.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing {@link ProductCompany} entities.
+ * <p>
+ * Provides business logic and transactional operations for creating, updating, retrieving, and deleting product
+ * companies. Extends {@link EntityMapper} to handle mapping between {@link ProductCompanyDto} and {@link ProductCompany}
+ * entities.
+ * </p>
+ *
+ * @see EntityMapper
+ * @see ProductCompanyService
+ * @see ProductCompany
+ * @see ProductCompanyDto
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Service
 @Transactional
 public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, ProductCompany> implements ProductCompanyService {

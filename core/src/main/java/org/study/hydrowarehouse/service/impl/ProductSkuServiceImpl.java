@@ -30,11 +30,12 @@ import java.util.Optional;
  * within a transactional context provided by {@link org.springframework.transaction.annotation.Transactional @Transactional}.
  * </p>
  *
- * @author Aliaksandr Pishchala
+ * @see EntityMapper
  * @see ProductSkuService
  * @see ProductSku
  * @see ProductSkuDto
- * @see EntityMapper
+ *
+ * @author Aliaksandr Pishchala
  */
 @Service
 @Transactional

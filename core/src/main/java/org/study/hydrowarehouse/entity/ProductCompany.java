@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents a company that manufactures or supplies products.
+ * <p>
+ * Mapped to the {@code product_companies} table in the database, this entity stores company details and maintains
+ * relationships with {@link Product} to represent the products it offers. It also has a many-to-many
+ * relationship with {@link Country} to indicate the countries in which the company operates or distributes its products.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Table(name = "product_companies")
 @Entity
 public class ProductCompany implements Serializable {

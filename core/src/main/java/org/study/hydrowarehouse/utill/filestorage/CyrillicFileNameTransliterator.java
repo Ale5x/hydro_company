@@ -10,6 +10,8 @@ import java.util.Map;
  * Service implementation of {@link FileNameTransliterator} that transliterates file names from Cyrillic
  * to Latin characters.
  *
+ * @see FileNameTransliterator
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

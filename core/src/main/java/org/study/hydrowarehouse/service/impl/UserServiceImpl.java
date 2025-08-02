@@ -23,6 +23,11 @@ import java.util.*;
  * The class {@link UserServiceImpl} implements methods of the UserService interface.
  * The class is annotated as a service, which qualifies it to be automatically created by component-scanning.
  *
+ * @see EntityMapper
+ * @see UserService
+ * @see User
+ * @see UserDto
+ *
  * @author Aliaksandr Pishchala
  */
 @Service

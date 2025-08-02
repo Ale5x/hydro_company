@@ -4,6 +4,15 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents a storage rack in the warehouse.
+ * <p>
+ * Mapped to the {@code storage_racks} table in the database, this entity stores information about storage racks,
+ * which contain multiple shelves for organizing and storing products within the warehouse.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Entity
 @Table(name = "storage_racks")
 public class StorageRack implements Serializable {

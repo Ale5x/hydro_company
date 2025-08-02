@@ -1,5 +1,14 @@
 package org.study.hydrowarehouse.exception;
 
+/**
+ * Utility class that holds constant exception message strings used across the application.
+ * <p>
+ * This class is final and has a private constructor to prevent instantiation, as it serves only as a container for
+ * static constant values.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public final class ExceptionMessages {
 
     private ExceptionMessages() {

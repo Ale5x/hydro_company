@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.RoleDao;
 import org.study.hydrowarehouse.entity.ERole;
 import org.study.hydrowarehouse.entity.Role;
+import org.study.hydrowarehouse.service.EntityMapper;
 import org.study.hydrowarehouse.service.RoleService;
 
 import java.util.Optional;
@@ -13,6 +14,11 @@ import java.util.Optional;
 /**
  * The class {@link RoleServiceImpl} implements methods of the RoleService interface.
  * The class is annotated as a service, which qualifies it to be automatically created by component-scanning.
+ *
+ * @see EntityMapper
+ * @see RoleService
+ * @see Role
+ * @see ERole
  *
  * @author Aliaksandr Pishchala
  */

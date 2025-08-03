@@ -8,7 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.StorageRackService;
 import org.study.hydrowarehouse.utill.StringUtils;
 

@@ -10,7 +10,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductCompanyDto;
 import org.study.hydrowarehouse.entity.ProductCompany;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductCompanyService;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.StringUtils;

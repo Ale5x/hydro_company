@@ -8,7 +8,7 @@ import org.study.hydrowarehouse.entity.Country;
 import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.service.CountryService;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -7,7 +7,7 @@ import org.study.hydrowarehouse.dao.UserStatusDao;
 import org.study.hydrowarehouse.entity.Dto.UserStatusDto;
 import org.study.hydrowarehouse.entity.UserStatus;
 import org.study.hydrowarehouse.exception.CoreException;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.UserStatusService;
 
 import java.util.ArrayList;

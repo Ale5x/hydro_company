@@ -1,4 +1,4 @@
-package org.study.hydrowarehouse.service;
+package org.study.hydrowarehouse.mapping;
 
 import org.study.hydrowarehouse.exception.CoreException;
 

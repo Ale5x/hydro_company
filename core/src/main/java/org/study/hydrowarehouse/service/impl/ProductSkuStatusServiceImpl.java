@@ -8,7 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductSkuStatusDto;
 import org.study.hydrowarehouse.entity.ProductSkuStatus;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductSkuStatusService;
 import org.study.hydrowarehouse.utill.StringUtils;
 

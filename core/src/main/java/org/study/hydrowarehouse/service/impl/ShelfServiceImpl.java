@@ -10,7 +10,7 @@ import org.study.hydrowarehouse.entity.Shelf;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ShelfService;
 import org.study.hydrowarehouse.utill.StringUtils;
 

@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.study.hydrowarehouse.dao.RoleDao;
 import org.study.hydrowarehouse.entity.ERole;
 import org.study.hydrowarehouse.entity.Role;
-import org.study.hydrowarehouse.service.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.RoleService;
 
 import java.util.Optional;

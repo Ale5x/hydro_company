@@ -17,7 +17,7 @@ import java.util.Optional;
 @Transactional(rollbackFor = Exception.class)
 public class StorageRackDaoImpl extends CriteriaQueryHelper<StorageRack> implements StorageRackDao {
 
-    private final static String STORAGE_RACK_ID = "storageRackId";
+    private final static String STORAGE_RACK_ID = "rackId";
     private final static String STORAGE_RACK_NAME = "name";
     private final static String DELETE_STORAGE_RUCK_BY_ID = String.format("DELETE StorageRack WHERE id =: %s",
             STORAGE_RACK_ID);

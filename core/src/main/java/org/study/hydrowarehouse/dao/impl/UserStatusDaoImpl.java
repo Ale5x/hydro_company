@@ -10,6 +10,19 @@ import org.study.hydrowarehouse.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of {@link UserStatusDao} that provides database access operations
+ * for {@link UserStatus} entities.
+ * <p>
+ * This class extends {@link CriteriaQueryHelper} to reuse common JPA Criteria API functionality.
+ * It is annotated with {@link org.springframework.stereotype.Repository} to mark it as a persistence component,
+ * and with {@link org.springframework.transaction.annotation.Transactional} to enable transaction management.
+ * </p>
+ *
+ * <p>All operations are transactional with rollback for any {@link Exception}.</p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class UserStatusDaoImpl extends CriteriaQueryHelper<UserStatus> implements UserStatusDao {

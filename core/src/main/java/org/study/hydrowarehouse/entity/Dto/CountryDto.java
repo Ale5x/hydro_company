@@ -4,17 +4,43 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
 
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.Country} entity.
+ * <p>
+ * This DTO is used to transfer country data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class CountryDto extends RepresentationModel<CountryDto> {
 
+    /**
+     * Unique identifier of the country.
+     */
     private Integer countryId;
+
+    /**
+     * Name of the country.
+     */
     private String name;
 
+    /**
+     * Default constructor.
+     */
     public CountryDto() {}
 
+    /**
+     * Constructs a CountryDto with specified id and name.
+     *
+     * @param countryId the unique identifier of the country
+     * @param name      the name of the country
+     */
     public CountryDto (Integer countryId, String name) {
         this.countryId = countryId;
         this.name = name;
     }
+
 
     public Integer getCountryId() {
         return countryId;

@@ -3,14 +3,38 @@ package org.study.hydrowarehouse.entity.Dto;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.ProductConnection} entity.
+ * <p>
+ * This DTO is used to transfer product connection data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class ProductConnectionDto extends RepresentationModel<ProductConnectionDto> {
 
+    /**
+     * Unique identifier of the product connection.
+     */
     private Integer productConnectionId;
+
+    /**
+     * Size specification of the product connection.
+     */
     private String size;
 
+    /**
+     * Default constructor.
+     */
     public ProductConnectionDto() {}
 
+    /**
+     * Constructs a ProductConnectionDto with the specified id and size.
+     *
+     * @param productConnectionId unique identifier of the product connection
+     * @param size                size specification of the product connection
+     */
     public ProductConnectionDto(Integer productConnectionId, String size) {
         this.productConnectionId = productConnectionId;
         this.size = size;

@@ -14,6 +14,18 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.*;
 
+/**
+ * Implementation of {@link CountryDao} that provides database access operations for {@link Country} entities.
+ * <p>
+ * This class extends {@link CriteriaQueryHelper} to leverage reusable JPA Criteria API functionality.
+ * It is annotated with {@link org.springframework.stereotype.Repository} to indicate a persistence component
+ * and {@link org.springframework.transaction.annotation.Transactional} to ensure transaction management.
+ * </p>
+ *
+ * <p>All operations are transactional with rollback for any {@link Exception}.</p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class CountryDaoImpl extends CriteriaQueryHelper<Country> implements CountryDao {

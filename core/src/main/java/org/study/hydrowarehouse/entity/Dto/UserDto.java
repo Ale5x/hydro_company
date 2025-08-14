@@ -5,25 +5,83 @@ import org.springframework.hateoas.RepresentationModel;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.User} entity.
+ * <p>
+ * This DTO is used to transfer user data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class UserDto extends RepresentationModel<UserDto> {
 
+    /**
+     * Unique identifier of the user.
+     */
     private Integer userDtoId;
+
+    /**
+     * First name of the user.
+     */
     private String firstName;
+
+    /**
+     * Last name of the user.
+     */
     private String lastName;
+
+    /**
+     * Email of the user.
+     */
     private String email;
+
+    /**
+     * Password of the user.
+     */
     private String password;
+
+    /**
+     * Path to the user's photo.
+     */
     private String pathPhoto;
+
+    /**
+     * Status of the user.
+     */
     private String status;
+
+    /**
+     * Registration date and time of the user.
+     */
     private LocalDateTime registration;
 
+    /**
+     * Collection of roles assigned to the user.
+     */
     private Collection<String> role;
+
+    /**
+     * Associated user company details.
+     */
     private UserCompanyDto userCompanyDto;
 
+    /**
+     * Default constructor.
+     */
     public UserDto() {}
 
+    /**
+     * Constructs a UserDto with specified first name, last name, email, password, and photo path.
+     *
+     * @param firstName first name of the user
+     * @param lastName  last name of the user
+     * @param email     email of the user
+     * @param password  password of the user
+     * @param pathPhoto path to the user's photo
+     */
     public UserDto(String firstName, String lastName, String email, String password,
-                String pathPhoto) {
+                   String pathPhoto) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;

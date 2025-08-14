@@ -3,19 +3,50 @@ package org.study.hydrowarehouse.entity.Dto;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.UserCompany} entity.
+ * <p>
+ * This DTO is used to transfer user company data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class UserCompanyDto extends RepresentationModel<UserCompanyDto> {
 
+    /**
+     * Unique identifier of the user company.
+     */
     private Integer companyDtoId;
+
+    /**
+     * Name of the user company.
+     */
     private String name;
 
+    /**
+     * Address of the user company.
+     */
     private String address;
 
+    /**
+     * Country associated with the user company.
+     */
     private CountryDto countryDto;
 
+    /**
+     * Default constructor.
+     */
     public UserCompanyDto() {
     }
 
+    /**
+     * Constructs a UserCompanyDto with the specified id, name, and address.
+     *
+     * @param companyDtoId unique identifier of the user company
+     * @param name         name of the user company
+     * @param address      address of the user company
+     */
     public UserCompanyDto(Integer companyDtoId, String name, String address) {
         this.companyDtoId = companyDtoId;
         this.name = name;

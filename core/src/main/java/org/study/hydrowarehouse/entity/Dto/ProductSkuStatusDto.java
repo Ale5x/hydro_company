@@ -3,19 +3,41 @@ package org.study.hydrowarehouse.entity.Dto;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.ProductSkuStatus} entity.
+ * <p>
+ * This DTO is used to transfer product SKU status data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
+public class ProductSkuStatusDto extends RepresentationModel<ProductSkuStatusDto> {
 
-public class ProductSkuStatusDto extends RepresentationModel<ProductSkuDto> {
-
+    /**
+     * Unique identifier of the product SKU status.
+     */
     private Integer productSkuStatusDtoId;
+
+    /**
+     * Status description of the product SKU.
+     */
     private String status;
 
+    /**
+     * Default constructor.
+     */
     public ProductSkuStatusDto() {
     }
 
+    /**
+     * Constructs a ProductSkuStatusDto with the specified status.
+     *
+     * @param status status description of the product SKU
+     */
     public ProductSkuStatusDto(String status) {
         this.status = status;
     }
-
 
     public Integer getProductSkuStatusDtoId() {
         return productSkuStatusDtoId;

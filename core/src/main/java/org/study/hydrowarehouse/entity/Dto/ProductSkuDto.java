@@ -3,14 +3,45 @@ package org.study.hydrowarehouse.entity.Dto;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.ProductSku} entity.
+ * <p>
+ * This DTO is used to transfer product SKU data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class ProductSkuDto extends RepresentationModel<ProductSkuDto> {
 
+    /**
+     * Unique identifier of the product SKU.
+     */
     private Integer productSkuDtoId;
+
+    /**
+     * Code of the product SKU.
+     */
     private String code;
+
+    /**
+     * Country associated with the product SKU.
+     */
     private CountryDto countryDto;
+
+    /**
+     * Shelf where the product SKU is stored.
+     */
     private ShelfDto shelfDto;
+
+    /**
+     * Status of the product SKU.
+     */
     private ProductSkuStatusDto status;
+
+    /**
+     * Associated product details.
+     */
     private ProductDto productDto;
 
     public Integer getProductSkuDtoId() {

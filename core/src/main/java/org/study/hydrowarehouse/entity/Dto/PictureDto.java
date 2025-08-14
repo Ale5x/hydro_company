@@ -4,10 +4,30 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
 
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.Picture} entity.
+ * <p>
+ * This DTO is used to transfer picture data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class PictureDto extends RepresentationModel<PictureDto> {
 
+    /**
+     * Unique identifier of the picture.
+     */
     private Integer pictureDtoId;
+
+    /**
+     * Path to the picture file.
+     */
     private String path;
+
+    /**
+     * Identifier of the associated product.
+     */
     private Integer productId;
 
     public Integer getPictureDtoId() {

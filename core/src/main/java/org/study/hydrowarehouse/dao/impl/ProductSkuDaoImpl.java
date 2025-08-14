@@ -27,7 +27,6 @@ import java.util.Optional;
  * <p><strong>Thread Safety:</strong> This class is thread-safe when used within the transactional context of Spring.</p>
  *
  * @author Aliaksandr Pishchala
- * @see ProductSkuDao
  */
 @Repository
 @Transactional(rollbackFor = Exception.class)

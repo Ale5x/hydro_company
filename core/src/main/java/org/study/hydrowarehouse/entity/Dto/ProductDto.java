@@ -5,29 +5,96 @@ import org.springframework.hateoas.RepresentationModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.Product} entity.
+ * <p>
+ * This DTO is used to transfer product data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class ProductDto extends RepresentationModel<ProductDto> {
 
+    /**
+     * Unique identifier of the product.
+     */
     private Integer productDtoId;
+
+    /**
+     * Quantity of the product.
+     */
     private Integer count;
+
+    /**
+     * Flow rate specification of the product.
+     */
     private Integer flowRate;
+
+    /**
+     * Operating pressure of the product.
+     */
     private Integer pressure;
+
+    /**
+     * Maximum allowable pressure of the product.
+     */
     private Integer pressureMax;
+
+    /**
+     * Weight of the product.
+     */
     private Double weight;
+
+    /**
+     * Additional information or notes about the product.
+     */
     private String additionalInformation;
 
+    /**
+     * Associated product type details.
+     */
     private ProductTypeDto productTypeDto;
+
+    /**
+     * Path to the hydraulic scheme file.
+     */
     private String pathHydraulicScheme;
+
+    /**
+     * List of paths to product images.
+     */
     private List<String> imagesPaths = new ArrayList<>();
+
+    /**
+     * List of associated product SKU details.
+     */
     private List<ProductSkuDto> productSkuDtos = new ArrayList<>();
+
+    /**
+     * Associated product company details.
+     */
     private ProductCompanyDto productCompanyDto;
+
+    /**
+     * Associated product connection details.
+     */
     private ProductConnectionDto productConnectionDto;
 
+    /**
+     * Default constructor.
+     */
     public ProductDto(){}
 
+    /**
+     * Constructs a ProductDto with the specified id.
+     *
+     * @param id unique identifier of the product
+     */
     public ProductDto(Integer id) {
         this.productDtoId = id;
     }
+
     public Integer getProductDtoId() {
         return productDtoId;
     }

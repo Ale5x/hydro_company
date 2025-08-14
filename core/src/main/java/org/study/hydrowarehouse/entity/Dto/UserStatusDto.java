@@ -3,11 +3,25 @@ package org.study.hydrowarehouse.entity.Dto;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
-
+/**
+ * Data Transfer Object for {@link org.study.hydrowarehouse.entity.UserStatus} entity.
+ * <p>
+ * This DTO is used to transfer user status data between the service layer and the presentation layer.
+ * It extends {@link RepresentationModel} to support HATEOAS links.
+ * </p>
+ *
+ * @author Aliaksandr Pishchala
+ */
 public class UserStatusDto extends RepresentationModel<UserStatusDto> {
 
+    /**
+     * Unique identifier of the user status.
+     */
     private Long userStatusIdDto;
 
+    /**
+     * Status description of the user.
+     */
     private String status;
 
     public Long getUserStatusIdDto() {

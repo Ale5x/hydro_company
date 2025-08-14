@@ -16,6 +16,8 @@ import java.util.List;
  * creating definition criteria and building criteria.
  *
  * @param <T> is an entity class type that participates in requests to retrieve data from the database.
+ *
+ * @author Aliaksandr Pishchala
  */
 @Component
 public class CriteriaQueryHelper<T> {

@@ -87,16 +87,11 @@ public class CriteriaQueryHelper<T> {
      */
     protected Predicate[] createPredicates(List<String> criteriaList, CriteriaBuilder criteriaBuilder, Root<T> root, String searchName) {
         Predicate[] predicates = new Predicate[criteriaList.size()];
-        System.out.println("predicates size is -> " + predicates.length + " | list size -> " + criteriaList.size());
         int count = 0;
         for (String criteria : criteriaList) {
-            System.out.println("START FOR EACH");
-            System.out.println("count -> " + count);
             predicates[count] = criteriaBuilder.like(root.get(criteria), createSearchCriteria(searchName));
             count++;
-            System.out.println("COUNT -> " + count + " | Criteria -> " + criteria);
         }
-        System.out.println("Predicates all " + predicates.toString());
         return predicates;
     }
 }

@@ -75,7 +75,6 @@ public class ProductTypeDaoImpl extends CriteriaQueryHelper<ProductType> impleme
                         createSearchCriteria(name).toLowerCase()
                 ));
 
-        System.out.println(createSearchCriteria(name));
         return session.createQuery(criteriaQuery).getResultList();
     }
 

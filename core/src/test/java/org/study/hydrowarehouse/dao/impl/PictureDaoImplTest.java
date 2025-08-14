@@ -47,7 +47,6 @@ class PictureDaoImplTest {
 
     @BeforeEach
     public void setUp() {
-        // Создаём несколько объектов Picture для теста
         pictureList = Arrays.asList(
                 new Picture("path/to/picture1", new Product(1)),
                 new Picture("path/to/picture2", new Product(1)),
@@ -92,11 +91,9 @@ class PictureDaoImplTest {
 
     @Test
     void createList() {
-        System.out.println("maxSizeFile1 " + maxSizeFile1);
         List<Picture> pictureListBefore = pictureDao.getPictures(maxLimit, offset);
         assertTrue(pictureListBefore.size() > 0);
         boolean condition = pictureDao.createList(pictureList);
-//        assertTrue(condition);
 
         List<Picture> pictureListAfter = pictureDao.getPictures(maxLimit, offset);
 

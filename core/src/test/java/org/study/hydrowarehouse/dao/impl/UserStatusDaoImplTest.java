@@ -25,10 +25,6 @@ class UserStatusDaoImplTest {
     @Test
     void findAll() {
         List<UserStatus> statuses = userStatusDao.findAll();
-        System.out.println("Size -> " + statuses.size());
-        statuses.stream()
-                .map(UserStatus::getStatus)
-                .forEach(System.out::println);
         assertFalse(statuses.isEmpty());
     }
 
@@ -47,9 +43,6 @@ class UserStatusDaoImplTest {
     @Test
     void findById() {
         Optional<UserStatus> userStatus = userStatusDao.findById(1l);
-        userStatus.stream()
-                .map(UserStatus::getStatus)
-                .forEach(System.out::println);
         assertTrue(userStatus.isPresent());
     }
 

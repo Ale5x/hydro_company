@@ -84,7 +84,6 @@ class ProductConnectionDaoImplTest {
     @Test
     void getListProductsConnection() {
         List<ProductConnection> connectionList = productConnectionDao.getListProductsConnection();
-        System.out.println(connectionList);
         assertTrue(connectionList.size() > 0);
         assertFalse(connectionList.isEmpty());
     }

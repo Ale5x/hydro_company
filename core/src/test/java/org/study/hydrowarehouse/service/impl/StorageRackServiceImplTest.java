@@ -13,6 +13,7 @@ import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.Shelf;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.ShelfService;
 
 import java.util.ArrayList;
@@ -27,9 +28,10 @@ import static org.mockito.Mockito.*;
 class StorageRackServiceImplTest {
 
     @Mock
-    private ShelfService shelfService;
-    @Mock
     private StorageRackDao storageRackDao;
+
+    @Mock
+    private DtoResolver dtoResolver;
 
     @InjectMocks
     private StorageRackServiceImpl storageRackService;
@@ -59,13 +61,11 @@ class StorageRackServiceImplTest {
 
     @Test
     void create() {
-        when(shelfService.findShelfByName(any(String.class))).thenReturn(Optional.of(shelf));
         when(storageRackDao.create(any(StorageRack.class))).thenReturn(3);
 
         boolean condition = storageRackService.create(storageRackDto);
 
         assertTrue(condition);
-        verify(shelfService, times(1)).findShelfByName(shelf.getName());
         verify(storageRackDao, times(1)).create(any(StorageRack.class));
     }
 
@@ -125,6 +125,7 @@ class StorageRackServiceImplTest {
     @Test
     void findById() {
         when(storageRackDao.getStorageRackById(id)).thenReturn(Optional.of(storageRack));
+        when(dtoResolver.resolveStorageRackDto(storageRack)).thenReturn(storageRackDto);
 
         Optional<StorageRackDto> storageRackDtoOptional = storageRackService.findById(id);
 
@@ -135,6 +136,7 @@ class StorageRackServiceImplTest {
     @Test
     void storageRackList() {
         when(storageRackDao.getStorageRacksList(offset, limit)).thenReturn(storageList);
+        when(dtoResolver.resolveStorageRackDto(storageRack)).thenReturn(storageRackDto);
 
         List<StorageRackDto> list = storageRackService.storageRackList(offset, limit);
 

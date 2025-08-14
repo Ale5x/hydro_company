@@ -7,6 +7,7 @@ import org.study.hydrowarehouse.dao.UserStatusDao;
 import org.study.hydrowarehouse.entity.Dto.UserStatusDto;
 import org.study.hydrowarehouse.entity.UserStatus;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.UserStatusService;
 
@@ -33,10 +34,12 @@ import java.util.Optional;
 public class UserStatusServiceImpl extends EntityMapper<UserStatusDto, UserStatus> implements UserStatusService {
 
     private final UserStatusDao userStatusDao;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public UserStatusServiceImpl(UserStatusDao userStatusDao) {
+    public UserStatusServiceImpl(UserStatusDao userStatusDao, DtoResolver dtoResolver) {
         this.userStatusDao = userStatusDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -78,11 +81,6 @@ public class UserStatusServiceImpl extends EntityMapper<UserStatusDto, UserStatu
 
     @Override
     public UserStatusDto mapToObjectDto(UserStatus object) {
-        if (object == null) return null;
-        UserStatusDto userStatusDto = new UserStatusDto();
-        userStatusDto.setUserStatusIdDto(object.getUserStatusId());
-        userStatusDto.setStatus(object.getStatus());
-
-        return userStatusDto;
+        return dtoResolver.resolveUserStatusDto(object);
     }
 }

@@ -8,6 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductTypeDto;
 import org.study.hydrowarehouse.entity.ProductType;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductTypeService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -36,9 +37,12 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     private final ProductTypeDao productTypeDao;
 
+    private final DtoResolver dtoResolver;
+
     @Autowired
-    public ProductTypeServiceImpl(ProductTypeDao productTypeDao) {
+    public ProductTypeServiceImpl(ProductTypeDao productTypeDao, DtoResolver dtoResolver) {
         this.productTypeDao = productTypeDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -60,6 +64,7 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
                 });
         existingProductType.setName(StringUtils.isBlankOrNullText(productTypeDto.getName())
                 ? existingProductType.getName() : productTypeDto.getName());
+
         return productTypeDao.update(existingProductType);
     }
 
@@ -110,27 +115,6 @@ public class ProductTypeServiceImpl extends EntityMapper<ProductTypeDto, Product
 
     @Override
     public ProductTypeDto mapToObjectDto(ProductType object) {
-        if (object == null) return null;
-        ProductTypeDto productTypeDto = new ProductTypeDto();
-
-        productTypeDto.setProductTypeId(object.getProductTypeId());
-        productTypeDto.setName(object.getName());
-        return productTypeDto;
-    }
-
-    protected ProductType updateProductTypeFromDto (ProductTypeDto productTypeDto) {
-        ProductType productType = new ProductType();
-        Optional<ProductType> productTypeOpt = productTypeDao.getProductTypeById(productTypeDto.getProductTypeId());
-        if (productTypeOpt.isPresent()) {
-            productType.setProductTypeId(productTypeDto.getProductTypeId());
-            productType.setName(productTypeDto.getName() == null
-                    ? productTypeOpt.get().getName() : productTypeDto.getName());
-        } else {
-            //logger
-            throw new CoreException(String.format(
-                                        ExceptionMessages.PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE,
-                                        productTypeDto.getProductTypeId()));
-        }
-        return productType;
+        return dtoResolver.resolveProductTypeDto(object);
     }
 }

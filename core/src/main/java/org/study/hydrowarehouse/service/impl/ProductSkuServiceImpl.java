@@ -8,7 +8,9 @@ import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityResolver;
 import org.study.hydrowarehouse.service.ProductSkuService;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -34,6 +36,9 @@ import java.util.Optional;
  * @see ProductSkuService
  * @see ProductSku
  * @see ProductSkuDto
+ * @see EntityResolver
+ * @see DtoResolver
+ * @see ServiceMediator
  *
  * @author Aliaksandr Pishchala
  */
@@ -45,19 +50,25 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     private final ProductSkuDao skuDao;
     private final ServiceMediator serviceMediator;
 
+    private final DtoResolver dtoResolver;
+
+    private final EntityResolver entityResolver;
+
     @Autowired
-    public ProductSkuServiceImpl(ProductSkuDao skuDao, ServiceMediator serviceMediator) {
+    public ProductSkuServiceImpl(ProductSkuDao skuDao, ServiceMediator serviceMediator, DtoResolver dtoResolver, EntityResolver entityResolver) {
         this.skuDao = skuDao;
         this.serviceMediator = serviceMediator;
+        this.dtoResolver = dtoResolver;
+        this.entityResolver = entityResolver;
     }
 
     @Override
     public boolean save(ProductSkuDto skuDto) throws CoreException {
         ProductSku productSku = new ProductSku();
         productSku.setCode(skuDto.getCode());
-        productSku.setCountry(resolveCountry(skuDto.getCountryDto()));
-        productSku.setProduct(resolveProduct(skuDto.getProductDto()));
-        productSku.setShelf(resolveShelf(skuDto.getShelfDto()));
+        productSku.setCountry(entityResolver.resolveCountry(skuDto.getCountryDto()));
+        productSku.setProduct(entityResolver.resolveProduct(skuDto.getProductDto()));
+        productSku.setShelf(entityResolver.resolveShelf(skuDto.getShelfDto()));
         productSku.setStatus(serviceMediator.findSkuStatusByStatus(IN_STOCK).orElseThrow(() -> {
             //logger
             throw new CoreException(String.format(
@@ -89,15 +100,15 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
         }
 
         if (skuDto.getCountryDto() != null) {
-            existingSku.setCountry(resolveCountry(skuDto.getCountryDto()));
+            existingSku.setCountry(entityResolver.resolveCountry(skuDto.getCountryDto()));
         }
 
         if (skuDto.getProductDto() != null) {
-            existingSku.setProduct(resolveProduct(skuDto.getProductDto()));
+            existingSku.setProduct(entityResolver.resolveProduct(skuDto.getProductDto()));
         }
 
         if (skuDto.getShelfDto() != null) {
-            existingSku.setShelf(resolveShelf(skuDto.getShelfDto()));
+            existingSku.setShelf(entityResolver.resolveShelf(skuDto.getShelfDto()));
         }
 
         if (skuDto.getStatus() != null) {
@@ -208,12 +219,7 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
 
     @Override
     public ProductSkuDto mapToObjectDto(ProductSku object) throws CoreException {
-        if (object == null) return null;
-
-        ProductSkuDto skuDto = new ProductSkuDto();
-        skuDto.setProductSkuDtoId(object.getProductSkuId());
-        skuDto.setCode(object.getCode());
-
+        ProductSkuDto skuDto = dtoResolver.resolveProductSkuDto(object);
         skuDto.setProductDto(mapProduct(object.getProduct()));
         skuDto.setCountryDto(mapCountry(object.getCountry()));
         skuDto.setShelfDto(mapShelf(object.getShelf()));
@@ -223,128 +229,58 @@ public class ProductSkuServiceImpl extends EntityMapper<ProductSkuDto, ProductSk
     }
 
     /**
-     * Maps a Product entity to its corresponding ProductDto.
+     * Maps a {@link Product} entity to its corresponding {@link ProductDto}.
+     * <p>
+     * Resolves the basic product fields and sets the related company, connection, and type DTOs.
+     * </p>
      *
-     * @param product the Product entity to be mapped
-     * @return the mapped ProductDto or null if the input is null
+     * @param product the {@link Product} entity to be mapped; must not be {@code null}
+     * @return a fully populated {@link ProductDto}
+     * @throws CoreException if an error occurs during the DTO resolution process
      */
-    private ProductDto mapProduct(Product product) {
-        if (product == null) return null;
-
-        ProductDto dto = new ProductDto();
-        dto.setProductDtoId(product.getProductId());
-        dto.setProductCompanyDto(mapCompany(product.getProductCompany()));
+    private ProductDto mapProduct(Product product) throws CoreException {
+        ProductDto dto = dtoResolver.resolveProductBasicFields(product);
+        dto.setProductCompanyDto(dtoResolver.resolveProductCompanyDto(product.getProductCompany()));
+        dto.setProductConnectionDto(dtoResolver.resolveProductConnectionDto(product.getProductConnection()));
+        dto.setProductTypeDto(dtoResolver.resolveProductTypeDto(product.getProductType()));
         return dto;
     }
 
     /**
-     * Maps a ProductCompany entity to its corresponding ProductCompanyDto.
+     * Maps a {@link Country} entity to its corresponding {@link CountryDto}.
      *
-     * @param company the ProductCompany entity to be mapped
-     * @return the mapped ProductCompanyDto or null if the input is null
+     * @param country the {@link Country} entity to be mapped; may be {@code null}
+     * @return the corresponding {@link CountryDto}, or {@code null} if {@code country} is null
+     * @throws CoreException if an error occurs during the DTO resolution process
      */
-    private ProductCompanyDto mapCompany(ProductCompany company) {
-        if (company == null) return null;
-
-        return new ProductCompanyDto(company.getProductCompanyId(), company.getName());
+    private CountryDto mapCountry(Country country) throws CoreException {
+        return dtoResolver.resolveCountryDto(country);
     }
 
     /**
-     * Maps a Country entity to its corresponding CountryDto.
+     * Maps a {@link Shelf} entity to its corresponding {@link ShelfDto}.
+     * <p>
+     * Resolves the shelf fields and sets the related storage rack DTO.
+     * </p>
      *
-     * @param country the Country entity to be mapped
-     * @return the mapped CountryDto or null if the input is null
+     * @param shelf the {@link Shelf} entity to be mapped; must not be {@code null}
+     * @return a fully populated {@link ShelfDto}
+     * @throws CoreException if an error occurs during the DTO resolution process
      */
-    private CountryDto mapCountry(Country country) {
-        if (country == null) return null;
-
-        return new CountryDto(country.getCountryId(), country.getName());
+    private ShelfDto mapShelf(Shelf shelf) throws CoreException {
+        ShelfDto shelfDto = dtoResolver.resolveShelfDto(shelf);
+        shelfDto.setStorageRackDto(dtoResolver.resolveStorageRackDto(shelf.getStorageRack()));
+        return shelfDto;
     }
 
     /**
-     * Maps a Shelf entity to its corresponding ShelfDto, including nested StorageRack.
+     * Maps a {@link ProductSkuStatus} entity to its corresponding {@link ProductSkuStatusDto}.
      *
-     * @param shelf the Shelf entity to be mapped
-     * @return the mapped ShelfDto or null if the input is null
+     * @param status the {@link ProductSkuStatus} entity to be mapped; may be {@code null}
+     * @return the corresponding {@link ProductSkuStatusDto}, or {@code null} if {@code status} is null
+     * @throws CoreException if an error occurs during the DTO resolution process
      */
-    private ShelfDto mapShelf(Shelf shelf) {
-        if (shelf == null) return null;
-
-        StorageRackDto rackDto = null;
-        if (shelf.getStorageRack() != null) {
-            rackDto = new StorageRackDto(
-                    shelf.getStorageRack().getRackId(),
-                    shelf.getStorageRack().getName()
-            );
-        }
-
-        return new ShelfDto(shelf.getShelfId(), shelf.getName(), rackDto);
-    }
-
-    /**
-     * Maps a ProductSkuStatus entity to its corresponding ProductSkuStatusDto.
-     *
-     * @param status the ProductSkuStatus entity to be mapped
-     * @return the mapped ProductSkuStatusDto or null if the input is null
-     */
-    private ProductSkuStatusDto mapStatus(ProductSkuStatus status) {
-        if (status == null) return null;
-
-        return new ProductSkuStatusDto(status.getProductSkuStatusId(), status.getStatus());
-    }
-
-    /**
-     * Resolves a Country entity from the given CountryDto.
-     *
-     * @param dto the CountryDto containing the ID of the country to resolve
-     * @return the resolved Country entity
-     * @throws CoreException if the ID is null or the Country is not found
-     */
-    private Country resolveCountry(CountryDto dto) {
-        if (dto == null) return null;
-        return serviceMediator.findCountryById(dto.getCountryId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.COUNTRY_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getCountryId()));
-                });
-    }
-
-    /**
-     * Resolves a Product entity from the given ProductDto.
-     *
-     * @param dto the ProductDto containing the ID of the product to resolve
-     * @return the resolved Product entity
-     * @throws CoreException if the ID is null or the Product is not found
-     */
-    private Product resolveProduct(ProductDto dto) {
-        if (dto == null) return null;
-        return serviceMediator.findProductById(dto.getProductDtoId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.PRODUCT_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getProductDtoId()));
-                });
-    }
-
-    /**
-     * Resolves a Shelf entity from the given ShelfDto.
-     *
-     * @param dto the ShelfDto containing the ID of the shelf to resolve
-     * @return the resolved Shelf entity
-     * @throws CoreException if the ID is null or the Shelf is not found
-     */
-    private Shelf resolveShelf(ShelfDto dto) {
-        if (dto == null) return null;
-        return serviceMediator.findShelfById(dto.getShelfDtoId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.SHELF_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getShelfDtoId(),
-                                                dto.getName()));
-                });
+    private ProductSkuStatusDto mapStatus(ProductSkuStatus status) throws CoreException {
+        return dtoResolver.resolveProductSkuStatusDto(status);
     }
 }

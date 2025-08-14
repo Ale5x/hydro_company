@@ -10,6 +10,8 @@ import org.study.hydrowarehouse.dao.ProductSkuDao;
 import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
+import org.study.hydrowarehouse.mapping.EntityResolver;
 import org.study.hydrowarehouse.service.ServiceMediator;
 
 import java.util.List;
@@ -25,6 +27,11 @@ class ProductSkuServiceImplTest {
     @Mock
     private ProductSkuDao skuDao;
 
+    @Mock
+    private DtoResolver dtoResolver;
+
+    @Mock
+    private EntityResolver entityResolver;
     @Mock
     private ServiceMediator serviceMediator;
 
@@ -68,9 +75,9 @@ class ProductSkuServiceImplTest {
 
     @Test
     void save_ShouldReturnTrue_WhenSaveSuccessful() throws CoreException {
-        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
-        when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
-        when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
+        when(entityResolver.resolveCountry(any())).thenReturn(country);
+        when(entityResolver.resolveProduct(any())).thenReturn(product);
+        when(entityResolver.resolveShelf(any())).thenReturn(shelf);
         when(serviceMediator.findSkuStatusByStatus("In Stock")).thenReturn(Optional.of(status));
         when(skuDao.save(any(ProductSku.class))).thenReturn(1);
 
@@ -80,9 +87,9 @@ class ProductSkuServiceImplTest {
 
     @Test
     void save_ShouldThrowCoreException_WhenStatusNotFound() {
-        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
-        when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
-        when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
+        when(entityResolver.resolveCountry(any())).thenReturn(country);
+        when(entityResolver.resolveProduct(any())).thenReturn(product);
+        when(entityResolver.resolveShelf(any())).thenReturn(shelf);
         when(serviceMediator.findSkuStatusByStatus("In Stock")).thenReturn(Optional.empty());
 
         CoreException ex = assertThrows(CoreException.class, () -> skuService.save(skuDto));
@@ -96,9 +103,9 @@ class ProductSkuServiceImplTest {
         existingSku.setCode("OLD");
 
         when(skuDao.findById(1)).thenReturn(Optional.of(existingSku));
-        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(country));
-        when(serviceMediator.findProductById(1)).thenReturn(Optional.of(product));
-        when(serviceMediator.findShelfById(3)).thenReturn(Optional.of(shelf));
+        when(entityResolver.resolveCountry(any())).thenReturn(country);
+        when(entityResolver.resolveProduct(any())).thenReturn(product);
+        when(entityResolver.resolveShelf(any())).thenReturn(shelf);
         when(serviceMediator.findSkuStatusById(status.getProductSkuStatusId())).thenReturn(Optional.of(status));
         when(skuDao.update(any(ProductSku.class))).thenReturn(true);
 
@@ -146,9 +153,9 @@ class ProductSkuServiceImplTest {
     void update_ShouldThrowCoreException_WhenStatusNotFound() {
         when(skuDao.findById(1)).thenReturn(Optional.of(productSku));
         skuDto.setStatus(new ProductSkuStatusDto(5, "new status"));
-        when(serviceMediator.findCountryById(anyInt())).thenReturn(Optional.of(country));
-        when(serviceMediator.findProductById(anyInt())).thenReturn(Optional.of(product));
-        when(serviceMediator.findShelfById(anyInt())).thenReturn(Optional.of(shelf));
+        when(entityResolver.resolveCountry(any())).thenReturn(country);
+        when(entityResolver.resolveProduct(any())).thenReturn(product);
+        when(entityResolver.resolveShelf(any())).thenReturn(shelf);
 
         CoreException ex = assertThrows(CoreException.class, () -> skuService.update(skuDto));
 
@@ -191,18 +198,20 @@ class ProductSkuServiceImplTest {
 
     @Test
     void findById_ShouldReturnDto_WhenFound() throws CoreException {
-        productSku.setProductSkuId(1);
-        productSku.setCode("SKU-123");
-        productSku.setProduct(product);
-        productSku.setCountry(country);
-        productSku.setShelf(shelf);
-        productSku.setStatus(status);
+        String code = "SKU-123";
+        productSku.setCode(code);
+        skuDto.setCode(code);
 
-        when(skuDao.findById(1)).thenReturn(Optional.of(productSku));
+
+        when(skuDao.findById(anyInt())).thenReturn(Optional.of(productSku));
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(skuDto);
+        when(dtoResolver.resolveProductBasicFields(any())).thenReturn(new ProductDto());
+        when(dtoResolver.resolveCountryDto(any())).thenReturn(new CountryDto());
+        when(dtoResolver.resolveShelfDto(any())).thenReturn(new ShelfDto());
 
         Optional<ProductSkuDto> result = skuService.findById(1);
         assertTrue(result.isPresent());
-        assertEquals("SKU-123", result.get().getCode());
+        assertEquals(code, result.get().getCode());
     }
 
     @Test
@@ -215,24 +224,32 @@ class ProductSkuServiceImplTest {
 
     @Test
     void findById_ShouldReturnSku_WhenExists() throws CoreException {
-        ProductSku sku = new ProductSku();
-        sku.setProductSkuId(1);
-        sku.setCode("SKU-001");
-        sku.setProduct(product);
-        sku.setCountry(country);
-        sku.setStatus(status);
-        sku.setShelf(shelf);
+        String code = "SKU-123";
+        productSku.setCode(code);
+        skuDto.setCode(code);
 
-        when(skuDao.findById(1)).thenReturn(Optional.of(sku));
+
+        when(skuDao.findById(anyInt())).thenReturn(Optional.of(productSku));
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(skuDto);
+        when(dtoResolver.resolveProductBasicFields(any())).thenReturn(new ProductDto());
+        when(dtoResolver.resolveCountryDto(any())).thenReturn(new CountryDto());
+        when(dtoResolver.resolveShelfDto(any())).thenReturn(new ShelfDto());
+
+        when(skuDao.findById(1)).thenReturn(Optional.of(productSku));
 
         Optional<ProductSkuDto> result = skuService.findById(1);
 
         assertTrue(result.isPresent());
-        assertEquals("SKU-001", result.get().getCode());
+        assertEquals(code, result.get().getCode());
     }
 
     @Test
     void findByCode_ShouldReturnList_WhenFound() throws CoreException {
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(skuDto);
+        when(dtoResolver.resolveProductBasicFields(any())).thenReturn(new ProductDto());
+        when(dtoResolver.resolveCountryDto(any())).thenReturn(new CountryDto());
+        when(dtoResolver.resolveShelfDto(any())).thenReturn(new ShelfDto());
+
         when(skuDao.findByCode("SKU-123")).thenReturn(List.of(productSku));
         List<ProductSkuDto> result = skuService.findByCode("SKU-123");
         assertEquals(1, result.size());
@@ -240,6 +257,11 @@ class ProductSkuServiceImplTest {
 
     @Test
     void findAllByStatus_ShouldReturnList_WhenStatusExists() throws CoreException {
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(skuDto);
+        when(dtoResolver.resolveProductBasicFields(any())).thenReturn(new ProductDto());
+        when(dtoResolver.resolveCountryDto(any())).thenReturn(new CountryDto());
+        when(dtoResolver.resolveShelfDto(any())).thenReturn(new ShelfDto());
+
         when(serviceMediator.findSkuStatusByStatus("In Stock")).thenReturn(Optional.of(status));
         when(skuDao.findAllByStatus(10, 0, status)).thenReturn(List.of(productSku));
 
@@ -258,7 +280,13 @@ class ProductSkuServiceImplTest {
 
     @Test
     void findAllByProduct_ShouldReturnList_WhenProductExists() throws CoreException {
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(skuDto);
+        when(dtoResolver.resolveProductBasicFields(any())).thenReturn(new ProductDto());
+        when(dtoResolver.resolveCountryDto(any())).thenReturn(new CountryDto());
+        when(dtoResolver.resolveShelfDto(any())).thenReturn(new ShelfDto());
+
         ProductDto productDto = new ProductDto(1);
+
         when(skuDao.findAllByProduct(10, 0, new Product(1))).thenReturn(List.of(productSku));
 
         List<ProductSkuDto> result = skuService.findAllByProduct(10, 0, productDto);

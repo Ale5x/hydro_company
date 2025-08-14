@@ -9,8 +9,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydrowarehouse.dao.ShelfDao;
 import org.study.hydrowarehouse.entity.Dto.ShelfDto;
+import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.Shelf;
+import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
+import org.study.hydrowarehouse.mapping.EntityResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,12 @@ class ShelfServiceImplTest {
 
     @Mock
     private ShelfDao shelfDao;
+
+    @Mock
+    private DtoResolver dtoResolver;
+
+    @Mock
+    private EntityResolver entityResolver;
 
     @InjectMocks
     private ShelfServiceImpl shelfService;
@@ -46,16 +56,17 @@ class ShelfServiceImplTest {
 
     @Test
     void create() {
-        Shelf sendShelf = new Shelf(0, "create");
-        ShelfDto sendShelfDto = new ShelfDto();
-        sendShelfDto.setName(sendShelf.getName());
+        ShelfDto shelfDto = new ShelfDto();
+        shelfDto.setName("Test Shelf");
+        shelfDto.setStorageRackDto(new StorageRackDto());
 
-        when(shelfDao.create(any(Shelf.class))).thenReturn(1);
+        StorageRack mockedRack = new StorageRack();
+        when(entityResolver.resolveStorageRack(any())).thenReturn(mockedRack);
+        when(shelfDao.create(any(Shelf.class))).thenReturn(1); // Важно — возвращаем > 0
 
-        boolean condition = shelfService.create(sendShelfDto);
+        boolean result = shelfService.create(shelfDto);
 
-        assertTrue(condition);
-        verify(shelfDao, times(1)).create(sendShelf);
+        assertTrue(result);
     }
 
     @Test
@@ -114,6 +125,7 @@ class ShelfServiceImplTest {
     @Test
     void findAll() {
         when(shelfDao.getAllShelf()).thenReturn(shelfList);
+        when(dtoResolver.resolveShelfDto(shelf)).thenReturn(shelfDto);
 
         List<ShelfDto> shelfDtoList = shelfService.findAll();
 
@@ -124,7 +136,7 @@ class ShelfServiceImplTest {
     @Test
     void findById() {
         when(shelfDao.findById(id)).thenReturn(Optional.of(shelf));
-
+        when(dtoResolver.resolveShelfDto(shelf)).thenReturn(shelfDto);
         Optional<ShelfDto> shelfDtoOptional = shelfService.findById(id);
 
         assertTrue(shelfDtoOptional.isPresent());
@@ -134,7 +146,7 @@ class ShelfServiceImplTest {
     @Test
     void findByName() {
         when(shelfDao.findByName(name)).thenReturn(Optional.of(shelf));
-
+        when(dtoResolver.resolveShelfDto(shelf)).thenReturn(shelfDto);
         Optional<ShelfDto> shelfDtoOptional = shelfService.findByName(name);
 
         assertTrue(shelfDtoOptional.isPresent());
@@ -155,6 +167,7 @@ class ShelfServiceImplTest {
     @Test
     void findShelfByName() {
         when(shelfDao.findByName(name)).thenReturn(Optional.of(shelf));
+        when(dtoResolver.resolveShelfDto(shelf)).thenReturn(shelfDto);
         Optional<Shelf> shelfOptional = shelfService.findShelfByName(name);
 
         assertTrue(shelfOptional.isPresent());

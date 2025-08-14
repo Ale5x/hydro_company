@@ -10,6 +10,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductCompanyDto;
 import org.study.hydrowarehouse.entity.ProductCompany;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductCompanyService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * </p>
  *
  * @see EntityMapper
+ * @see DtoResolver
  * @see ProductCompanyService
  * @see ProductCompany
  * @see ProductCompanyDto
@@ -39,11 +41,14 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
     private final ProductCompanyDao productCompanyDao;
     private final ServiceMediator serviceMediator;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public ProductCompanyServiceImpl(ProductCompanyDao productCompanyDao, ServiceMediator serviceMediator) {
+    public ProductCompanyServiceImpl(ProductCompanyDao productCompanyDao, ServiceMediator serviceMediator,
+                                     DtoResolver dtoResolver) {
         this.productCompanyDao = productCompanyDao;
         this.serviceMediator = serviceMediator;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -117,47 +122,9 @@ public class ProductCompanyServiceImpl extends EntityMapper<ProductCompanyDto, P
 
     @Override
     public ProductCompanyDto mapToObjectDto(ProductCompany object) {
-        if (object == null) return null;
-        ProductCompanyDto productCompanyDto = new ProductCompanyDto();
-
-        productCompanyDto.setProductCompanyDtoId(object.getProductCompanyId());
-        productCompanyDto.setName(object.getName());
-        productCompanyDto.setCountries(toCountryDtoList(object.getCompanyCountries()));
-        return productCompanyDto;
-    }
-
-    /**
-     * Converts a set of Country entities to a list of CountryDto objects.
-     *
-     * @param countrySet the set of Country entities to convert
-     * @return a list of corresponding CountryDto objects
-     */
-    public List<CountryDto> toCountryDtoList(Set<Country> countrySet) {
-        if (countrySet == null || countrySet.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return countrySet.stream()
-                .map(this::mapToCountryDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Converts a {@link Country} entity to its corresponding {@link CountryDto}.
-     * <p>
-     * This method extracts the identifier and name from the {@code Country} object
-     * and maps them into a new instance of {@code CountryDto}.
-     * </p>
-     *
-     * @param country the {@code Country} entity to convert; must not be {@code null}
-     * @return a {@code CountryDto} containing mapped data from the input entity
-     * @throws NullPointerException if the input {@code country} is {@code null}
-     */
-    private CountryDto mapToCountryDto(Country country) {
-        if (country == null) return null;
-
-        CountryDto dto = new CountryDto();
-        dto.setCountryId(country.getCountryId());
-        dto.setName(country.getName());
-        return dto;
+        if (object == null) return new ProductCompanyDto();
+        ProductCompanyDto companyDto = dtoResolver.resolveProductCompanyDto(object);
+        companyDto.setCountries(dtoResolver.resolveCountryDtoList(object.getCompanyCountries()));
+        return companyDto;
     }
 }

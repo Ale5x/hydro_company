@@ -8,6 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductConnectionDto;
 import org.study.hydrowarehouse.entity.ProductConnection;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductConnectionService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -36,10 +37,12 @@ import java.util.Optional;
 public class ProductConnectionServiceImpl extends EntityMapper<ProductConnectionDto, ProductConnection> implements ProductConnectionService {
 
     private final ProductConnectionDao productConnectionDao;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public ProductConnectionServiceImpl(ProductConnectionDao productConnectionDao) {
+    public ProductConnectionServiceImpl(ProductConnectionDao productConnectionDao, DtoResolver dtoResolver) {
         this.productConnectionDao = productConnectionDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -85,7 +88,6 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
         if (objectsList == null) return null;
         List<ProductConnectionDto> productConnectionDtoList = new ArrayList<>();
         for (ProductConnection prCon : objectsList) {
-
             productConnectionDtoList.add(mapToObjectDto(prCon));
         }
         return productConnectionDtoList;
@@ -93,12 +95,6 @@ public class ProductConnectionServiceImpl extends EntityMapper<ProductConnection
 
     @Override
     public ProductConnectionDto mapToObjectDto(ProductConnection object) {
-        if (object == null) return null;
-        ProductConnectionDto productConnectionDto = new ProductConnectionDto();
-
-        productConnectionDto.setProductConnectionId(object.getProductConnectionId());
-        productConnectionDto.setSize(object.getSize());
-
-        return productConnectionDto;
+        return dtoResolver.resolveProductConnectionDto(object);
     }
 }

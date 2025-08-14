@@ -11,6 +11,7 @@ import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.entity.Dto.UserDto;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.*;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -18,7 +19,6 @@ import org.study.hydrowarehouse.utill.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 
 /**
  * The class {@link UserServiceImpl} implements methods of the UserService interface.
@@ -45,13 +45,16 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     private final PasswordEncoder passwordEncoder;
 
     private final ServiceMediator serviceMediator;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, RoleService roleService, PasswordEncoder passwordEncoder, ServiceMediator serviceMediator) {
+    public UserServiceImpl(UserDao userDao, RoleService roleService, PasswordEncoder passwordEncoder,
+                           ServiceMediator serviceMediator, DtoResolver dtoResolver) {
         this.userDao = userDao;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.serviceMediator = serviceMediator;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -206,22 +209,6 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     }
 
     /**
-     * The method creates a company type DTO from a company for transport between layers.
-     * @param userCompany is the company type.
-     * @return the CompanyDto.
-     */
-    protected UserCompanyDto addCompanyDtoToUserDto(UserCompany userCompany) {
-        UserCompanyDto userCompanyDto = new UserCompanyDto();
-        userCompanyDto.setCompanyDtoId(userCompany.getUserCompanyId());
-        userCompanyDto.setName(userCompany.getName());
-        userCompanyDto.setAddress(userCompany.getAddress());
-
-        userCompanyDto.setCountryDto(resolveCountryDto(userCompany.getCountry()));
-
-        return userCompanyDto;
-    }
-
-    /**
      * The method returns the list of the collection of the Role's name
      * @param role is user's role.
      * @return the collection of the strings of the Role's name.
@@ -295,19 +282,9 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     @Override
     public UserDto mapToObjectDto(User object) {
         if (object == null) return null;
-        UserDto userDto = new UserDto();
+        UserDto userDto = dtoResolver.resolveUserDto(object);
 
-        userDto.setUserDtoId(object.getUserId());
-        userDto.setFirstName(object.getFirstName());
-        userDto.setLastName(object.getLastName());
-        userDto.setEmail(object.getEmail());
-        userDto.setPathPhoto(object.getPathPhoto());
-        userDto.setRegistration(object.getRegistration());
-        userDto.setStatus(object.getStatus().getStatus());
-
-        if (object.getUserCompany() != null) {
-            userDto.setUserCompanyDto(addCompanyDtoToUserDto(object.getUserCompany()));
-        }
+        userDto.setUserCompanyDto(mapUserCompanyDto(object.getUserCompany()));
 
         if (object.getRole() != null) {
             userDto.setRole(mapRoles(object.getRole()));
@@ -318,6 +295,25 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
                                         object.getRole()));
         }
         return userDto;
+    }
+
+    /**
+     * Maps a {@link UserCompany} entity to its corresponding {@link UserCompanyDto}.
+     * <p>
+     * This method first resolves the basic {@link UserCompanyDto} using
+     * {@code dtoResolver.resolveUserCompanyDto()}, then additionally sets
+     * the {@link CountryDto} for the company's country.
+     * </p>
+     *
+     * @param userCompany the {@link UserCompany} entity to be mapped; must not be {@code null}
+     * @return a fully populated {@link UserCompanyDto} instance
+     * @throws CoreException if an error occurs during the DTO resolution process
+     */
+    private UserCompanyDto mapUserCompanyDto(UserCompany userCompany) throws CoreException {
+        UserCompanyDto companyDto = dtoResolver.resolveUserCompanyDto(userCompany);
+        companyDto.setCountryDto(dtoResolver.resolveCountryDto(userCompany.getCountry()));
+
+        return companyDto;
     }
 
     /**
@@ -373,13 +369,5 @@ public class UserServiceImpl  extends EntityMapper<UserDto, User> implements Use
     protected Role mapUserRole(UserDto dto) throws CoreException {
         if (dto == null) return null;
         return extractUserRole(dto);
-    }
-
-    private CountryDto resolveCountryDto (Country object) {
-        if(object == null) return null;
-        CountryDto countryDto = new CountryDto();
-        countryDto.setCountryId(object.getCountryId());
-        countryDto.setName(object.getName());
-        return countryDto;
     }
 }

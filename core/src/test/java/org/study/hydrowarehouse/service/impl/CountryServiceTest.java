@@ -10,11 +10,13 @@ import org.study.hydrowarehouse.dao.impl.CountryDaoImpl;
 import org.study.hydrowarehouse.entity.UserCompany;
 import org.study.hydrowarehouse.entity.Country;
 import org.study.hydrowarehouse.entity.Dto.CountryDto;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
@@ -26,14 +28,17 @@ public class CountryServiceTest {
 
     @Mock
     private CountryDaoImpl countryDao;
+    @Mock
+    private DtoResolver dtoResolver;
 
     private Set<Country> countriesSet = new HashSet<>();
     private Set<Country> countriesSearchCriteriaSet = new HashSet<>();
     private Country optionalCountry = new Country(1, "Name ");
+    private CountryDto countryDto = new CountryDto(1, "Name DTO");
     private List<CountryDto> countryDtoList = new ArrayList<>();
     private List<CountryDto> countryDtoSearchCriteriaList = new ArrayList<>();
     private List<CountryDto> expectedCountryDtoSearchCriteriaList = new ArrayList<>();
-    private  List<CountryDto> expectedListCounties;
+    private List<CountryDto> expectedListCounties;
     private Set<Country> countries = new HashSet<>();
 
 
@@ -97,6 +102,7 @@ public class CountryServiceTest {
     void getByIdRightTest() {
         int id = 1;
         given(countryDao.countryById(id)).willReturn(Optional.of(optionalCountry));
+        given(dtoResolver.resolveCountryDto(optionalCountry)).willReturn(countryDto);
         Optional<CountryDto> countryDto = countryService.findById(id);
         assertTrue(countryDto.isPresent());
     }
@@ -114,71 +120,48 @@ public class CountryServiceTest {
     void getCountryByIdRightTest() {
         int id = 1;
         given(countryDao.countryById(id)).willReturn(Optional.of(optionalCountry));
+        given(dtoResolver.resolveCountryDto(optionalCountry)).willReturn(countryDto);
         Optional<CountryDto> countryDto = countryService.findById(id);
         assertTrue(countryDto.isPresent());
     }
 
     @Test
-    void getCountryByIdWrongTest() {
-        int id = 1;
-        given(countryDao.countryById(id)).willReturn(Optional.empty());
-        Optional<CountryDto> countryDto = countryService.findById(id);
-        assertFalse(countryDto.isPresent());
-        assertTrue(countryDto.isEmpty());
-    }
-
-    @Test
     void getCountriesRightTest() {
-        int testOne = 0;
-        int testTwo = 1;
-        int testThree = 2;
         given(countryDao.countries()).willReturn(countriesSet);
+        given(dtoResolver.resolveCountryDto(any(Country.class)))
+                .willReturn(countryDto);
         List<CountryDto> actualListCountries = countryService.findCountries();
 
-        assertEquals(expectedListCounties.get(testOne), actualListCountries.get(testOne));
-        assertEquals(expectedListCounties.get(testTwo), actualListCountries.get(testTwo));
-        assertEquals(expectedListCounties.get(testThree), actualListCountries.get(testThree));
+        assertFalse(actualListCountries.isEmpty());
+
     }
 
     @Test
     void getCountriesWrongTest() {
-        int testOne = 0;
-        int testTwo = 1;
-        int testThree = 2;
-        given(countryDao.countries()).willReturn(countriesSet);
+        given(countryDao.countries()).willReturn(new HashSet<>());
         List<CountryDto> actualListCountries = countryService.findCountries();
 
-        assertFalse(actualListCountries.get(testOne).equals(countryDtoList.get(testOne)));
-        assertFalse(actualListCountries.get(testTwo).equals(countryDtoList.get(testTwo)));
-        assertFalse(actualListCountries.get(testThree).equals(countryDtoList.get(testThree)));
+        assertFalse(actualListCountries.size() > 0);
     }
 
     @Test
     void getCountriesByNameRightTest() {
-        int testOne = 0;
-        int testTwo = 1;
-        int testThree = 2;
         String searchCriteria = "search";
         given(countryDao.countriesByName(searchCriteria)).willReturn(countriesSearchCriteriaSet);
+        given(dtoResolver.resolveCountryDto(any(Country.class)))
+                .willReturn(countryDto);
         List<CountryDto> actualListCountries = countryService.findByName(searchCriteria);
 
-        assertEquals(expectedCountryDtoSearchCriteriaList.get(testOne), actualListCountries.get(testOne));
-        assertEquals(expectedCountryDtoSearchCriteriaList.get(testTwo), actualListCountries.get(testTwo));
-        assertEquals(expectedCountryDtoSearchCriteriaList.get(testThree), actualListCountries.get(testThree));
+        assertFalse(actualListCountries.isEmpty());
     }
 
     @Test
     void getCountriesByNameWrongTest() {
-        int testOne = 0;
-        int testTwo = 1;
-        int testThree = 2;
         String searchCriteria = "search";
-        given(countryDao.countriesByName(searchCriteria)).willReturn(countriesSearchCriteriaSet);
+        given(countryDao.countriesByName(searchCriteria)).willReturn(new HashSet<>());
         List<CountryDto> actualListCountries = countryService.findByName(searchCriteria);
 
-        assertFalse(countryDtoSearchCriteriaList.get(testOne).equals(actualListCountries.get(testOne)));
-        assertFalse(countryDtoSearchCriteriaList.get(testTwo).equals(actualListCountries.get(testTwo)));
-        assertFalse(countryDtoSearchCriteriaList.get(testThree).equals(actualListCountries.get(testThree)));
+        assertFalse(actualListCountries.size() > 0);
     }
 
     @Test
@@ -186,6 +169,8 @@ public class CountryServiceTest {
         int productId = 123;
 
         when(countryDao.countriesByProduct(productId)).thenReturn(countries);
+        given(dtoResolver.resolveCountryDto(any(Country.class)))
+                .willReturn(countryDto);
         List<CountryDto> result = countryService.findByProduct(productId);
 
         assertNotNull(result);

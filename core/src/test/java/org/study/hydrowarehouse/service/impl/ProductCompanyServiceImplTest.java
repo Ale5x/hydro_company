@@ -5,23 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.study.hydrowarehouse.dao.ProductCompanyDao;
+import org.study.hydrowarehouse.dao.impl.ProductCompanyDaoImpl;
 import org.study.hydrowarehouse.entity.Country;
 import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.entity.Dto.ProductCompanyDto;
 import org.study.hydrowarehouse.entity.ProductCompany;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.ServiceMediator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +30,10 @@ class ProductCompanyServiceImplTest {
 
     @Mock
     private ProductCompanyDao productCompanyDao;
+
+    @Mock
+    private DtoResolver dtoResolver;
+
     @InjectMocks
     private ProductCompanyServiceImpl productCompanyService;
 
@@ -42,6 +47,8 @@ class ProductCompanyServiceImplTest {
 
     private List<ProductCompany> productCompanyList = new ArrayList<>();
     private List<ProductCompanyDto> dtoList = new ArrayList<>();
+    private List<CountryDto> countryDtoList = new ArrayList<>();
+    private Set<Country> countryList = new HashSet<>();
     private ProductCompanyDto prDto = new ProductCompanyDto();
     private ProductCompany productCompany = new ProductCompany(1, "name");
 
@@ -55,6 +62,11 @@ class ProductCompanyServiceImplTest {
         prDto.setName("name");
 
         dtoList.add(prDto);
+
+        countryDtoList.add(new CountryDto(1, "Country"));
+        countryList.add(new Country());
+
+        productCompany.setCompanyCountries(countryList);
     }
 
     @Test
@@ -157,11 +169,28 @@ class ProductCompanyServiceImplTest {
 
     @Test
     void findById() {
+        int id = 1;
+        ProductCompany productCompany = new ProductCompany(id, "Test Company");
+        Set<Country> countries = new HashSet<>();
+
+        countries.add(new Country(1, "USA"));
+        productCompany.setCompanyCountries(countries);
+
+        ProductCompanyDto expectedDto = new ProductCompanyDto();
+        expectedDto.setCountries(List.of(new CountryDto(1, "USA")));
+
         when(productCompanyDao.getById(id)).thenReturn(Optional.of(productCompany));
+        when(dtoResolver.resolveProductCompanyDto(productCompany)).thenReturn(expectedDto);
+        when(dtoResolver.resolveCountryDtoList(productCompany.getCompanyCountries()))
+                .thenReturn(expectedDto.getCountries());
+        Optional<ProductCompanyDto> result = productCompanyService.findById(id);
 
-        Optional<ProductCompanyDto> productCompanyDto = productCompanyService.findById(id);
-        assertTrue(productCompanyDto.isPresent());
+        // then
+        assertTrue(result.isPresent());
+        assertEquals(expectedDto, result.get());
 
-        verify(productCompanyDao, times(1)).getById(id);
+        verify(productCompanyDao).getById(id);
+        verify(dtoResolver).resolveProductCompanyDto(productCompany);
+        verify(dtoResolver).resolveCountryDtoList(productCompany.getCompanyCountries());
     }
 }

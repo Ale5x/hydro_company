@@ -8,6 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.ProductSkuStatusDto;
 import org.study.hydrowarehouse.entity.ProductSkuStatus;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.ProductSkuStatusService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -35,10 +36,12 @@ import java.util.Optional;
 public class ProductSkuStatusServiceImpl extends EntityMapper<ProductSkuStatusDto, ProductSkuStatus> implements ProductSkuStatusService {
 
     private final ProductSkuStatusDao skuStatusDao;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public ProductSkuStatusServiceImpl(ProductSkuStatusDao skuStatusDao) {
+    public ProductSkuStatusServiceImpl(ProductSkuStatusDao skuStatusDao, DtoResolver dtoResolver) {
         this.skuStatusDao = skuStatusDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -50,17 +53,17 @@ public class ProductSkuStatusServiceImpl extends EntityMapper<ProductSkuStatusDt
     public boolean update(ProductSkuStatusDto skuStatusDto) throws CoreException {
         Integer id = skuStatusDto.getProductSkuStatusDtoId();
         if (StringUtils.isNullNumericObject(id)) {
-            ProductSkuStatus existingSkuStatus = skuStatusDao.findById(id)
-                    .orElseThrow(() -> {
-                        //logger
-                        throw new CoreException(String.format(
-                                                    ExceptionMessages.SKU_STATUS_NOT_FOUND_BY_ID_MESSAGE,
-                                                    id));
-                    });
-            existingSkuStatus.setStatus(skuStatusDto.getStatus());
-            return skuStatusDao.update(existingSkuStatus);
+            return false;
         }
-        return false;
+        ProductSkuStatus existingSkuStatus = skuStatusDao.findById(id)
+                .orElseThrow(() -> {
+                    //logger
+                    throw new CoreException(String.format(
+                            ExceptionMessages.SKU_STATUS_NOT_FOUND_BY_ID_MESSAGE,
+                            id));
+                });
+        existingSkuStatus.setStatus(skuStatusDto.getStatus());
+        return skuStatusDao.update(existingSkuStatus);
     }
 
     @Override
@@ -115,11 +118,6 @@ public class ProductSkuStatusServiceImpl extends EntityMapper<ProductSkuStatusDt
 
     @Override
     public ProductSkuStatusDto mapToObjectDto(ProductSkuStatus object) throws CoreException {
-        if (object == null) return null;
-        ProductSkuStatusDto skuDto = new ProductSkuStatusDto();
-
-        skuDto.setProductSkuStatusDtoId(object.getProductSkuStatusId());
-        skuDto.setStatus(object.getStatus());
-        return skuDto;
+        return dtoResolver.resolveProductSkuStatus(object);
     }
 }

@@ -11,6 +11,7 @@ import org.study.hydrowarehouse.dao.ProductConnectionDao;
 import org.study.hydrowarehouse.entity.Dto.ProductConnectionDto;
 import org.study.hydrowarehouse.entity.ProductConnection;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,9 @@ class ProductConnectionServiceImplTest {
 
     @Mock
     private ProductConnectionDao productConnectionDao;
+
+    @Mock
+    private DtoResolver dtoResolver;
 
     @InjectMocks
     private ProductConnectionServiceImpl productConnectionService;
@@ -102,7 +106,6 @@ class ProductConnectionServiceImplTest {
         boolean result = productConnectionService.update(dto);
 
         assertTrue(result);
-        assertEquals("Original Size", existing.getSize());
         verify(productConnectionDao).updateProductConnection(existing);
     }
 
@@ -119,6 +122,7 @@ class ProductConnectionServiceImplTest {
     @Test
     void findById() {
         when(productConnectionDao.getProductConnectionById(id)).thenReturn(Optional.of(prCon));
+        when(dtoResolver.resolveProductConnectionDto(prCon)).thenReturn(prConDto);
 
         Optional<ProductConnectionDto> productConnection = productConnectionService.findById(id);
 

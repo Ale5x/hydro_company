@@ -12,7 +12,9 @@ import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.entity.UserCompany;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.CountryService;
+import org.study.hydrowarehouse.service.ServiceMediator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +34,14 @@ class UserCompanyServiceImplTest {
     @Mock
     private UserCompanyDao userCompanyDao;
     @Mock
-    private CountryService countryService;
+    private ServiceMediator serviceMediator;
+
+    @Mock
+    private DtoResolver dtoResolver;
 
     private UserCompanyDto userCompanyDto = new UserCompanyDto();
     private CountryDto countryDto = new CountryDto(1, "BOSH");
+    private UserCompany userCompany = new UserCompany();
     private List<UserCompany> userCompanyList = new ArrayList<>();
     private int returnExpected = 1;
     private int returnExpectedWrong = 0;
@@ -44,7 +50,6 @@ class UserCompanyServiceImplTest {
     @BeforeEach
     void setUp() {
         for (int i = 0; i < 10; i++) {
-            UserCompany userCompany = new UserCompany();
             userCompany.setUserCompanyId(i);
             userCompany.setName("Name #" + i);
             userCompany.setAddress("Address street #" + i);
@@ -57,7 +62,6 @@ class UserCompanyServiceImplTest {
     @Test
     void create() {
         when(userCompanyDao.save(any(UserCompany.class))).thenReturn(returnExpected);
-        when(countryService.findById(1)).thenReturn(Optional.of(countryDto));
         boolean expected = true;
         boolean actual = userCompanyService.create(userCompanyDto);
         assertEquals(expected, actual);
@@ -85,7 +89,7 @@ class UserCompanyServiceImplTest {
         Country newCountry = new Country(1, "Country");
 
         when(userCompanyDao.companyById(1)).thenReturn(Optional.of(existingCompany));
-        when(countryService.findCountryById(1)).thenReturn(Optional.of(newCountry));
+        when(serviceMediator.findCountryById(1)).thenReturn(Optional.of(newCountry));
         when(userCompanyDao.update(existingCompany)).thenReturn(true);
 
         boolean result = userCompanyService.update(dto);
@@ -127,7 +131,7 @@ class UserCompanyServiceImplTest {
         existingCompany.setName("Existing Company");
 
         when(userCompanyDao.companyById(1)).thenReturn(Optional.of(existingCompany));
-        when(countryService.findCountryById(404)).thenReturn(Optional.empty());
+        when(serviceMediator.findCountryById(404)).thenReturn(Optional.empty());
 
         CoreException ex = assertThrows(CoreException.class, () -> userCompanyService.update(dto));
 
@@ -146,6 +150,7 @@ class UserCompanyServiceImplTest {
     void findByName() {
         String name = "Test name";
         when(userCompanyDao.companiesByName(name)).thenReturn(userCompanyList);
+        when(dtoResolver.resolveUserCompanyDto(userCompany)).thenReturn(userCompanyDto);
         List<UserCompanyDto> userCompanyDtoList = userCompanyService.findByName(name);
         assertFalse(userCompanyDtoList.isEmpty());
         assertTrue(userCompanyDtoList.size() > 0);
@@ -154,6 +159,7 @@ class UserCompanyServiceImplTest {
     @Test
     void findAll() {
         when(userCompanyDao.companies(0, 0)).thenReturn(userCompanyList);
+        when(dtoResolver.resolveUserCompanyDto(userCompany)).thenReturn(userCompanyDto);
         List<UserCompanyDto> userCompanyDtoList = userCompanyService.findAll(0, 0);
         assertFalse(userCompanyDtoList.isEmpty());
         assertTrue(userCompanyDtoList.size() > 0);
@@ -163,7 +169,7 @@ class UserCompanyServiceImplTest {
     void findById() {
         int companyId = 1;
         when(userCompanyDao.companyById(companyId)).thenReturn(Optional.of(userCompanyList.get(companyId)));
-        userCompanyList.stream().filter(x -> x.getUserCompanyId() == companyId).forEach(System.out::println);
+        when(dtoResolver.resolveUserCompanyDto(userCompany)).thenReturn(userCompanyDto);
 
         Optional<UserCompanyDto> company = userCompanyService.findById(companyId);
         assertTrue(company.isPresent());
@@ -173,8 +179,6 @@ class UserCompanyServiceImplTest {
     void findByIdWrongTest() {
         int companyId = 1;
         when(userCompanyDao.companyById(companyId)).thenReturn(Optional.empty());
-
-        userCompanyList.stream().filter(x -> x.getUserCompanyId() == companyId).forEach(System.out::println);
 
         Optional<UserCompanyDto> company = userCompanyService.findById(companyId);
         assertFalse(company.isPresent());

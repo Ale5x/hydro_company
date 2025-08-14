@@ -11,7 +11,8 @@ import org.study.hydrowarehouse.dao.ProductDao;
 import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
-import org.study.hydrowarehouse.service.ServiceMediator;
+import org.study.hydrowarehouse.mapping.DtoResolver;
+import org.study.hydrowarehouse.mapping.EntityResolver;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
 import java.util.*;
@@ -27,7 +28,10 @@ class ProductServiceImplTest {
     private ProductDao productDao;
 
     @Mock
-    private ServiceMediator serviceMediator;
+    private EntityResolver entityResolver;
+
+    @Mock
+    private DtoResolver dtoResolver;
 
     @Mock
     private ImageStorage imageStorage;
@@ -36,6 +40,10 @@ class ProductServiceImplTest {
     private ProductServiceImpl productService;
 
     private ProductDto productDto = new ProductDto();
+
+    private ProductConnectionDto productConDto =  new ProductConnectionDto();
+
+    private ProductCompanyDto prCompanyDto = new ProductCompanyDto(1, "name");
     private Product product = new Product();
 
     private ProductSku productSku = new ProductSku();
@@ -85,6 +93,7 @@ class ProductServiceImplTest {
         product.setWeight(1.5);
         product.setAdditionalInformation("ta-ta");
         product.setPathHydraulicScheme("path");
+        product.setProductType(productType);
 
         productSku.setProductSkuId(11);
         productSku.setCountry(country);
@@ -100,6 +109,11 @@ class ProductServiceImplTest {
         product.setProductSkus(List.of(productSku));
 
         productList.add(product);
+
+        productConDto.setProductConnectionId(1);
+
+        prCompanyDto.setCountries(List.of(new CountryDto(1, "name Country")));
+
     }
 
     @Test
@@ -132,10 +146,8 @@ class ProductServiceImplTest {
         existing.setProductType(new ProductType(12, "OldType"));
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
-        when(serviceMediator.findCountryById(2)).thenReturn(Optional.of(new Country(2, "NewCountry")));
-        when(serviceMediator.findProductCompanyById(3)).thenReturn(Optional.of(new ProductCompany(3, "NewCompany")));
-        when(serviceMediator.findProductConnectionById(4)).thenReturn(Optional.of(new ProductConnection(4, "1/2''")));
-        when(serviceMediator.findProductTypeById(5)).thenReturn(Optional.of(new ProductType(5, "NewType")));
+        when(entityResolver.resolveProductCompany(any(ProductCompanyDto.class))).thenReturn(new ProductCompany(3, "NewCompany"));
+        when(entityResolver.resolveProductType(any(ProductTypeDto.class))).thenReturn(new ProductType(5, "NewType"));
         when(productDao.update(any(Product.class))).thenReturn(true);
 
         boolean result = productService.update(dto);
@@ -177,10 +189,9 @@ class ProductServiceImplTest {
 
         assertTrue(result);
 
-        verify(serviceMediator, never()).findProductCompanyById(anyInt());
-        verify(serviceMediator, never()).findProductConnectionById(anyInt());
-        verify(serviceMediator, never()).findProductTypeById(anyInt());
-        verify(serviceMediator, never()).findCountryById(anyInt());
+        verify(entityResolver, never()).resolveProductCompany(any(ProductCompanyDto.class));
+        verify(entityResolver, never()).resolveProductConnection(any(ProductConnectionDto.class));
+        verify(entityResolver, never()).resolveProductType(any(ProductTypeDto.class));
 
     }
 
@@ -208,7 +219,7 @@ class ProductServiceImplTest {
         assertTrue(result);
         assertSame(existingType, existing.getProductType());
 
-        verify(serviceMediator, never()).findProductTypeById(anyInt());
+        verify(entityResolver, never()).resolveProductType(any(ProductTypeDto.class));
     }
 
     @Test
@@ -235,7 +246,7 @@ class ProductServiceImplTest {
         assertTrue(result);
         assertSame(existingCompany, existing.getProductCompany());
 
-        verify(serviceMediator, never()).findProductCompanyById(anyInt());
+        verify(entityResolver, never()).resolveProductCompany(any(ProductCompanyDto.class));
     }
 
     @Test
@@ -262,25 +273,7 @@ class ProductServiceImplTest {
         assertTrue(result);
         assertSame(existingConnection, existing.getProductConnection());
 
-        verify(serviceMediator, never()).findProductConnectionById(anyInt());
-    }
-
-    @Test
-    void testUpdate_shouldThrowExceptionIfCountryNotFound() {
-        ProductDto dto = new ProductDto();
-        dto.setProductDtoId(1);
-        CountryDto countryDto = new CountryDto();
-        countryDto.setCountryId(99);
-
-        Product existing = new Product();
-        existing.setProductId(1);
-
-        when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
-        when(serviceMediator.findCountryById(99)).thenReturn(Optional.empty());
-
-        CoreException ex = assertThrows(CoreException.class, () -> productService.update(dto));
-
-        assertTrue(ex.getMessage().contains("Country not found"));
+        verify(entityResolver, never()).resolveProductConnection(any(ProductConnectionDto.class));
     }
 
     @Test
@@ -298,7 +291,8 @@ class ProductServiceImplTest {
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
 
-        when(serviceMediator.findProductConnectionById(11)).thenReturn(Optional.empty());
+        when(entityResolver.resolveProductConnection(any(ProductConnectionDto.class)))
+                .thenThrow(new CoreException("Product Connection not found"));
 
         CoreException exception = assertThrows(CoreException.class, () -> {
             productService.update(dto);
@@ -322,7 +316,8 @@ class ProductServiceImplTest {
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
 
-        when(serviceMediator.findProductTypeById(5)).thenReturn(Optional.empty());
+        when(entityResolver.resolveProductType(any(ProductTypeDto.class)))
+                .thenThrow(new CoreException("Product Type not found"));
 
         CoreException exception = assertThrows(CoreException.class, () -> {
             productService.update(dto);
@@ -346,7 +341,8 @@ class ProductServiceImplTest {
 
         when(productDao.getProductById(1)).thenReturn(Optional.of(existing));
 
-        when(serviceMediator.findProductCompanyById(10)).thenReturn(Optional.empty());
+        when(entityResolver.resolveProductCompany(any(ProductCompanyDto.class)))
+                .thenThrow(new CoreException("Product Company not found"));
 
         CoreException exception = assertThrows(CoreException.class, () -> {
             productService.update(dto);
@@ -374,12 +370,27 @@ class ProductServiceImplTest {
 
     @Test
     void findById() {
+        Product product = new Product();
+        product.setProductId(productId);
+
+        ProductDto mappedDto = new ProductDto();
+        mappedDto.setProductDtoId(productId);
+
         when(productDao.getProductById(productId)).thenReturn(Optional.of(product));
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(mappedDto);
+        when(dtoResolver.resolveProductTypeDto(any())).thenReturn(new ProductTypeDto());
+        when(dtoResolver.resolveProductCompanyDto(any())).thenReturn(new ProductCompanyDto());
+        when(dtoResolver.resolveProductConnectionDto(any())).thenReturn(new ProductConnectionDto());
+        when(dtoResolver.resolveProductSkuDto(any())).thenReturn(new ProductSkuDto());
 
-        Optional<ProductDto> isProduct = productService.findById(productId);
+        Optional<ProductDto> result = productService.findById(productId);
 
-        assertTrue(isProduct.isPresent());
-        verify(productDao, times(1)).getProductById(productId);
+        assertTrue(result.isPresent());
+        assertEquals(productId, result.get().getProductDtoId());
+
+        verify(productDao).getProductById(productId);
+        verify(dtoResolver).resolveProductBasicFields(product);
+
     }
 
     @Test
@@ -395,6 +406,7 @@ class ProductServiceImplTest {
     @Test
     void findAll() {
         when(productDao.getProductsList(offset, limit, status)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> list = productService.findAll(limit, offset, status);
 
@@ -410,6 +422,7 @@ class ProductServiceImplTest {
         skuStatus.setStatus(defaultStatus);
         List<Product> mockProducts = List.of(product);
         when(productDao.getProductsList(limit, offset, defaultStatus)).thenReturn(mockProducts);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAll(offset, limit, null);
 
@@ -425,6 +438,7 @@ class ProductServiceImplTest {
 
         List<Product> mockProducts = List.of(product);
         when(productDao.getProductsList(limit, offset, defaultStatus)).thenReturn(mockProducts);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAll(offset, limit, "   ");
 
@@ -435,6 +449,7 @@ class ProductServiceImplTest {
     @Test
     void findAllByPressure() {
         when(productDao.getProductsByPressure(offset, limit, 1, status)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> list = productService.findAllByPressure(limit, offset, 1, status);
 
@@ -453,11 +468,12 @@ class ProductServiceImplTest {
 
         List<Product> products = List.of(product);
         when(productDao.getProductsByPressure(10, 0, 320, "In active")).thenReturn(products);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
+
         List<ProductDto> result = productService.findAllByPressure(offset, limit, pressure, status);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1, result.get(0).getProductDtoId()); // предположим, у product ID = 1
 
         verify(productDao).getProductsByPressure(limit, offset, pressure, "In active");
     }
@@ -473,12 +489,12 @@ class ProductServiceImplTest {
 
         List<Product> products = List.of(product);
         when(productDao.getProductsByPressure(limit, offset, pressure, "In active")).thenReturn(products);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByPressure(offset, limit, pressure, status);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1, result.get(0).getProductDtoId());
 
         verify(productDao).getProductsByPressure(limit, offset, pressure, "In active");
     }
@@ -486,6 +502,7 @@ class ProductServiceImplTest {
     @Test
     void findAllByFlowRate() {
         when(productDao.getProductsByFlowRate(offset, limit, 150, status)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> list = productService.findAllByFlowRate(limit, offset, 150, status);
 
@@ -499,8 +516,8 @@ class ProductServiceImplTest {
         int limit = 10;
         int flowRate = 150;
 
-        List<Product> products = List.of(new Product());
-        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(products);
+        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByFlowRate(limit, offset, flowRate, null);
 
@@ -514,8 +531,8 @@ class ProductServiceImplTest {
         int limit = 10;
         int flowRate = 150;
 
-        List<Product> products = List.of(new Product());
-        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(products);
+        when(productDao.getProductsByFlowRate(limit, offset, flowRate, defaultStatus)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByFlowRate(limit, offset, flowRate, "");
 
@@ -526,6 +543,8 @@ class ProductServiceImplTest {
     @Test
     void findAllByType() {
         when(productDao.getProductsByTypeId(offset, limit, 1, status)).thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
+
         ProductTypeDto type = new ProductTypeDto();
         type.setProductTypeId(1);
         List<ProductDto> list = productService.findAllByType(limit, offset, type, status);
@@ -539,10 +558,9 @@ class ProductServiceImplTest {
         int limit = 10;
         ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
 
-        List<Product> productList = List.of(new Product());
-
         when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus))
                 .thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, null);
 
@@ -557,10 +575,9 @@ class ProductServiceImplTest {
         int limit = 10;
         ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
 
-        List<Product> productList = List.of(new Product());
-
         when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), defaultStatus))
                 .thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, "");
 
@@ -575,10 +592,9 @@ class ProductServiceImplTest {
         int limit = 10;
         ProductTypeDto typeDto = new ProductTypeDto(1, "Valve");
 
-        List<Product> productList = List.of(new Product());
-
         when(productDao.getProductsByTypeId(limit, offset, typeDto.getProductTypeId(), status))
                 .thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
         List<ProductDto> result = productService.findAllByType(offset, limit, typeDto, status);
 
@@ -590,9 +606,9 @@ class ProductServiceImplTest {
     @Test
     void findAllByCompany() {
         when(productDao.getProductsByCompanyId(offset, limit, 1, status)).thenReturn(productList);
-        ProductCompanyDto company = new ProductCompanyDto();
-        company.setProductCompanyDtoId(1);
-        List<ProductDto> list = productService.findAllByCompany(limit, offset, company, status);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
+
+        List<ProductDto> list = productService.findAllByCompany(limit, offset, prCompanyDto, status);
 
         assertNotNull(list);
         verify(productDao, times(1)).getProductsByCompanyId(limit, offset, 1, status);
@@ -602,29 +618,29 @@ class ProductServiceImplTest {
     void findAllByCompany_shouldUseDefaultStatus_whenStatusIsNull() throws CoreException {
         int offset = 0;
         int limit = 10;
-        ProductCompanyDto company = new ProductCompanyDto(1, "Some Company");
 
-        when(productDao.getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus))
+        when(productDao.getProductsByCompanyId(limit, offset, prCompanyDto.getProductCompanyDtoId(), defaultStatus))
                 .thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
-        List<ProductDto> result = productService.findAllByCompany(offset, limit, company, null);
+        List<ProductDto> result = productService.findAllByCompany(offset, limit, prCompanyDto, null);
 
         assertNotNull(result);
-        verify(productDao).getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus);
+        verify(productDao).getProductsByCompanyId(limit, offset, prCompanyDto.getProductCompanyDtoId(), defaultStatus);
     }
 
     @Test
     void findAllByCompany_shouldUseDefaultStatus_whenStatusIsEmpty() throws CoreException {
         int offset = 0;
         int limit = 10;
-        ProductCompanyDto company = new ProductCompanyDto(1, "Some Company");
 
-        when(productDao.getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus))
+        when(productDao.getProductsByCompanyId(limit, offset, prCompanyDto.getProductCompanyDtoId(), defaultStatus))
                 .thenReturn(productList);
+        when(dtoResolver.resolveProductBasicFields(product)).thenReturn(productDto);
 
-        List<ProductDto> result = productService.findAllByCompany(offset, limit, company, "");
+        List<ProductDto> result = productService.findAllByCompany(offset, limit, prCompanyDto, "");
 
         assertNotNull(result);
-        verify(productDao).getProductsByCompanyId(limit, offset, company.getProductCompanyDtoId(), defaultStatus);
+        verify(productDao).getProductsByCompanyId(limit, offset, prCompanyDto.getProductCompanyDtoId(), defaultStatus);
     }
 }

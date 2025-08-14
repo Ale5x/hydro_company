@@ -10,6 +10,7 @@ import org.study.hydrowarehouse.entity.Picture;
 import org.study.hydrowarehouse.entity.Product;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.PictureService;
 import org.study.hydrowarehouse.service.ServiceMediator;
@@ -28,7 +29,6 @@ import java.util.Optional;
  * {@link Picture} entities.
  * </p>
  *
- * @see EntityMapper
  * @see PictureService
  * @see Picture
  * @see PictureDto
@@ -44,13 +44,15 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     private final PictureDao pictureDao;
     private final ServiceMediator serviceMediator;
-
+    private final DtoResolver dtoResolver;
     private final ImageStorage imageStorage;
 
     @Autowired
-    public PictureServiceImpl(PictureDao pictureDao, ServiceMediator serviceMediator, ImageStorage imageStorage) {
+    public PictureServiceImpl(PictureDao pictureDao, ServiceMediator serviceMediator, DtoResolver dtoResolver,
+                              ImageStorage imageStorage) {
         this.pictureDao = pictureDao;
         this.serviceMediator = serviceMediator;
+        this.dtoResolver = dtoResolver;
         this.imageStorage = imageStorage;
     }
 
@@ -151,13 +153,7 @@ public class PictureServiceImpl extends EntityMapper<PictureDto, Picture> implem
 
     @Override
     public PictureDto mapToObjectDto(Picture object) {
-        if (object == null) return null;
-        PictureDto pictureDto = new PictureDto();
-
-        pictureDto.setPictureDtoId(object.getPictureId());
-        pictureDto.setPath(object.getPath());
-        pictureDto.setProductId(object.getProduct().getProductId());
-        return pictureDto;
+        return dtoResolver.resolvePictureDto(object);
     }
 
     @Override

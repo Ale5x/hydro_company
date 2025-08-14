@@ -7,6 +7,7 @@ import org.study.hydrowarehouse.dao.CountryDao;
 import org.study.hydrowarehouse.entity.Country;
 import org.study.hydrowarehouse.entity.Dto.CountryDto;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.CountryService;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 
@@ -32,18 +33,17 @@ import java.util.stream.Collectors;
 public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implements CountryService {
 
     private final CountryDao countryDao;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public CountryServiceImpl(CountryDao countryDao) {
+    public CountryServiceImpl(CountryDao countryDao, DtoResolver dtoResolver) {
         this.countryDao = countryDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
     public List<CountryDto> findCountries() {
-        return mapToListObjectsDto(new ArrayList<>(countryDao.countries()))
-                .stream()
-                .sorted(Comparator.comparing(CountryDto::getName))
-                .collect(Collectors.toList());
+        return mapToListObjectsDto(new ArrayList<>(countryDao.countries()));
     }
 
     @Override
@@ -79,23 +79,16 @@ public class CountryServiceImpl extends EntityMapper<CountryDto, Country> implem
 
     @Override
     public List<CountryDto> mapToListObjectsDto(List<Country> objectsDtoList) {
-        if (objectsDtoList == null) return null;
+        if (objectsDtoList == null || objectsDtoList.isEmpty()) return null;
         List<CountryDto> countryDtoList = new ArrayList<>();
         for(Country country : objectsDtoList) {
-            CountryDto countryDto = new CountryDto();
-            countryDto.setCountryId(country.getCountryId());
-            countryDto.setName(country.getName());
-            countryDtoList.add(countryDto);
+            countryDtoList.add(mapToObjectDto(country));
         }
         return countryDtoList;
     }
 
     @Override
     public CountryDto mapToObjectDto(Country object) {
-        if(object == null) return null;
-        CountryDto countryDto = new CountryDto();
-        countryDto.setCountryId(object.getCountryId());
-        countryDto.setName(object.getName());
-        return countryDto;
+        return dtoResolver.resolveCountryDto(object);
     }
 }

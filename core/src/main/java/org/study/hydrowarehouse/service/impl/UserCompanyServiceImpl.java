@@ -10,8 +10,10 @@ import org.study.hydrowarehouse.entity.UserCompany;
 import org.study.hydrowarehouse.entity.Dto.UserCompanyDto;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.CountryService;
 import org.study.hydrowarehouse.mapping.EntityMapper;
+import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.service.UserCompanyService;
 import org.study.hydrowarehouse.utill.StringUtils;
 
@@ -33,12 +35,18 @@ import java.util.*;
 public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCompany> implements UserCompanyService {
     private final UserCompanyDao userCompanyDao;
 
-    private final CountryService countryService;
+    private final ServiceMediator serviceMediator;
+
+    private final DtoResolver dtoResolver;
+
+
 
     @Autowired
-    public UserCompanyServiceImpl(UserCompanyDao userCompanyDao, CountryService countryService) {
+    public UserCompanyServiceImpl(UserCompanyDao userCompanyDao, ServiceMediator serviceMediator,
+                                  DtoResolver dtoResolver) {
         this.userCompanyDao = userCompanyDao;
-        this.countryService = countryService;
+        this.serviceMediator = serviceMediator;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -94,36 +102,13 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
     }
 
     @Override
-    public List<UserCompanyDto> mapToListObjectsDto(List<UserCompany> objectsList) throws CoreException {
-        if (objectsList == null) return null;
-        List<UserCompanyDto> userCompanyDtoList = new ArrayList<>();
-        for (UserCompany userCompany : objectsList) {
-            userCompanyDtoList.add(mapToObjectDto(userCompany));
-        }
-        return userCompanyDtoList;
-    }
-
-    @Override
-    public UserCompanyDto mapToObjectDto(UserCompany object) throws CoreException {
-        if (object == null) return null;
-        UserCompanyDto userCompanyDto = new UserCompanyDto();
-
-        userCompanyDto.setCompanyDtoId(object.getUserCompanyId());
-        userCompanyDto.setName(object.getName());
-        userCompanyDto.setAddress(object.getAddress());
-
-        userCompanyDto.setCountryDto(resolveCountryDto(object.getCountry()));
-        return userCompanyDto;
-    }
-
-    @Override
     public Optional<UserCompany> findCompanyById(int id) throws CoreException {
         return userCompanyDao.companyById(id);
     }
 
     protected Country findCountryForCompany(CountryDto countryDto) {
         if (countryDto == null) return null;
-        return countryService.findCountryById(countryDto.getCountryId())
+        return serviceMediator.findCountryById(countryDto.getCountryId())
                 .orElseThrow(() -> {
                     // Logger
                     throw new CoreException(
@@ -135,11 +120,22 @@ public class UserCompanyServiceImpl extends EntityMapper<UserCompanyDto, UserCom
                 });
     }
 
-    private CountryDto resolveCountryDto (Country object) {
-        if(object == null) return null;
-        CountryDto countryDto = new CountryDto();
-        countryDto.setCountryId(object.getCountryId());
-        countryDto.setName(object.getName());
-        return countryDto;
+    @Override
+    public List<UserCompanyDto> mapToListObjectsDto(List<UserCompany> objectsList) throws CoreException {
+        if (objectsList == null) return null;
+        List<UserCompanyDto> userCompanyDtoList = new ArrayList<>();
+        for (UserCompany userCompany : objectsList) {
+            userCompanyDtoList.add(mapToObjectDto(userCompany));
+        }
+        return userCompanyDtoList;
+    }
+
+    @Override
+    public UserCompanyDto mapToObjectDto(UserCompany object) throws CoreException {
+        if (object == null) return new UserCompanyDto();
+        UserCompanyDto userCompanyDto = dtoResolver.resolveUserCompanyDto(object);
+
+        userCompanyDto.setCountryDto(dtoResolver.resolveCountryDto(object.getCountry()));
+        return userCompanyDto;
     }
 }

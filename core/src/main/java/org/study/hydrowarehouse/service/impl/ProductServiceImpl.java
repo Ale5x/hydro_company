@@ -9,14 +9,15 @@ import org.study.hydrowarehouse.entity.*;
 import org.study.hydrowarehouse.entity.Dto.*;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
+import org.study.hydrowarehouse.mapping.EntityResolver;
 import org.study.hydrowarehouse.service.ProductService;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 import org.study.hydrowarehouse.utill.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service implementation for managing {@link Product} entities.
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
  * </p>
  *
  * @see EntityMapper
+ * @see DtoResolver
  * @see ProductService
  * @see Product
  * @see ProductDto
@@ -41,15 +43,22 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
     private final ProductDao productDao;
 
-    private final ServiceMediator serviceMediator;
+//    private final ServiceMediator serviceMediator;
 
     private final ImageStorage imageStorage;
 
+    private final DtoResolver dtoResolver;
+
+    private final EntityResolver entityResolver;
+
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ServiceMediator serviceMediator, ImageStorage imageStorage) {
+    public ProductServiceImpl(ProductDao productDao, ServiceMediator serviceMediator, ImageStorage imageStorage,
+                              DtoResolver dtoResolver, EntityResolver entityResolver) {
         this.productDao = productDao;
-        this.serviceMediator = serviceMediator;
+//        this.serviceMediator = serviceMediator;
         this.imageStorage = imageStorage;
+        this.dtoResolver = dtoResolver;
+        this.entityResolver = entityResolver;
     }
 
     @Override
@@ -65,9 +74,9 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
         product.setPathHydraulicScheme(productDto.getPathHydraulicScheme());
         product.setAdditionalInformation(productDto.getAdditionalInformation());
 
-        product.setProductCompany(resolveProductCompany(productDto.getProductCompanyDto()));
-        product.setProductType(resolveProductType(productDto.getProductTypeDto()));
-        product.setProductConnection(resolveProductConnection(productDto.getProductConnectionDto()));
+        product.setProductCompany(entityResolver.resolveProductCompany(productDto.getProductCompanyDto()));
+        product.setProductType(entityResolver.resolveProductType(productDto.getProductTypeDto()));
+        product.setProductConnection(entityResolver.resolveProductConnection(productDto.getProductConnectionDto()));
 
         product.setPicturePath(generatePictureList(productDto.getImagesPaths(), product));
         return productDao.create(product) > 0;
@@ -102,7 +111,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         if (connectionDto != null && (currentConnection == null
                 || !Objects.equals(currentConnection.getProductConnectionId(), connectionDto.getProductConnectionId()))) {
-            existingProduct.setProductConnection(resolveProductConnection(connectionDto));
+            existingProduct.setProductConnection(entityResolver.resolveProductConnection(connectionDto));
         }
 
         ProductCompanyDto companyDto = productDto.getProductCompanyDto();
@@ -110,7 +119,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         if (companyDto != null &&
                 (currentCompany == null || !Objects.equals(currentCompany.getProductCompanyId(), companyDto.getProductCompanyDtoId()))) {
-            existingProduct.setProductCompany(resolveProductCompany(companyDto));
+            existingProduct.setProductCompany(entityResolver.resolveProductCompany(companyDto));
         }
 
         ProductTypeDto typeDto = productDto.getProductTypeDto();
@@ -118,7 +127,7 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
 
         if (typeDto != null &&
                 (currentType == null || !Objects.equals(currentType.getProductTypeId(), typeDto.getProductTypeId()))) {
-            existingProduct.setProductType(resolveProductType(typeDto));
+            existingProduct.setProductType(entityResolver.resolveProductType(typeDto));
         }
         return productDao.update(existingProduct);
     }
@@ -225,92 +234,15 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
     @Override
     public ProductDto mapToObjectDto(Product object) {
         if (object == null) return null;
-        ProductDto dto = new ProductDto();
+        ProductDto dto = dtoResolver.resolveProductBasicFields(object);
 
-        resolveBasicFields(dto, object);
-        dto.setProductTypeDto(resolveProductTypeDto(object.getProductType()));
-        dto.setProductCompanyDto(resolveProductCompanyDto(object.getProductCompany()));
-        dto.setProductConnectionDto(resolveProductConnectionDto(object.getProductConnection()));
+        dto.setProductTypeDto(dtoResolver.resolveProductTypeDto(object.getProductType()));
+        dto.setProductCompanyDto(dtoResolver.resolveProductCompanyDto(object.getProductCompany()));
+        dto.setProductConnectionDto(dtoResolver.resolveProductConnectionDto(object.getProductConnection()));
         dto.setPathHydraulicScheme(object.getPathHydraulicScheme());
         dto.setImagesPaths(convertToPicturesDtoList(object.getPicturePath()));
-        dto.setProductSkuDtos(resolveProductSkuDto(object.getProductSkus()));
+
         return dto;
-    }
-
-    /**
-     * Converts the ProductType entity to ProductTypeDto.
-     *
-     * @param productType the source ProductType entity
-     * @return the mapped ProductTypeDto, or null if input is null
-     */
-    private ProductTypeDto resolveProductTypeDto(ProductType productType) {
-        if (productType == null) return null;
-        return new ProductTypeDto(productType.getProductTypeId(), productType.getName());
-    }
-
-    /**
-     * Converts the ProductCompany entity to ProductCompanyDto, including associated countries.
-     *
-     * @param productCompany the source ProductCompany entity
-     * @return the mapped ProductCompanyDto, or null if input is null
-     */
-    private ProductCompanyDto resolveProductCompanyDto(ProductCompany productCompany) {
-        if (productCompany == null) return null;
-        return new ProductCompanyDto(
-                productCompany.getProductCompanyId(),
-                productCompany.getName(),
-                toCountryDtoList(productCompany.getCompanyCountries())
-        );
-    }
-
-    /**
-     * Converts the ProductConnection entity to ProductConnectionDto.
-     *
-     * @param connection the source ProductConnection entity
-     * @return the mapped ProductConnectionDto, or null if input is null
-     */
-    private ProductConnectionDto resolveProductConnectionDto(ProductConnection connection) {
-        if (connection == null) return null;
-        return new ProductConnectionDto(connection.getProductConnectionId(), connection.getSize());
-    }
-
-
-    /**
-     * Sets the basic fields of the product such as ID, count, pressure, etc.
-     *
-     * @param dto    the target ProductDto
-     * @param entity the source Product entity
-     */
-    private void resolveBasicFields(ProductDto dto, Product entity) {
-        if (entity == null) return;
-        dto.setProductDtoId(entity.getProductId());
-        dto.setCount(entity.getCount());
-        dto.setFlowRate(entity.getFlowRate());
-        dto.setPressure(entity.getPressure());
-        dto.setPressureMax(entity.getPressureMax());
-        dto.setWeight(entity.getWeight());
-        dto.setAdditionalInformation(entity.getAdditionalInformation());
-    }
-
-    /**
-     * The method converts storage racks DTO objects into the list of the storage racks.
-     * @param storageDtoList the storage racks DTO objects
-     * @return the list of storage racks objects.
-     */
-    private List<StorageRack> convertFromStorageRackDtoList(List<StorageRackDto> storageDtoList) {
-        if (storageDtoList == null) return null;
-        List<StorageRack> storageList = new ArrayList<>();
-        for (StorageRackDto storageRackDto : storageDtoList) {
-            StorageRack storageRack = serviceMediator.findStorageRackById(storageRackDto.getStorageRackDtoId())
-                    .orElseThrow(() -> {
-                        //logger
-                        throw new CoreException(String.format(
-                                                    ExceptionMessages.STORAGE_RACK_BY_ID_NOT_FOUND_MESSAGE,
-                                                    storageRackDto.getStorageRackDtoId()));
-                    });
-            storageList.add(storageRack);
-        }
-        return storageList;
     }
 
     /**
@@ -345,192 +277,6 @@ public class ProductServiceImpl extends EntityMapper<ProductDto, Product> implem
             pictures.add(picture);
         }
         return pictures;
-    }
-
-    /**
-     * Resolves a {@link ProductCompany} based on the provided {@link ProductCompanyDto}.
-     * <p>
-     * This method checks if the {@code productCompanyDtoId} is null or missing. If the ID is missing,
-     * a new {@link ProductCompany} is created using the provided name from the DTO. If the ID is present,
-     * it attempts to find the corresponding {@link ProductCompany} by its ID from the database. If no matching
-     * company is found, an exception is thrown.
-     *
-     * @param dto the {@link ProductCompanyDto} containing the company information (name and optional ID)
-     * @return a {@link ProductCompany} object either newly created or fetched from the database
-     * @throws CoreException if the company ID is provided but no company is found in the database
-     */
-    private ProductCompany resolveProductCompany(ProductCompanyDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getProductCompanyDtoId())) {
-            return new ProductCompany(dto.getName());
-        }
-        return serviceMediator.findProductCompanyById(dto.getProductCompanyDtoId())
-                .orElseThrow(() -> {
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.PRODUCT_COMPANY_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getProductCompanyDtoId()));
-                });
-    }
-
-    /**
-     * Resolves a {@link ProductType} based on the provided {@link ProductTypeDto}.
-     * <p>
-     * This method checks if the {@code productTypeId} is null or missing. If the ID is missing,
-     * a new {@link ProductType} is created using the provided name from the DTO. If the ID is present,
-     * it attempts to find the corresponding {@link ProductType} by its ID from the database. If no matching
-     * type is found, an exception is thrown.
-     *
-     * @param dto the {@link ProductTypeDto} containing the product type information (name and optional ID)
-     * @return a {@link ProductType} object either newly created or fetched from the database
-     * @throws CoreException if the product type ID is provided but no matching product type is found in the database
-     */
-    private ProductType resolveProductType(ProductTypeDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getProductTypeId())) {
-            return new ProductType(dto.getName());
-        }
-        return serviceMediator.findProductTypeById(
-                        dto.getProductTypeId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.PRODUCT_TYPE_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getProductTypeId()));
-                });
-    }
-
-    /**
-     * Converts a list of {@link ProductSku} entities to a list of corresponding {@link ProductSkuDto} objects.
-     *
-     * <p>Each {@code ProductSku} is mapped to a {@code ProductSkuDto} by copying its basic fields and resolving
-     * nested entities using helper methods like {@code resolveShelfDto}, {@code resolveCountryDto}, and
-     * {@code resolveProductSkuStatusDto}.</p>
-     *
-     * @param productSkuList the list of {@link ProductSku} entities to convert; may be {@code null}
-     * @return a list of {@link ProductSkuDto} objects, or {@code null} if {@code productSkuList} is {@code null}
-     */
-    private List<ProductSkuDto> resolveProductSkuDto(List<ProductSku> productSkuList) {
-        if (productSkuList == null) return null;
-        List<ProductSkuDto> skuDtoList = new ArrayList<>();
-        for (ProductSku sku : productSkuList) {
-            ProductSkuDto skuDto = new ProductSkuDto();
-
-            skuDto.setProductSkuDtoId(sku.getProductSkuId());
-            skuDto.setCode(sku.getCode());
-//            skuDto.setShelfDto(resolveShelfDto(sku.getShelf()));
-            skuDto.setCountryDto(resolveCountryDto(sku.getCountry()));
-            skuDto.setStatus(resolveProductSkuStatusDto(sku.getStatus()));
-
-            skuDtoList.add(skuDto);
-        }
-        return skuDtoList;
-    }
-
-    /**
-     * Converts a {@link ProductSkuStatus} entity to its corresponding {@link ProductSkuStatusDto}.
-     *
-     * <p>This method is used to map entity fields to a DTO object. If the input {@code skuStatus} is {@code null},
-     * the method returns {@code null}.</p>
-     *
-     * @param skuStatus the {@link ProductSkuStatus} entity to convert
-     * @return the corresponding {@link ProductSkuStatusDto}, or {@code null} if the input is {@code null}
-     */
-    private ProductSkuStatusDto resolveProductSkuStatusDto(ProductSkuStatus skuStatus) {
-        if (skuStatus == null) return null;
-        ProductSkuStatusDto skuStatusDto = new ProductSkuStatusDto();
-        skuStatusDto.setProductSkuStatusDtoId(skuStatus.getProductSkuStatusId());
-        skuStatusDto.setStatus(skuStatus.getStatus());
-        return skuStatusDto;
-    }
-
-    /**
-     * Converts the Shelf entity to ShelfDto.
-     *
-     * @param shelf the source Shelf entity
-     * @return the mapped ShelfDto, or null if input is null
-     */
-    private ShelfDto resolveShelfDto(Shelf shelf) {
-        if (shelf == null) return null;
-        ShelfDto shelfDto = new ShelfDto();
-        shelfDto.setShelfDtoId(shelf.getShelfId());
-        shelfDto.setName(shelf.getName());
-        shelfDto.setStorageRackDto(resolveStorageRackDto(shelf.getStorageRack()));
-        return shelfDto;
-    }
-
-    /**
-     * Converts a {@link StorageRack} entity to its corresponding {@link StorageRackDto}.
-     *
-     * <p>If the input {@code storageRack} is {@code null}, this method returns {@code null}.
-     * Otherwise, it maps the entity's fields to a new DTO instance.</p>
-     *
-     * @param storageRack the {@link StorageRack} entity to be converted
-     * @return the corresponding {@link StorageRackDto}, or {@code null} if the input is {@code null}
-     */
-    private StorageRackDto resolveStorageRackDto(StorageRack storageRack) {
-        if (storageRack == null) return null;
-        StorageRackDto storageRackDto = new StorageRackDto();
-        storageRackDto.setStorageRackDtoId(storageRack.getRackId());
-        storageRackDto.setName(storageRack.getName());
-        return storageRackDto;
-    }
-
-    /**
-     * Resolves a {@link ProductConnection} based on the provided {@link ProductConnectionDto}.
-     * <p>
-     * This method checks if the {@code productConnectionId} is null or missing. If the ID is missing,
-     * a new {@link ProductConnection} is created using the provided size from the DTO. If the ID is present,
-     * it attempts to find the corresponding {@link ProductConnection} by its ID from the database. If no matching
-     * connection is found, an exception is thrown.
-     *
-     * @param dto the {@link ProductConnectionDto} containing the product connection information (size and optional ID)
-     * @return a {@link ProductConnection} object either newly created or fetched from the database
-     * @throws CoreException if the product connection ID is provided but no matching product connection is found in the database
-     */
-    private ProductConnection resolveProductConnection(ProductConnectionDto dto) {
-        if (StringUtils.isNullNumericObject(dto.getProductConnectionId())) {
-            return new ProductConnection(dto.getSize());
-        }
-        return serviceMediator.findProductConnectionById(
-                        dto.getProductConnectionId())
-                .orElseThrow(() -> {
-                    //logger
-                    throw new CoreException(String.format(
-                                                ExceptionMessages.PRODUCT_CONNECTION_BY_ID_NOT_FOUND_MESSAGE,
-                                                dto.getProductConnectionId()));
-                });
-    }
-
-    /**
-     * Converts a set of Country entities to a list of CountryDto objects.
-     *
-     * @param countrySet the set of Country entities to convert
-     * @return a list of corresponding CountryDto objects
-     */
-    public List<CountryDto> toCountryDtoList(Set<Country> countrySet) {
-        if (countrySet == null || countrySet.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return countrySet.stream()
-                .map(this::resolveCountryDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Converts a {@link Country} entity to its corresponding {@link CountryDto}.
-     * <p>
-     * This method extracts the identifier and name from the {@code Country} object
-     * and maps them into a new instance of {@code CountryDto}.
-     * </p>
-     *
-     * @param country the {@code Country} entity to convert; must not be {@code null}
-     * @return a {@code CountryDto} containing mapped data from the input entity
-     * @throws NullPointerException if the input {@code country} is {@code null}
-     */
-    private CountryDto resolveCountryDto(Country country) {
-        if (country == null) return null;
-        CountryDto dto = new CountryDto();
-        dto.setCountryId(country.getCountryId());
-        dto.setName(country.getName());
-        return dto;
     }
 
     /**

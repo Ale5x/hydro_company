@@ -13,6 +13,7 @@ import org.study.hydrowarehouse.entity.Picture;
 import org.study.hydrowarehouse.entity.Product;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.service.ServiceMediator;
 import org.study.hydrowarehouse.utill.filestorage.ImageStorage;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +33,8 @@ class PictureServiceImplTest {
     private PictureDao pictureDao;
     @Mock
     private ServiceMediator serviceMediator;
+    @Mock
+    private DtoResolver dtoResolver;
 
     @Mock
     private ImageStorage imageStorage;
@@ -40,6 +44,7 @@ class PictureServiceImplTest {
 
     private PictureDto pictureDto = new PictureDto();
     private Picture picture = new Picture();
+    private Product product = new Product();
     private Product productWithMaxPictures = new Product();
     private Product productWithMinPictures = new Product();
     private List<PictureDto> pictureDtoList = new ArrayList<>();
@@ -91,6 +96,9 @@ class PictureServiceImplTest {
         productWithMinPictures.setPicturePath(minPictureList);
 
 
+        picture.setPath("some path");
+
+        product.setProductId(someId);
     }
 
     @Test
@@ -119,28 +127,34 @@ class PictureServiceImplTest {
 
     @Test
     void testUpdate_shouldUpdateSuccessfully() throws CoreException {
+        int pictureId = 1;
+        int productId = 10;
+        String oldPath = "old/path/image.png";
+        String newPath = "new/path/image.png";
+
+        Picture existingPicture = new Picture(oldPath, new Product(productId));
+        existingPicture.setPictureId(pictureId);
+
         PictureDto pictureDto = new PictureDto();
-        pictureDto.setPictureDtoId(1);
-        pictureDto.setPath("newPath");
-        pictureDto.setProductId(2);
+        pictureDto.setPictureDtoId(pictureId);
+        pictureDto.setProductId(productId);
+        pictureDto.setPath(newPath);
 
-        Picture existingPicture = new Picture();
-        existingPicture.setPictureId(1);
-        existingPicture.setPath("oldPath");
+        Product product = new Product(productId);
 
-        Product product = new Product();
-        product.setProductId(2);
+        when(pictureDao.findById(pictureId)).thenReturn(Optional.of(existingPicture));
+        when(serviceMediator.findProductById(productId)).thenReturn(Optional.of(product));
+        when(pictureDao.update(any(Picture.class))).thenReturn(true);
 
-        when(pictureDao.findById(pictureDto.getPictureDtoId())).thenReturn(Optional.of(existingPicture));
-
-        when(serviceMediator.findProductById(pictureDto.getProductId())).thenReturn(Optional.of(product));
+        when(imageStorage.removeFile(anyString())).thenReturn(true);
 
         boolean result = pictureService.update(pictureDto);
 
         assertTrue(result);
-        assertEquals("newPath", existingPicture.getPath());
-        assertEquals(product, existingPicture.getProduct());
-        verify(pictureDao).update(existingPicture);   
+        verify(pictureDao).findById(pictureId);
+        verify(serviceMediator).findProductById(productId);
+        verify(imageStorage).removeFile(oldPath);
+        verify(pictureDao).update(any(Picture.class));
     }
 
     @Test
@@ -242,8 +256,9 @@ class PictureServiceImplTest {
 
     @Test
     void remove() {
-        when(pictureDao.findById(1)).thenReturn(Optional.of(new Picture("path", new Product(someId))));
+        when(pictureDao.findById(1)).thenReturn(Optional.of(picture));
         when(pictureDao.remove(someId)).thenReturn(true);
+        when(imageStorage.removeFile(picture.getPath())).thenReturn(true);
 
         boolean condition = pictureService.remove(someId);
 
@@ -254,7 +269,8 @@ class PictureServiceImplTest {
     @Test
     void findPicturesByProductId() {
         when(pictureDao.getPicturesByProductId(someId)).thenReturn(maxPictureList);
-
+        given(dtoResolver.resolvePictureDto(any(Picture.class)))
+                    .willReturn(pictureDto);
         List<PictureDto> list = pictureService.findPicturesByProductId(someId);
 
         assertNotNull(list);
@@ -264,7 +280,8 @@ class PictureServiceImplTest {
     @Test
     void findPicturesById() {
         when(pictureDao.findById(someId)).thenReturn(Optional.of(picture));
-
+        given(dtoResolver.resolvePictureDto(any(Picture.class)))
+                .willReturn(pictureDto);
         Optional<PictureDto> pictureDtoOptional = pictureService.findPictureById(someId);
 
         assertTrue(pictureDtoOptional.isPresent());
@@ -274,7 +291,8 @@ class PictureServiceImplTest {
     @Test
     void findAll() {
         when(pictureDao.getPictures(limit, offset)).thenReturn(maxPictureList);
-
+        given(dtoResolver.resolvePictureDto(any(Picture.class)))
+                .willReturn(pictureDto);
         List<PictureDto> list = pictureService.findAll(offset, limit);
 
         assertNotNull(list);

@@ -11,6 +11,7 @@ import org.study.hydrowarehouse.dao.ProductTypeDao;
 import org.study.hydrowarehouse.entity.Dto.ProductTypeDto;
 import org.study.hydrowarehouse.entity.ProductType;
 import org.study.hydrowarehouse.exception.CoreException;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ class ProductTypeServiceImplTest {
     @Mock
     private ProductTypeDao productTypeDao;
 
+    @Mock
+    private DtoResolver dtoResolver;
+
     @InjectMocks
     private ProductTypeServiceImpl productTypeService;
 
@@ -38,6 +42,9 @@ class ProductTypeServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        productTypeDto.setProductTypeId(1);
+        productTypeDto.setName("Type DTO");
+
         MockitoAnnotations.openMocks(this);
 
         productTypeList.add(productType);
@@ -56,22 +63,15 @@ class ProductTypeServiceImplTest {
 
     @Test
     void testUpdate_successful() throws CoreException {
-        ProductTypeDto dto = new ProductTypeDto();
-        dto.setProductTypeId(1);
-        dto.setName("Updated Type");
+        String newName = "new name";
+        when(productTypeDao.getProductTypeById(1)).thenReturn(Optional.of(productType));
+        productTypeDto.setName(newName);
+        when(productTypeDao.update(productType)).thenReturn(true);
 
-        ProductType existing = new ProductType();
-        existing.setProductTypeId(1);
-        existing.setName("Old Type");
-
-        when(productTypeDao.getProductTypeById(1)).thenReturn(Optional.of(existing));
-        when(productTypeDao.update(existing)).thenReturn(true);
-
-        boolean result = productTypeService.update(dto);
+        boolean result = productTypeService.update(productTypeDto);
 
         assertTrue(result);
-        assertEquals("Updated Type", existing.getName());
-        verify(productTypeDao).update(existing);
+        verify(productTypeDao).update(productType);
     }
 
     @Test
@@ -122,7 +122,6 @@ class ProductTypeServiceImplTest {
         when(productTypeDao.getProductTypes()).thenReturn(productTypeList);
 
         List<ProductTypeDto> list = productTypeService.findAll();
-        System.out.println(" ---> " + list);
         assertNotNull(list);
         verify(productTypeDao, times(1)).getProductTypes();
     }
@@ -140,6 +139,7 @@ class ProductTypeServiceImplTest {
     @Test
     void findByName() {
         when(productTypeDao.getProductTypeByName(name)).thenReturn(List.of(productType));
+        when(dtoResolver.resolveProductTypeDto(productType)).thenReturn(productTypeDto);
 
         List<ProductTypeDto> productType = productTypeService.findByName(name);
 

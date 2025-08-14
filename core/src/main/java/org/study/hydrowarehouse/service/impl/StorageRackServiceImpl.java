@@ -8,6 +8,7 @@ import org.study.hydrowarehouse.entity.Dto.StorageRackDto;
 import org.study.hydrowarehouse.entity.StorageRack;
 import org.study.hydrowarehouse.exception.CoreException;
 import org.study.hydrowarehouse.exception.ExceptionMessages;
+import org.study.hydrowarehouse.mapping.DtoResolver;
 import org.study.hydrowarehouse.mapping.EntityMapper;
 import org.study.hydrowarehouse.service.StorageRackService;
 import org.study.hydrowarehouse.utill.StringUtils;
@@ -36,10 +37,12 @@ import java.util.Optional;
 public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, StorageRack> implements StorageRackService {
 
     private final StorageRackDao storageRackDao;
+    private final DtoResolver dtoResolver;
 
     @Autowired
-    public StorageRackServiceImpl(StorageRackDao storageRackDao) {
+    public StorageRackServiceImpl(StorageRackDao storageRackDao, DtoResolver dtoResolver) {
         this.storageRackDao = storageRackDao;
+        this.dtoResolver = dtoResolver;
     }
 
     @Override
@@ -92,11 +95,6 @@ public class StorageRackServiceImpl extends EntityMapper<StorageRackDto, Storage
 
     @Override
     public StorageRackDto mapToObjectDto(StorageRack object) {
-        if (object == null) return null;
-        StorageRackDto storageRackDto = new StorageRackDto();
-        storageRackDto.setStorageRackDtoId(object.getRackId());
-        storageRackDto.setName(object.getName());
-
-        return storageRackDto;
+        return dtoResolver.resolveStorageRackDto(object);
     }
 }
